@@ -1,9 +1,10 @@
+
 "use client";
 
 import { useCartStore } from "@/store/cart";
 import Link from "next/link";
 import Image from "next/image";
-import { Trash2, Plus, Minus, ArrowRight } from "lucide-react";
+import { Trash2, Plus, Minus, ArrowRight, ShoppingBag, Truck, ShieldCheck, RefreshCcw } from "lucide-react";
 import { useEffect, useState } from "react";
 
 export function CartClient() {
@@ -14,18 +15,29 @@ export function CartClient() {
         setMounted(true);
     }, []);
 
-    if (!mounted) return <div className="py-20 text-center">Đang tải giỏ hàng...</div>;
+    if (!mounted) return (
+        <div className="py-20 flex flex-col items-center justify-center space-y-4">
+            <div className="h-12 w-12 border-4 border-primary/20 border-t-primary rounded-full animate-spin" />
+            <p className="text-muted-foreground font-medium animate-pulse">Đang tải giỏ hàng...</p>
+        </div>
+    );
 
     if (items.length === 0) {
         return (
-            <div className="flex flex-col items-center justify-center py-20 text-center">
-                <h2 className="text-2xl font-bold tracking-tight">Giỏ hàng của bạn đang trống</h2>
-                <p className="text-muted-foreground mt-4 mb-8">
-                    Có vẻ như bạn chưa thêm sản phẩm nào vào giỏ hàng.
+            <div className="flex flex-col items-center justify-center py-32 text-center">
+                <div className="relative mb-8">
+                    <div className="absolute inset-0 bg-primary/10 rounded-full blur-3xl animate-pulse" />
+                    <div className="relative h-24 w-24 bg-secondary/50 rounded-3xl flex items-center justify-center border border-border/50">
+                        <ShoppingBag className="h-12 w-12 text-muted-foreground/50" />
+                    </div>
+                </div>
+                <h2 className="text-3xl font-extrabold tracking-tight mb-4">Giỏ hàng của bạn đang trống</h2>
+                <p className="text-muted-foreground mt-2 mb-10 max-w-sm mx-auto leading-relaxed">
+                    Có vẻ như bạn chưa chọn được sản phẩm ưng ý nào. Hãy quay lại cửa hàng để khám phá những thiết bị công nghệ mới nhất nhé.
                 </p>
                 <Link
                     href="/products"
-                    className="inline-flex h-10 items-center justify-center rounded-md bg-primary px-8 text-sm font-medium text-primary-foreground shadow transition-colors hover:bg-primary/90 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
+                    className="inline-flex h-12 items-center justify-center rounded-2xl bg-primary px-10 text-sm font-bold text-primary-foreground shadow-2xl shadow-primary/20 transition-all hover:scale-105 active:scale-95"
                 >
                     Bắt đầu mua sắm
                 </Link>
@@ -34,106 +46,157 @@ export function CartClient() {
     }
 
     return (
-        <div className="grid grid-cols-1 gap-12 lg:grid-cols-12 items-start">
-            <div className="lg:col-span-8">
-                <div className="border rounded-lg overflow-hidden">
-                    <table className="w-full">
-                        <thead className="bg-muted/50 hidden md:table-header-group">
-                            <tr className="text-left text-sm text-muted-foreground border-b">
-                                <th className="p-4 font-medium">Sản phẩm</th>
-                                <th className="p-4 font-medium">Số lượng</th>
-                                <th className="p-4 font-medium">Tổng cộng</th>
-                                <th className="p-4 w-10"></th>
-                            </tr>
-                        </thead>
-                        <tbody className="divide-y">
-                            {items.map((item) => (
-                                <tr key={item.id} className="group">
-                                    <td className="p-4">
-                                        <div className="flex items-center gap-4">
-                                            <div className="relative h-16 w-16 min-w-16 overflow-hidden rounded border bg-white p-1">
-                                                {item.image && (
-                                                    <Image
-                                                        src={item.image}
-                                                        alt={item.name}
-                                                        fill
-                                                        className="object-contain"
-                                                    />
-                                                )}
-                                            </div>
-                                            <div>
-                                                <Link href={`/products/${item.id}`} className="font-medium hover:underline block md:hidden mb-1">
-                                                    {item.name}
-                                                </Link>
-                                                <Link href={`/products/${item.id}`} className="font-medium hover:underline hidden md:block">
-                                                    {item.name}
-                                                </Link>
-                                                <div className="text-sm text-muted-foreground md:hidden">
-                                                    ${item.price} x {item.quantity}
-                                                </div>
-                                            </div>
+        <div className="grid grid-cols-1 gap-12 lg:grid-cols-12 items-start pb-20">
+            {/* Products List */}
+            <div className="lg:col-span-8 space-y-6">
+                <div className="hidden md:grid grid-cols-12 gap-4 px-6 py-4 text-[10px] font-bold uppercase tracking-widest text-muted-foreground border-b border-border/40">
+                    <div className="col-span-6">Sản phẩm</div>
+                    <div className="col-span-3 text-center">Số lượng</div>
+                    <div className="col-span-2 text-right">Tổng cộng</div>
+                    <div className="col-span-1"></div>
+                </div>
+
+                <div className="space-y-4">
+                    {items.map((item) => (
+                        <div key={item.id} className="group relative rounded-3xl border border-border/40 bg-card/30 backdrop-blur-sm p-4 transition-all hover:border-primary/20 hover:shadow-xl hover:shadow-primary/5">
+                            <div className="grid grid-cols-1 md:grid-cols-12 gap-6 items-center">
+                                {/* Product Info */}
+                                <div className="md:col-span-6 flex items-center gap-6">
+                                    <div className="relative h-24 w-24 min-w-[6rem] overflow-hidden rounded-2xl border border-border/50 bg-white p-2">
+                                        {item.image && (
+                                            <Image
+                                                src={item.image}
+                                                alt={item.name}
+                                                fill
+                                                className="object-contain p-2 transition-transform duration-500 group-hover:scale-110"
+                                            />
+                                        )}
+                                    </div>
+                                    <div className="space-y-1">
+                                        <Link href={`/products/${item.id}`} className="font-bold text-lg leading-tight hover:text-primary transition-colors line-clamp-1">
+                                            {item.name}
+                                        </Link>
+                                        <div className="text-sm font-semibold text-primary">
+                                            ${Number(item.price).toLocaleString()}
                                         </div>
-                                    </td>
-                                    <td className="p-4">
-                                        <div className="flex items-center border rounded-md w-fit">
-                                            <button
-                                                onClick={() => updateQuantity(item.id, item.quantity - 1)}
-                                                className="p-2 hover:bg-muted disabled:opacity-50"
-                                                disabled={item.quantity <= 1}
-                                            >
-                                                <Minus className="h-3 w-3" />
-                                            </button>
-                                            <span className="w-8 text-center text-sm">{item.quantity}</span>
-                                            <button
-                                                onClick={() => updateQuantity(item.id, item.quantity + 1)}
-                                                className="p-2 hover:bg-muted"
-                                            >
-                                                <Plus className="h-3 w-3" />
-                                            </button>
-                                        </div>
-                                    </td>
-                                    <td className="p-4 font-medium hidden md:table-cell">
-                                        ${(item.price * item.quantity).toFixed(2)}
-                                    </td>
-                                    <td className="p-4 text-right">
+                                    </div>
+                                </div>
+
+                                {/* Quantity Control */}
+                                <div className="md:col-span-3 flex justify-center">
+                                    <div className="flex items-center bg-secondary/50 rounded-2xl p-1 border border-border/50">
                                         <button
-                                            onClick={() => removeItem(item.id)}
-                                            className="text-muted-foreground hover:text-destructive transition-colors"
+                                            onClick={() => updateQuantity(item.id, item.quantity - 1)}
+                                            className="h-8 w-8 flex items-center justify-center rounded-xl hover:bg-background hover:text-primary transition-all disabled:opacity-30"
+                                            disabled={item.quantity <= 1}
                                         >
-                                            <Trash2 className="h-4 w-4" />
+                                            <Minus className="h-4 w-4" />
                                         </button>
-                                    </td>
-                                </tr>
-                            ))}
-                        </tbody>
-                    </table>
+                                        <span className="w-10 text-center text-sm font-bold">{item.quantity}</span>
+                                        <button
+                                            onClick={() => updateQuantity(item.id, item.quantity + 1)}
+                                            className="h-8 w-8 flex items-center justify-center rounded-xl hover:bg-background hover:text-primary transition-all"
+                                        >
+                                            <Plus className="h-4 w-4" />
+                                        </button>
+                                    </div>
+                                </div>
+
+                                {/* Item Total */}
+                                <div className="md:col-span-2 text-right hidden md:block">
+                                    <span className="text-lg font-bold tracking-tight">
+                                        ${(item.price * item.quantity).toLocaleString()}
+                                    </span>
+                                </div>
+
+                                {/* Remove Button */}
+                                <div className="md:col-span-1 text-right">
+                                    <button
+                                        onClick={() => removeItem(item.id)}
+                                        className="h-10 w-10 flex items-center justify-center rounded-2xl text-muted-foreground hover:bg-destructive/10 hover:text-destructive transition-all"
+                                        title="Xoá sản phẩm"
+                                    >
+                                        <Trash2 className="h-5 w-5" />
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    ))}
                 </div>
             </div>
 
-            <div className="lg:col-span-4 space-y-6">
-                <div className="border rounded-lg p-6 bg-muted/20">
-                    <h3 className="text-lg font-semibold mb-4">Tổng đơn hàng</h3>
-                    <div className="space-y-2 text-sm">
-                        <div className="flex justify-between">
-                            <span className="text-muted-foreground">Tạm tính</span>
-                            <span>${total().toFixed(2)}</span>
+            {/* Order Summary Sidebar */}
+            <div className="lg:col-span-4 space-y-6 sticky top-24">
+                <div className="rounded-3xl border border-border/40 bg-card/50 backdrop-blur-xl p-8 shadow-2xl relative overflow-hidden">
+                    <div className="absolute top-0 right-0 -translate-y-1/2 translate-x-1/2 w-32 h-32 bg-primary/5 rounded-full blur-2xl" />
+
+                    <h3 className="text-2xl font-bold mb-8 flex items-center gap-3">
+                        Tổng đơn hàng
+                    </h3>
+
+                    <div className="space-y-6">
+                        <div className="space-y-3">
+                            <div className="flex justify-between text-sm font-medium">
+                                <span className="text-muted-foreground">Tạm tính</span>
+                                <span className="text-foreground">${total().toLocaleString()}</span>
+                            </div>
+                            <div className="flex justify-between text-sm font-medium">
+                                <span className="text-muted-foreground">Phí vận chuyển</span>
+                                <span className="text-green-500 font-bold uppercase text-[10px] tracking-widest bg-green-500/10 px-2 py-0.5 rounded-full">Miễn phí</span>
+                            </div>
                         </div>
-                        <div className="flex justify-between">
-                            <span className="text-muted-foreground">Giao hàng</span>
-                            <span>Tính khi thanh toán</span>
+
+                        <div className="h-px bg-border/40" />
+
+                        <div className="flex justify-between items-baseline pt-2">
+                            <span className="text-lg font-bold">Tổng cộng</span>
+                            <div className="text-right">
+                                <span className="text-3xl font-black tracking-tighter text-primary">
+                                    ${total().toLocaleString()}
+                                </span>
+                                <p className="text-[10px] text-muted-foreground font-bold uppercase tracking-widest mt-1">Đã bao gồm thuế VAT</p>
+                            </div>
                         </div>
-                        <div className="border-t pt-2 mt-2 flex justify-between font-bold text-base">
-                            <span>Tổng cộng</span>
-                            <span>${total().toFixed(2)}</span>
+
+                        <Link
+                            href="/checkout"
+                            className="w-full h-14 mt-4 inline-flex items-center justify-center rounded-2xl bg-primary px-8 text-base font-bold text-primary-foreground shadow-xl shadow-primary/20 transition-all hover:scale-[1.02] active:scale-95 group"
+                        >
+                            Tiến hành thanh toán
+                            <ArrowRight className="ml-2 h-5 w-5 transition-transform group-hover:translate-x-1" />
+                        </Link>
+                    </div>
+                </div>
+
+                {/* Trust Badges */}
+                <div className="grid grid-cols-1 gap-4 pt-4">
+                    <div className="flex items-center gap-4 p-4 rounded-2xl bg-secondary/20 border border-border/40">
+                        <div className="h-10 w-10 rounded-xl bg-background flex items-center justify-center text-primary shadow-sm space-x-1">
+                            <Truck className="h-5 w-5" />
+                        </div>
+                        <div className="text-xs">
+                            <p className="font-bold">Giao hàng miễn phí</p>
+                            <p className="text-muted-foreground">Cho tất cả đơn hàng từ $500</p>
                         </div>
                     </div>
-                    <Link
-                        href="/checkout"
-                        className="w-full mt-6 inline-flex h-10 items-center justify-center rounded-md bg-primary px-4 text-sm font-medium text-primary-foreground shadow hover:bg-primary/90 transition-colors"
-                    >
-                        Tiến hành thanh toán
-                        <ArrowRight className="ml-2 h-4 w-4" />
-                    </Link>
+                    <div className="flex items-center gap-4 p-4 rounded-2xl bg-secondary/20 border border-border/40">
+                        <div className="h-10 w-10 rounded-xl bg-background flex items-center justify-center text-primary shadow-sm">
+                            <ShieldCheck className="h-5 w-5" />
+                        </div>
+                        <div className="text-xs">
+                            <p className="font-bold">Bảo hành 24 tháng</p>
+                            <p className="text-muted-foreground">Sửa chữa tận nơi trong 24h</p>
+                        </div>
+                    </div>
+                    <div className="flex items-center gap-4 p-4 rounded-2xl bg-secondary/20 border border-border/40">
+                        <div className="h-10 w-10 rounded-xl bg-background flex items-center justify-center text-primary shadow-sm">
+                            <RefreshCcw className="h-5 w-5" />
+                        </div>
+                        <div className="text-xs">
+                            <p className="font-bold">Đổi trả 30 ngày</p>
+                            <p className="text-muted-foreground">Hoàn tiền 100% nếu không hài lòng</p>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
