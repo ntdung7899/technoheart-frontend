@@ -9,31 +9,36 @@ const adapter = new PrismaPg(pool);
 const prisma = new PrismaClient({ adapter });
 
 async function main() {
+    // Clear existing products to avoid duplicates and broken links
+    await prisma.orderItem.deleteMany({}); // Delete order items first due to FK
+    await prisma.order.deleteMany({});     // Delete orders
+    await prisma.product.deleteMany({});   // Delete products
+
     // Create Categories
     const phoneCategory = await prisma.category.upsert({
         where: { name: 'Phones' },
-        update: {},
+        update: { image: 'https://images.unsplash.com/photo-1511707171634-5f897ff02aa9?q=80&w=800&auto=format&fit=crop' },
         create: {
             name: 'Phones',
-            image: 'https://ik.imagekit.io/demo/img/phone.jpg',
+            image: 'https://images.unsplash.com/photo-1511707171634-5f897ff02aa9?q=80&w=800&auto=format&fit=crop',
         },
     });
 
     const laptopCategory = await prisma.category.upsert({
         where: { name: 'Laptops' },
-        update: {},
+        update: { image: 'https://images.unsplash.com/photo-1496181133206-80ce9b88a853?q=80&w=800&auto=format&fit=crop' },
         create: {
             name: 'Laptops',
-            image: 'https://ik.imagekit.io/demo/img/laptop.jpg',
+            image: 'https://images.unsplash.com/photo-1496181133206-80ce9b88a853?q=80&w=800&auto=format&fit=crop',
         },
     });
 
     const accessoriesCategory = await prisma.category.upsert({
         where: { name: 'Accessories' },
-        update: {},
+        update: { image: 'https://images.unsplash.com/photo-1505740420928-5e560c06d30e?q=80&w=800&auto=format&fit=crop' },
         create: {
             name: 'Accessories',
-            image: 'https://ik.imagekit.io/demo/img/headphones.jpg',
+            image: 'https://images.unsplash.com/photo-1505740420928-5e560c06d30e?q=80&w=800&auto=format&fit=crop',
         },
     });
 
@@ -46,7 +51,7 @@ async function main() {
                 price: 999,
                 stock: 50,
                 categoryId: phoneCategory.id,
-                images: ['https://ik.imagekit.io/demo/img/iphone15.jpg'],
+                images: ['https://images.unsplash.com/photo-1696446701796-da61225697cc?q=80&w=800&auto=format&fit=crop'],
             },
             {
                 name: 'MacBook Pro 14"',
@@ -54,7 +59,7 @@ async function main() {
                 price: 1999,
                 stock: 30,
                 categoryId: laptopCategory.id,
-                images: ['https://ik.imagekit.io/demo/img/macbook.jpg'],
+                images: ['https://images.unsplash.com/photo-1517336714731-489689fd1ca4?q=80&w=800&auto=format&fit=crop'],
             },
             {
                 name: 'AirPods Max',
@@ -62,7 +67,7 @@ async function main() {
                 price: 549,
                 stock: 100,
                 categoryId: accessoriesCategory.id,
-                images: ['https://ik.imagekit.io/demo/img/airpodsutil.jpg'],
+                images: ['https://images.unsplash.com/photo-1613040809024-b4ef7ba99bc3?q=80&w=800&auto=format&fit=crop'],
             },
             {
                 name: 'Samsung Galaxy S24 Ultra',
@@ -70,7 +75,7 @@ async function main() {
                 price: 1299,
                 stock: 45,
                 categoryId: phoneCategory.id,
-                images: ['https://ik.imagekit.io/demo/img/s24.jpg'],
+                images: ['https://images.unsplash.com/photo-1610945415295-d9bbf067e59c?q=80&w=800&auto=format&fit=crop'],
             },
         ],
     });

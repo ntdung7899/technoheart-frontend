@@ -16,7 +16,7 @@ interface CartStore {
     removeItem: (id: string) => void;
     updateQuantity: (id: string, quantity: number) => void;
     clearCart: () => void;
-    // Computed values are usually derived in component, but we can have helper
+    total: () => number;
 }
 
 export const useCartStore = create<CartStore>()(
@@ -50,6 +50,7 @@ export const useCartStore = create<CartStore>()(
                 })
             },
             clearCart: () => set({ items: [] }),
+            total: () => get().items.reduce((acc, item) => acc + item.price * item.quantity, 0),
         }),
         {
             name: 'cart-storage',

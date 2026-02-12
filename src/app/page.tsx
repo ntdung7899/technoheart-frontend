@@ -1,12 +1,13 @@
 
 import prisma from "@/lib/prisma";
+import { ProductCard } from "@/components/ui/ProductCard";
 import Link from "next/link";
 import Image from "next/image";
 import { ArrowRight } from "lucide-react";
 
 async function getFeaturedProducts() {
   return await prisma.product.findMany({
-    take: 4,
+    take: 8,
     include: { category: true },
   });
 }
@@ -116,35 +117,9 @@ export default async function Home() {
               Handpicked premium electronics just for you.
             </p>
           </div>
-          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-6 mt-12">
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 mt-12">
             {featuredProducts.map((product) => (
-              <Link href={`/products/${product.id}`} key={product.id} className="group">
-                <div className="rounded-xl border bg-card text-card-foreground shadow-sm transition-all hover:shadow-md h-full flex flex-col">
-                  <div className="p-6 flex-1 flex flex-col items-center">
-                    <div className="relative aspect-square w-full overflow-hidden rounded-md bg-white p-4 mb-4">
-                      {product.images.length > 0 && (
-                        <Image
-                          src={product.images[0]}
-                          alt={product.name}
-                          width={300}
-                          height={300}
-                          className="object-contain w-full h-full transition-transform group-hover:scale-105 duration-300"
-                        />
-                      )}
-                    </div>
-                    <div className="w-full text-left space-y-1">
-                      <p className="text-sm text-muted-foreground">{product.category.name}</p>
-                      <h3 className="font-semibold text-lg leading-tight group-hover:underline decoration-primary/50 underline-offset-4">{product.name}</h3>
-                    </div>
-                  </div>
-                  <div className="p-6 pt-0 flex items-center justify-between mt-auto">
-                    <span className="text-xl font-bold">${Number(product.price)}</span>
-                    <span className="inline-flex items-center justify-center rounded-full bg-primary/10 p-2 text-primary transition-colors group-hover:bg-primary group-hover:text-primary-foreground">
-                      <ArrowRight className="h-4 w-4" />
-                    </span>
-                  </div>
-                </div>
-              </Link>
+              <ProductCard key={product.id} product={product} />
             ))}
           </div>
           <div className="mt-12 flex justify-center">

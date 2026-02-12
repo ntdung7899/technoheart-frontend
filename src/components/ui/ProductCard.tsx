@@ -1,7 +1,6 @@
-
 import Link from 'next/link';
 import Image from 'next/image';
-import { ArrowRight } from 'lucide-react';
+import { ArrowRight, ShoppingBag } from 'lucide-react';
 import { Product, Category } from '@prisma/client';
 
 interface ProductWithCategory extends Product {
@@ -14,36 +13,57 @@ interface ProductCardProps {
 
 export function ProductCard({ product }: ProductCardProps) {
     return (
-        <Link href={`/products/${product.id}`} className="group">
-            <div className="rounded-xl border bg-card text-card-foreground shadow-sm transition-all hover:shadow-md h-full flex flex-col">
-                <div className="p-6 flex-1 flex flex-col items-center">
-                    <div className="relative aspect-square w-full overflow-hidden rounded-md bg-white p-4 mb-4">
+        <Link href={`/products/${product.id}`} className="group block h-full">
+            <div className="relative flex h-full flex-col overflow-hidden rounded-2xl border border-border/50 bg-card transition-all duration-300 hover:-translate-y-1 hover:border-primary/20 hover:shadow-xl hover:shadow-primary/5">
+                {/* Image Container */}
+                <div className="relative aspect-[4/5] overflow-hidden bg-muted/30">
+                    <div className="absolute inset-0 z-10 flex items-center justify-center p-8 transition-transform duration-500 group-hover:scale-110">
                         {product.images.length > 0 ? (
                             <Image
                                 src={product.images[0]}
                                 alt={product.name}
-                                width={300}
-                                height={300}
-                                className="object-contain w-full h-full transition-transform group-hover:scale-105 duration-300"
+                                fill
+                                className="object-contain p-6"
+                                sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 25vw"
                             />
                         ) : (
                             <div className="flex h-full w-full items-center justify-center bg-muted text-muted-foreground">
-                                No Image
+                                <ShoppingBag className="h-10 w-10 opacity-20" />
                             </div>
                         )}
                     </div>
-                    <div className="w-full text-left space-y-1">
-                        <p className="text-sm text-muted-foreground">{product.category.name}</p>
-                        <h3 className="font-semibold text-lg leading-tight group-hover:underline decoration-primary/50 underline-offset-4">
-                            {product.name}
-                        </h3>
+
+                    {/* Category Badge */}
+                    <div className="absolute left-3 top-3 z-20">
+                        <span className="inline-flex items-center rounded-full bg-background/80 px-2.5 py-0.5 text-[10px] font-semibold uppercase tracking-wider backdrop-blur-sm border border-border/50">
+                            {product.category.name}
+                        </span>
                     </div>
                 </div>
-                <div className="p-6 pt-0 flex items-center justify-between mt-auto">
-                    <span className="text-xl font-bold">${Number(product.price)}</span>
-                    <span className="inline-flex items-center justify-center rounded-full bg-primary/10 p-2 text-primary transition-colors group-hover:bg-primary group-hover:text-primary-foreground">
-                        <ArrowRight className="h-4 w-4" />
-                    </span>
+
+                {/* Content */}
+                <div className="flex flex-1 flex-col p-5">
+                    <div className="flex-1 space-y-1.5">
+                        <h3 className="font-semibold text-lg leading-tight transition-colors group-hover:text-primary">
+                            {product.name}
+                        </h3>
+                        <p className="line-clamp-2 text-xs text-muted-foreground leading-relaxed">
+                            {product.description}
+                        </p>
+                    </div>
+
+                    <div className="mt-4 flex items-center justify-between pt-4 border-t border-border/50">
+                        <div className="flex flex-col">
+                            <span className="text-xs text-muted-foreground">Price</span>
+                            <span className="text-lg font-bold tracking-tight">
+                                ${Number(product.price).toLocaleString()}
+                            </span>
+                        </div>
+
+                        <div className="flex h-10 w-10 items-center justify-center rounded-full bg-secondary text-secondary-foreground transition-all duration-300 group-hover:bg-primary group-hover:text-primary-foreground group-hover:shadow-lg group-hover:shadow-primary/20">
+                            <ArrowRight className="h-5 w-5 transition-transform duration-300 group-hover:translate-x-0.5" />
+                        </div>
+                    </div>
                 </div>
             </div>
         </Link>
