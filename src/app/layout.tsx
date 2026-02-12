@@ -15,8 +15,8 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "TechnoHeart | Premium Electronics",
-  description: "Modern minimalist electronics store.",
+  title: "TechnoHeart | Điện Máy Cao Cấp",
+  description: "Cửa hàng đồ điện tử tối giản và hiện đại.",
 };
 
 export default function RootLayout({
@@ -25,7 +25,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en">
+    <html lang="vi">
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased min-h-screen flex flex-col`}
       >

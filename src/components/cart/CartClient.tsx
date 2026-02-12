@@ -14,20 +14,20 @@ export function CartClient() {
         setMounted(true);
     }, []);
 
-    if (!mounted) return <div className="py-20 text-center">Loading cart...</div>;
+    if (!mounted) return <div className="py-20 text-center">Đang tải giỏ hàng...</div>;
 
     if (items.length === 0) {
         return (
             <div className="flex flex-col items-center justify-center py-20 text-center">
-                <h2 className="text-2xl font-bold tracking-tight">Your cart is empty</h2>
+                <h2 className="text-2xl font-bold tracking-tight">Giỏ hàng của bạn đang trống</h2>
                 <p className="text-muted-foreground mt-4 mb-8">
-                    Looks like you haven't added anything yet.
+                    Có vẻ như bạn chưa thêm sản phẩm nào vào giỏ hàng.
                 </p>
                 <Link
                     href="/products"
                     className="inline-flex h-10 items-center justify-center rounded-md bg-primary px-8 text-sm font-medium text-primary-foreground shadow transition-colors hover:bg-primary/90 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
                 >
-                    Start Shopping
+                    Bắt đầu mua sắm
                 </Link>
             </div>
         );
@@ -40,9 +40,9 @@ export function CartClient() {
                     <table className="w-full">
                         <thead className="bg-muted/50 hidden md:table-header-group">
                             <tr className="text-left text-sm text-muted-foreground border-b">
-                                <th className="p-4 font-medium">Product</th>
-                                <th className="p-4 font-medium">Quantity</th>
-                                <th className="p-4 font-medium">Total</th>
+                                <th className="p-4 font-medium">Sản phẩm</th>
+                                <th className="p-4 font-medium">Số lượng</th>
+                                <th className="p-4 font-medium">Tổng cộng</th>
                                 <th className="p-4 w-10"></th>
                             </tr>
                         </thead>
@@ -112,18 +112,18 @@ export function CartClient() {
 
             <div className="lg:col-span-4 space-y-6">
                 <div className="border rounded-lg p-6 bg-muted/20">
-                    <h3 className="text-lg font-semibold mb-4">Order Summary</h3>
+                    <h3 className="text-lg font-semibold mb-4">Tổng đơn hàng</h3>
                     <div className="space-y-2 text-sm">
                         <div className="flex justify-between">
-                            <span className="text-muted-foreground">Subtotal</span>
+                            <span className="text-muted-foreground">Tạm tính</span>
                             <span>${total().toFixed(2)}</span>
                         </div>
                         <div className="flex justify-between">
-                            <span className="text-muted-foreground">Shipping</span>
-                            <span>Calculated at checkout</span>
+                            <span className="text-muted-foreground">Giao hàng</span>
+                            <span>Tính khi thanh toán</span>
                         </div>
                         <div className="border-t pt-2 mt-2 flex justify-between font-bold text-base">
-                            <span>Total</span>
+                            <span>Tổng cộng</span>
                             <span>${total().toFixed(2)}</span>
                         </div>
                     </div>
@@ -131,7 +131,7 @@ export function CartClient() {
                         href="/checkout"
                         className="w-full mt-6 inline-flex h-10 items-center justify-center rounded-md bg-primary px-4 text-sm font-medium text-primary-foreground shadow hover:bg-primary/90 transition-colors"
                     >
-                        Proceed to Checkout
+                        Tiến hành thanh toán
                         <ArrowRight className="ml-2 h-4 w-4" />
                     </Link>
                 </div>

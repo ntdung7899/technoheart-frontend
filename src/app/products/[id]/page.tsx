@@ -32,14 +32,18 @@ export default async function ProductDetailPage({ params }: Props) {
                         <div className="mr-2 flex h-8 w-8 items-center justify-center rounded-full border border-border/50 group-hover:border-primary/50 group-hover:bg-primary/5">
                             <ArrowLeft className="h-4 w-4 transition-transform group-hover:-translate-x-0.5" />
                         </div>
-                        Back to Collection
+                        Quay lại bộ sưu tập
                     </Link>
                     <div className="hidden sm:flex items-center gap-2 text-xs text-muted-foreground uppercase tracking-widest">
-                        <Link href="/" className="hover:text-primary transition-colors">Home</Link>
+                        <Link href="/" className="hover:text-primary transition-colors">Trang chủ</Link>
                         <span>/</span>
-                        <Link href="/products" className="hover:text-primary transition-colors">Products</Link>
+                        <Link href="/products" className="hover:text-primary transition-colors">Sản phẩm</Link>
                         <span>/</span>
-                        <span className="text-foreground font-semibold">{product.category.name}</span>
+                        <span className="text-foreground font-semibold">
+                            {product.category.name === 'Phones' ? 'Điện thoại' :
+                                product.category.name === 'Laptops' ? 'Laptop' :
+                                    product.category.name === 'Accessories' ? 'Phụ kiện' : product.category.name}
+                        </span>
                     </div>
                 </div>
 
@@ -58,18 +62,18 @@ export default async function ProductDetailPage({ params }: Props) {
                                     />
                                 ) : (
                                     <div className="flex h-full w-full items-center justify-center bg-muted text-muted-foreground">
-                                        No Image Available
+                                        Không có ảnh
                                     </div>
                                 )}
                                 <div className="absolute left-6 top-6">
                                     <span className="rounded-full bg-primary/10 border border-primary/20 px-4 py-1.5 text-xs font-bold uppercase tracking-wider text-primary backdrop-blur-md">
-                                        Featured
+                                        Nổi bật
                                     </span>
                                 </div>
                             </div>
 
                             <div className="grid grid-cols-4 gap-4 sm:gap-6">
-                                {product.images.map((img, idx) => (
+                                {product.images.map((img: string, idx: number) => (
                                     <button key={idx} className="relative aspect-square overflow-hidden rounded-2xl border border-border/50 bg-white p-3 transition-all hover:border-primary/50 hover:shadow-lg focus:outline-none focus:ring-2 focus:ring-primary/20">
                                         <Image
                                             src={img}
@@ -89,7 +93,9 @@ export default async function ProductDetailPage({ params }: Props) {
                             {/* Product Header */}
                             <div className="mb-6 space-y-2">
                                 <div className="flex items-center gap-2 font-medium text-primary text-sm uppercase tracking-wider">
-                                    {product.category.name}
+                                    {product.category.name === 'Phones' ? 'Điện thoại' :
+                                        product.category.name === 'Laptops' ? 'Laptop' :
+                                            product.category.name === 'Accessories' ? 'Phụ kiện' : product.category.name}
                                 </div>
                                 <h1 className="text-3xl font-bold tracking-tight text-foreground lg:text-4xl">
                                     {product.name}
@@ -101,12 +107,12 @@ export default async function ProductDetailPage({ params }: Props) {
                                         ))}
                                     </div>
                                     <span className="text-sm text-muted-foreground font-medium underline-offset-4 hover:underline cursor-pointer">
-                                        12 reviews
+                                        12 đánh giá
                                     </span>
                                     <div className="h-4 w-px bg-border/60"></div>
                                     <div className="flex items-center gap-1.5 text-xs font-bold text-green-600">
                                         <CheckCircle2 className="h-3.5 w-3.5" />
-                                        IN STOCK
+                                        CÒN HÀNG
                                     </div>
                                 </div>
                             </div>
@@ -117,16 +123,16 @@ export default async function ProductDetailPage({ params }: Props) {
                                     <span className="text-4xl font-extrabold tracking-tight text-foreground">
                                         ${Number(product.price).toLocaleString()}
                                     </span>
-                                    <span className="text-sm text-muted-foreground">Inc. VAT</span>
+                                    <span className="text-sm text-muted-foreground">Đã bao gồm VAT</span>
                                 </div>
                                 <p className="mt-2 text-xs text-muted-foreground">
-                                    Or from $85.42/mo. for 24 mos. with 0% interest.
+                                    Hoặc từ $85.42/tháng trong 24 tháng với lãi suất 0%.
                                 </p>
                             </div>
 
                             {/* Description */}
                             <div className="mb-8">
-                                <h3 className="text-sm font-bold uppercase tracking-widest text-foreground/70 mb-3">Overview</h3>
+                                <h3 className="text-sm font-bold uppercase tracking-widest text-foreground/70 mb-3">Tổng quan</h3>
                                 <p className="text-base text-muted-foreground leading-relaxed">
                                     {product.description}
                                 </p>
@@ -141,7 +147,7 @@ export default async function ProductDetailPage({ params }: Props) {
                                     images: product.images
                                 }} />
                                 <p className="text-center text-xs text-muted-foreground">
-                                    Secure checkout with encrypted payment protection.
+                                    Thanh toán an toàn với bảo vệ mã hóa dữ liệu.
                                 </p>
                             </div>
 
@@ -151,37 +157,41 @@ export default async function ProductDetailPage({ params }: Props) {
                                     <div className="flex h-10 w-10 items-center justify-center rounded-full bg-secondary/50 text-primary">
                                         <Truck className="h-5 w-5" />
                                     </div>
-                                    <span className="text-[10px] font-bold uppercase tracking-tight">Express Delivery</span>
+                                    <span className="text-[10px] font-bold uppercase tracking-tight">Giao hàng nhanh</span>
                                 </div>
                                 <div className="flex flex-col items-center gap-2 text-center border-x border-border/40">
                                     <div className="flex h-10 w-10 items-center justify-center rounded-full bg-secondary/50 text-primary">
                                         <ShieldCheck className="h-5 w-5" />
                                     </div>
-                                    <span className="text-[10px] font-bold uppercase tracking-tight">2 Year Warranty</span>
+                                    <span className="text-[10px] font-bold uppercase tracking-tight">Bảo hành 2 năm</span>
                                 </div>
                                 <div className="flex flex-col items-center gap-2 text-center">
                                     <div className="flex h-10 w-10 items-center justify-center rounded-full bg-secondary/50 text-primary">
                                         <RefreshCw className="h-5 w-5" />
                                     </div>
-                                    <span className="text-[10px] font-bold uppercase tracking-tight">30-Day Returns</span>
+                                    <span className="text-[10px] font-bold uppercase tracking-tight">30 ngày đổi trả</span>
                                 </div>
                             </div>
 
                             {/* Specifications Preview */}
                             <div className="rounded-2xl border border-border/50 bg-card p-6">
-                                <h3 className="text-sm font-bold uppercase tracking-widest text-foreground/70 mb-4">Core Specifications</h3>
+                                <h3 className="text-sm font-bold uppercase tracking-widest text-foreground/70 mb-4">Thông số cơ bản</h3>
                                 <div className="space-y-3">
                                     <div className="flex justify-between text-sm py-2 border-b border-border/30">
-                                        <span className="text-muted-foreground">Category</span>
-                                        <span className="font-semibold">{product.category.name}</span>
+                                        <span className="text-muted-foreground">Danh mục</span>
+                                        <span className="font-semibold">
+                                            {product.category.name === 'Phones' ? 'Điện thoại' :
+                                                product.category.name === 'Laptops' ? 'Laptop' :
+                                                    product.category.name === 'Accessories' ? 'Phụ kiện' : product.category.name}
+                                        </span>
                                     </div>
                                     <div className="flex justify-between text-sm py-2 border-b border-border/30">
-                                        <span className="text-muted-foreground">Availability</span>
-                                        <span className="font-semibold text-green-600">{product.stock > 0 ? "In Stock" : "Limited"}</span>
+                                        <span className="text-muted-foreground">Tình trạng</span>
+                                        <span className="font-semibold text-green-600">{product.stock > 0 ? "Còn hàng" : "Hết hàng"}</span>
                                     </div>
                                     <div className="flex justify-between text-sm py-2">
-                                        <span className="text-muted-foreground">Delivery</span>
-                                        <span className="font-semibold">Free (Next Day)</span>
+                                        <span className="text-muted-foreground">Vận chuyển</span>
+                                        <span className="font-semibold">Miễn phí (Ngày mai)</span>
                                     </div>
                                 </div>
                             </div>

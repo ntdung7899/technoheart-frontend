@@ -16,16 +16,16 @@ export function Footer() {
                                 <span className="text-xl font-bold tracking-tight">TechnoHeart</span>
                             </Link>
                             <p className="text-sm text-muted-foreground max-w-xs leading-relaxed">
-                                Experience the next generation of premium electronics. Crafted for those who demand excellence in every detail.
+                                Trải nghiệm thế hệ đồ điện tử cao cấp tiếp theo. Được chế tác cho những người đòi hỏi sự xuất sắc trong từng chi tiết.
                             </p>
                         </div>
 
                         <div className="space-y-4">
-                            <h4 className="text-sm font-semibold uppercase tracking-wider">Stay Updated</h4>
+                            <h4 className="text-sm font-semibold uppercase tracking-wider">Cập nhật tin tức</h4>
                             <div className="relative max-w-sm">
                                 <input
                                     type="email"
-                                    placeholder="Enter your email"
+                                    placeholder="Nhập email của bạn"
                                     className="w-full rounded-full border border-border/50 bg-secondary/30 py-3 pl-4 pr-12 text-sm focus:outline-none focus:ring-2 focus:ring-primary/20"
                                 />
                                 <button className="absolute right-1 top-1 flex h-8 w-8 items-center justify-center rounded-full bg-primary text-primary-foreground transition-transform hover:scale-110">
@@ -38,26 +38,42 @@ export function Footer() {
                     {/* Links Sections */}
                     <div className="grid grid-cols-2 gap-8 sm:grid-cols-3 lg:col-span-8">
                         <div className="space-y-4">
-                            <h4 className="text-sm font-semibold uppercase tracking-wider text-foreground">Explore</h4>
+                            <h4 className="text-sm font-semibold uppercase tracking-wider text-foreground">Khám phá</h4>
                             <ul className="space-y-2.5 text-sm text-muted-foreground">
-                                {['Phones', 'Laptops', 'Accessories', 'New Arrivals'].map((link) => (
-                                    <li key={link}><Link href={`/products?category=${link}`} className="transition-colors hover:text-primary">{link}</Link></li>
+                                {[
+                                    { name: 'Điện thoại', id: 'Phones' },
+                                    { name: 'Laptop', id: 'Laptops' },
+                                    { name: 'Phụ kiện', id: 'Accessories' },
+                                    { name: 'Sản phẩm mới', id: 'New' }
+                                ].map((item) => (
+                                    <li key={item.id}><Link href={`/products?category=${item.id}`} className="transition-colors hover:text-primary">{item.name}</Link></li>
                                 ))}
                             </ul>
                         </div>
                         <div className="space-y-4">
-                            <h4 className="text-sm font-semibold uppercase tracking-wider text-foreground">Service</h4>
+                            <h4 className="text-sm font-semibold uppercase tracking-wider text-foreground">Dịch vụ</h4>
                             <ul className="space-y-2.5 text-sm text-muted-foreground">
-                                {['Contact Us', 'FAQs', 'Shipping', 'Returns', 'Warranty'].map((link) => (
-                                    <li key={link}><Link href="#" className="transition-colors hover:text-primary">{link}</Link></li>
+                                {[
+                                    { name: 'Liên hệ', href: '#' },
+                                    { name: 'Hỏi đáp', href: '#' },
+                                    { name: 'Giao hàng', href: '#' },
+                                    { name: 'Đổi trả', href: '#' },
+                                    { name: 'Bảo hành', href: '#' }
+                                ].map((link) => (
+                                    <li key={link.name}><Link href={link.href} className="transition-colors hover:text-primary">{link.name}</Link></li>
                                 ))}
                             </ul>
                         </div>
                         <div className="space-y-4">
-                            <h4 className="text-sm font-semibold uppercase tracking-wider text-foreground">Company</h4>
+                            <h4 className="text-sm font-semibold uppercase tracking-wider text-foreground">Công ty</h4>
                             <ul className="space-y-2.5 text-sm text-muted-foreground">
-                                {['About Us', 'Privacy Policy', 'Terms of Service', 'Career'].map((link) => (
-                                    <li key={link}><Link href="#" className="transition-colors hover:text-primary">{link}</Link></li>
+                                {[
+                                    { name: 'Về chúng tôi', href: '#' },
+                                    { name: 'Chính sách bảo mật', href: '#' },
+                                    { name: 'Điều khoản dịch vụ', href: '#' },
+                                    { name: 'Tuyển dụng', href: '#' }
+                                ].map((link) => (
+                                    <li key={link.name}><Link href={link.href} className="transition-colors hover:text-primary">{link.name}</Link></li>
                                 ))}
                             </ul>
                         </div>

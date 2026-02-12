@@ -16,13 +16,41 @@ export function Header() {
                     </Link>
 
                     <nav className="hidden md:flex items-center gap-1">
-                        {['Phones', 'Laptops', 'Accessories'].map((item) => (
+                        <div className="group relative">
                             <Link
-                                key={item}
-                                href={`/products?category=${item}`}
+                                href="/products"
+                                className="px-4 py-2 text-sm font-medium text-muted-foreground transition-all hover:text-foreground hover:bg-secondary/50 rounded-full flex items-center gap-1"
+                            >
+                                Sản phẩm
+                            </Link>
+                            <div className="absolute top-full left-0 hidden group-hover:block pt-2 w-64 animate-in fade-in slide-in-from-top-2 duration-200">
+                                <div className="rounded-2xl border border-border/50 bg-background/95 backdrop-blur-xl p-2 shadow-2xl">
+                                    {[
+                                        { name: 'Thực phẩm bảo vệ sức khoẻ', id: 'health' },
+                                        { name: 'Chăm sóc cá nhân', id: 'personal-care' },
+                                        { name: 'Thiết bị điện tử', id: 'electronics' }
+                                    ].map((sub) => (
+                                        <Link
+                                            key={sub.id}
+                                            href={`/products?category=${sub.id}`}
+                                            className="block px-4 py-3 text-sm font-medium text-muted-foreground transition-all hover:text-foreground hover:bg-secondary/50 rounded-xl"
+                                        >
+                                            {sub.name}
+                                        </Link>
+                                    ))}
+                                </div>
+                            </div>
+                        </div>
+                        {[
+                            { name: 'Tin tức', id: 'news' },
+                            { name: 'Liên hệ', id: 'contact' }
+                        ].map((item) => (
+                            <Link
+                                key={item.id}
+                                href={`/${item.id}`}
                                 className="px-4 py-2 text-sm font-medium text-muted-foreground transition-all hover:text-foreground hover:bg-secondary/50 rounded-full"
                             >
-                                {item}
+                                {item.name}
                             </Link>
                         ))}
                     </nav>
@@ -33,7 +61,7 @@ export function Header() {
                         <Search className="absolute left-3 h-4 w-4 text-muted-foreground" />
                         <input
                             type="text"
-                            placeholder="Search products..."
+                            placeholder="Tìm kiếm sản phẩm..."
                             className="h-9 w-40 lg:w-64 rounded-full border border-border/50 bg-secondary/30 pl-9 pr-4 text-xs focus:outline-none focus:ring-2 focus:ring-primary/20 transition-all"
                         />
                     </div>

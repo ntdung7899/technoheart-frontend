@@ -36,7 +36,7 @@ export function AddToCartButton({ product }: AddToCartButtonProps) {
             className="flex w-full items-center justify-center rounded-md bg-primary px-8 py-3 text-base font-medium text-primary-foreground hover:bg-primary/90 focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed transition-all"
         >
             <ShoppingCart className="mr-2 h-5 w-5" />
-            {isAdded ? "Added to Cart" : "Add to Cart"}
+            {isAdded ? "Đã thêm vào giỏ" : "Thêm vào giỏ hàng"}
         </button>
     );
 }

@@ -36,7 +36,9 @@ export function ProductCard({ product }: ProductCardProps) {
                     {/* Category Badge */}
                     <div className="absolute left-3 top-3 z-20">
                         <span className="inline-flex items-center rounded-full bg-background/80 px-2.5 py-0.5 text-[10px] font-semibold uppercase tracking-wider backdrop-blur-sm border border-border/50">
-                            {product.category.name}
+                            {product.category.name === 'Phones' ? 'Điện thoại' :
+                                product.category.name === 'Laptops' ? 'Laptop' :
+                                    product.category.name === 'Accessories' ? 'Phụ kiện' : product.category.name}
                         </span>
                     </div>
                 </div>
@@ -54,7 +56,7 @@ export function ProductCard({ product }: ProductCardProps) {
 
                     <div className="mt-4 flex items-center justify-between pt-4 border-t border-border/50">
                         <div className="flex flex-col">
-                            <span className="text-xs text-muted-foreground">Price</span>
+                            <span className="text-xs text-muted-foreground">Giá</span>
                             <span className="text-lg font-bold tracking-tight">
                                 ${Number(product.price).toLocaleString()}
                             </span>

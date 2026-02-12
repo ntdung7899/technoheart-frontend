@@ -42,11 +42,11 @@ export default function CheckoutPage() {
                 clearCart();
                 router.push("/checkout/success");
             } else {
-                alert("Failed to place order. Please try again.");
+                alert("Không thể đặt hàng. Vui lòng thử lại.");
             }
         } catch (error) {
-            console.error("Checkout error:", error);
-            alert("An error occurred.");
+            console.error("Lỗi thanh toán:", error);
+            alert("Đã xảy ra lỗi.");
         } finally {
             setLoading(false);
         }
@@ -55,21 +55,21 @@ export default function CheckoutPage() {
     if (items.length === 0) {
         return (
             <div className="container mx-auto px-4 py-20 text-center">
-                <h1 className="text-2xl font-bold">Your cart is empty</h1>
+                <h1 className="text-2xl font-bold">Giỏ hàng của bạn đang trống</h1>
             </div>
         );
     }
 
     return (
         <div className="container mx-auto px-4 py-8 md:py-12">
-            <h1 className="text-3xl font-bold mb-8">Checkout</h1>
+            <h1 className="text-3xl font-bold mb-8">Thanh toán</h1>
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">
                 {/* Form */}
                 <div>
-                    <h2 className="text-xl font-semibold mb-6">Shipping Address</h2>
+                    <h2 className="text-xl font-semibold mb-6">Địa chỉ giao hàng</h2>
                     <form onSubmit={handleSubmit} className="space-y-4">
                         <div>
-                            <label className="block text-sm font-medium mb-1">Street Address</label>
+                            <label className="block text-sm font-medium mb-1">Địa chỉ</label>
                             <input
                                 type="text"
                                 name="street"
@@ -81,7 +81,7 @@ export default function CheckoutPage() {
                         </div>
                         <div className="grid grid-cols-2 gap-4">
                             <div>
-                                <label className="block text-sm font-medium mb-1">City</label>
+                                <label className="block text-sm font-medium mb-1">Thành phố</label>
                                 <input
                                     type="text"
                                     name="city"
@@ -92,7 +92,7 @@ export default function CheckoutPage() {
                                 />
                             </div>
                             <div>
-                                <label className="block text-sm font-medium mb-1">State / Province</label>
+                                <label className="block text-sm font-medium mb-1">Tỉnh / Thành</label>
                                 <input
                                     type="text"
                                     name="state"
@@ -105,7 +105,7 @@ export default function CheckoutPage() {
                         </div>
                         <div className="grid grid-cols-2 gap-4">
                             <div>
-                                <label className="block text-sm font-medium mb-1">ZIP / Postal Code</label>
+                                <label className="block text-sm font-medium mb-1">Mã bưu điện</label>
                                 <input
                                     type="text"
                                     name="zip"
@@ -116,7 +116,7 @@ export default function CheckoutPage() {
                                 />
                             </div>
                             <div>
-                                <label className="block text-sm font-medium mb-1">Country</label>
+                                <label className="block text-sm font-medium mb-1">Quốc gia</label>
                                 <input
                                     type="text"
                                     name="country"
@@ -137,10 +137,10 @@ export default function CheckoutPage() {
                                 {loading ? (
                                     <>
                                         <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                                        Processing...
+                                        Đang xử lý...
                                     </>
                                 ) : (
-                                    `Pay $${total().toFixed(2)}`
+                                    `Thanh toán $${total().toFixed(2)}`
                                 )}
                             </button>
                         </div>
@@ -149,7 +149,7 @@ export default function CheckoutPage() {
 
                 {/* Order Summary */}
                 <div className="bg-muted/20 p-6 rounded-lg h-fit">
-                    <h2 className="text-xl font-semibold mb-4">Order Summary</h2>
+                    <h2 className="text-xl font-semibold mb-4">Tổng đơn hàng</h2>
                     <ul className="divide-y border-b mb-4">
                         {items.map((item) => (
                             <li key={item.id} className="py-2 flex justify-between text-sm">
@@ -159,7 +159,7 @@ export default function CheckoutPage() {
                         ))}
                     </ul>
                     <div className="flex justify-between font-bold text-lg">
-                        <span>Total</span>
+                        <span>Tổng cộng</span>
                         <span>${total().toFixed(2)}</span>
                     </div>
                 </div>
