@@ -2,7 +2,7 @@
 import prisma from "@/lib/prisma";
 import { ProductCard } from "@/components/ui/ProductCard";
 import Link from "next/link";
-import { Search, SlidersHorizontal, ShoppingBag, X } from "lucide-react";
+import { Search } from "lucide-react";
 import { Metadata } from "next";
 import clsx from "clsx";
 
@@ -20,7 +20,7 @@ export default async function ProductsPage({ searchParams }: Props) {
     const categoryFilter = params.category || '';
     const searchFilter = params.search || '';
 
-    const where: any = {};
+    const where: { categoryId?: string; name?: { contains: string; mode: 'insensitive' } } = {};
     let selectedCategory = null;
 
     if (categoryFilter) {
@@ -75,7 +75,7 @@ export default async function ProductsPage({ searchParams }: Props) {
                                     Tất cả sản phẩm
                                 </Link>
                             </li>
-                            {categories.map((cat: any) => (
+                            {categories.map((cat) => (
                                 <li key={cat.id}>
                                     <Link
                                         href={`/products?category=${cat.id}`}
@@ -109,7 +109,7 @@ export default async function ProductsPage({ searchParams }: Props) {
 
                     {products.length > 0 ? (
                         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
-                            {products.map((product: any) => (
+                            {products.map((product) => (
                                 <div key={product.id} className="h-full">
                                     <ProductCard product={product} />
                                 </div>
