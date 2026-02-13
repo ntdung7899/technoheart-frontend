@@ -1,12 +1,14 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { useRouter } from "next/navigation";
-import { Loader2, ArrowLeft, Image as ImageIcon, Sparkles, Package, DollarSign, Tag, ChevronDown } from "lucide-react";
+import { useRouter, useParams } from "next/navigation";
+import { Loader2, ArrowLeft, Image as ImageIcon, Sparkles, Package, DollarSign, Tag, ChevronDown, Save } from "lucide-react";
 import Link from "next/link";
 
-export default function NewProductPage() {
+export default function EditProductPage() {
     const router = useRouter();
+    const { id } = useParams();
+    const [fetching, setFetching] = useState(true);
     const [loading, setLoading] = useState(false);
     const [categories, setCategories] = useState([]);
     const [formData, setFormData] = useState({
@@ -15,20 +17,39 @@ export default function NewProductPage() {
         price: "",
         stock: "",
         categoryId: "",
-        imageUrl: "https://ik.imagekit.io/demo/img/default-product.jpg",
+        imageUrl: "",
     });
 
     useEffect(() => {
-        fetch("/api/categories")
-            .then(res => res.json())
-            .then(data => {
-                setCategories(data);
-                if (data.length > 0) {
-                    setFormData(prev => ({ ...prev, categoryId: data[0].id }));
-                }
-            })
-            .catch(err => console.error("Error fetching categories:", err));
-    }, []);
+        const fetchData = async () => {
+            try {
+                const [catsRes, prodRes] = await Promise.all([
+                    fetch("/api/categories"),
+                    fetch(`/api/products/${id}`)
+                ]);
+
+                const catsData = await catsRes.json();
+                const prodData = await prodRes.json();
+
+                setCategories(catsData);
+                setFormData({
+                    name: prodData.name,
+                    description: prodData.description,
+                    price: prodData.price.toString(),
+                    stock: prodData.stock.toString(),
+                    categoryId: prodData.categoryId,
+                    imageUrl: prodData.images[0] || "",
+                });
+            } catch (error) {
+                console.error("Error fetching data:", error);
+                alert("Failed to load product data");
+            } finally {
+                setFetching(false);
+            }
+        };
+
+        fetchData();
+    }, [id]);
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
         setFormData({ ...formData, [e.target.name]: e.target.value });
@@ -39,8 +60,8 @@ export default function NewProductPage() {
         setLoading(true);
 
         try {
-            const res = await fetch("/api/products", {
-                method: "POST",
+            const res = await fetch(`/api/products/${id}`, {
+                method: "PATCH",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify(formData)
             });
@@ -50,15 +71,23 @@ export default function NewProductPage() {
                 router.refresh();
             } else {
                 const error = await res.json();
-                alert(error.error || "Failed to create product");
+                alert(error.error || "Failed to update product");
             }
         } catch (error) {
             console.error(error);
-            alert("Error creating product");
+            alert("Error updating product");
         } finally {
             setLoading(false);
         }
     };
+
+    if (fetching) {
+        return (
+            <div className="flex items-center justify-center min-h-[400px]">
+                <Loader2 className="h-10 w-10 animate-spin text-primary" />
+            </div>
+        );
+    }
 
     return (
         <div className="w-full mx-auto pb-20 text-zinc-900">
@@ -75,10 +104,10 @@ export default function NewProductPage() {
                 <div className="space-y-2">
                     <div className="flex items-center gap-2 text-primary font-bold text-sm uppercase tracking-[0.2em]">
                         <div className="h-1 w-6 bg-primary rounded-full"></div>
-                        Thêm mới
+                        Chỉnh sửa
                     </div>
-                    <h1 className="text-5xl font-black tracking-tightest">Tạo sản phẩm</h1>
-                    <p className="text-zinc-500 font-medium text-lg">Điền thông tin chi tiết để niêm yết sản phẩm mới lên cửa hàng của bạn.</p>
+                    <h1 className="text-5xl font-black tracking-tightest">Cập nhật sản phẩm</h1>
+                    <p className="text-zinc-500 font-medium text-lg">Thay đổi thông tin cho sản phẩm: <span className="text-zinc-900">{formData.name}</span></p>
                 </div>
             </div>
 
@@ -187,18 +216,12 @@ export default function NewProductPage() {
                                     value={formData.categoryId}
                                     onChange={handleChange}
                                 >
-                                    {categories.length === 0 && (
-                                        <option value="" disabled>Đang tải danh mục...</option>
-                                    )}
                                     {categories.map((cat: any) => (
                                         <option key={cat.id} value={cat.id}>{cat.name}</option>
                                     ))}
                                 </select>
                                 <ChevronDown className="absolute right-4 top-1/2 -translate-y-1/2 h-4 w-4 text-zinc-400 pointer-events-none" />
                             </div>
-                            {categories.length === 0 && (
-                                <p className="text-[10px] text-orange-500 mt-2 ml-1 italic font-medium">Bạn cần tạo ít nhất một danh mục trước.</p>
-                            )}
                         </div>
                     </div>
 
@@ -212,11 +235,17 @@ export default function NewProductPage() {
                         </div>
 
                         <div className="space-y-4">
-                            <div className="aspect-square rounded-2xl border-2 border-dashed border-zinc-200 bg-zinc-50 flex flex-col items-center justify-center p-6 text-center group hover:border-primary/40 transition-colors">
-                                <div className="h-12 w-12 rounded-2xl bg-white shadow-sm flex items-center justify-center mb-3 group-hover:scale-110 transition-transform">
-                                    <ImageIcon className="h-6 w-6 text-zinc-400" />
-                                </div>
-                                <p className="text-[10px] font-black uppercase tracking-widest text-zinc-400">Demo Preview</p>
+                            <div className="aspect-square rounded-2xl border-2 border-dashed border-zinc-200 bg-zinc-50 flex flex-col items-center justify-center p-6 text-center group overflow-hidden relative">
+                                {formData.imageUrl ? (
+                                    <img src={formData.imageUrl} alt="Preview" className="w-full h-full object-contain" />
+                                ) : (
+                                    <>
+                                        <div className="h-12 w-12 rounded-2xl bg-white shadow-sm flex items-center justify-center mb-3 group-hover:scale-110 transition-transform">
+                                            <ImageIcon className="h-6 w-6 text-zinc-400" />
+                                        </div>
+                                        <p className="text-[10px] font-black uppercase tracking-widest text-zinc-400">Xem trước</p>
+                                    </>
+                                )}
                             </div>
 
                             <div className="space-y-1.5">
@@ -235,13 +264,13 @@ export default function NewProductPage() {
                     {/* Submit Button */}
                     <button
                         type="submit"
-                        disabled={loading || categories.length === 0}
+                        disabled={loading}
                         className="w-full h-16 rounded-[2rem] bg-primary text-primary-foreground font-black text-sm uppercase tracking-[0.2em] shadow-2xl shadow-primary/30 hover:scale-[1.02] active:scale-95 transition-all flex items-center justify-center gap-3 disabled:opacity-50 disabled:hover:scale-100"
                     >
                         {loading ? <Loader2 className="animate-spin h-6 w-6" /> : (
                             <>
-                                <Package className="h-5 w-5" />
-                                Tạo sản phẩm
+                                <Save className="h-5 w-5" />
+                                Lưu thay đổi
                             </>
                         )}
                     </button>

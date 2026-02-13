@@ -13,7 +13,8 @@ import {
     LayoutDashboard,
     Bell,
     Search,
-    ChevronRight
+    ChevronRight,
+    LayoutGrid
 } from 'lucide-react';
 
 export default function AdminLayout({
@@ -26,6 +27,7 @@ export default function AdminLayout({
     const navItems = [
         { label: 'Tổng quan', href: '/admin', icon: LayoutDashboard },
         { label: 'Sản phẩm', href: '/admin/products', icon: Package },
+        { label: 'Danh mục', href: '/admin/categories', icon: LayoutGrid },
         { label: 'Đơn hàng', href: '/admin/orders', icon: ShoppingBag },
         { label: 'Khách hàng', href: '/admin/users', icon: Users },
         { label: 'Báo cáo', href: '/admin/analytics', icon: BarChart3 },
@@ -57,8 +59,8 @@ export default function AdminLayout({
                                         key={item.href}
                                         href={item.href}
                                         className={`flex items-center justify-between px-4 py-3.5 rounded-2xl text-sm font-bold transition-all group ${isActive
-                                                ? 'bg-primary text-primary-foreground shadow-lg shadow-primary/20'
-                                                : 'text-zinc-500 hover:text-zinc-900 hover:bg-zinc-100'
+                                            ? 'bg-primary text-primary-foreground shadow-lg shadow-primary/20'
+                                            : 'text-zinc-500 hover:text-zinc-900 hover:bg-zinc-100'
                                             }`}
                                     >
                                         <div className="flex items-center gap-3.5">
@@ -78,8 +80,8 @@ export default function AdminLayout({
                             <Link
                                 href="/admin/settings"
                                 className={`flex items-center gap-3.5 px-4 py-3.5 rounded-2xl text-sm font-bold transition-all group ${pathname === '/admin/settings'
-                                        ? 'bg-primary text-primary-foreground shadow-lg shadow-primary/20'
-                                        : 'text-zinc-500 hover:text-zinc-900 hover:bg-zinc-100'
+                                    ? 'bg-primary text-primary-foreground shadow-lg shadow-primary/20'
+                                    : 'text-zinc-500 hover:text-zinc-900 hover:bg-zinc-100'
                                     }`}
                             >
                                 <Settings className="h-5 w-5 transition-transform group-hover:scale-110 opacity-70 group-hover:opacity-100" />

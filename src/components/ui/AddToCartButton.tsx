@@ -11,22 +11,29 @@ interface AddToCartButtonProps {
         price: number | string;
         images: string[];
     };
+    quantity?: number;
 }
 
-export function AddToCartButton({ product }: AddToCartButtonProps) {
+export function AddToCartButton({ product, quantity = 1 }: AddToCartButtonProps) {
     const addItem = useCartStore((state) => state.addItem);
-    const [isAdded, setIsAdded] = useState(false);
+    const [status, setStatus] = useState<'idle' | 'loading' | 'success'>('idle');
+    const isAdded = status === 'success';
 
     const handleAdd = () => {
-        addItem({
-            id: product.id,
-            name: product.name,
-            price: Number(product.price),
-            quantity: 1,
-            image: product.images[0],
-        });
-        setIsAdded(true);
-        setTimeout(() => setIsAdded(false), 2000);
+        setStatus('loading');
+
+        // Small delay to feel more "active"
+        setTimeout(() => {
+            addItem({
+                id: product.id,
+                name: product.name,
+                price: Number(product.price),
+                quantity: quantity,
+                image: product.images[0],
+            });
+            setStatus('success');
+            setTimeout(() => setStatus('idle'), 2000);
+        }, 600);
     };
 
     return (
