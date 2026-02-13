@@ -2,7 +2,7 @@
 
 import { useCartStore } from "@/store/cart";
 import { useState } from "react";
-import { ShoppingCart } from "lucide-react";
+import { ShoppingCart, Check, Sparkles } from "lucide-react";
 
 interface AddToCartButtonProps {
     product: {
@@ -33,10 +33,29 @@ export function AddToCartButton({ product }: AddToCartButtonProps) {
         <button
             onClick={handleAdd}
             disabled={isAdded}
-            className="flex w-full items-center justify-center rounded-md bg-primary px-8 py-3 text-base font-medium text-primary-foreground hover:bg-primary/90 focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed transition-all"
+            className={`
+                relative flex w-full items-center justify-center rounded-xl px-8 py-3.5 text-base font-bold transition-all duration-300
+                ${isAdded
+                    ? "bg-green-500 text-white shadow-lg shadow-green-500/20"
+                    : "bg-primary text-primary-foreground shadow-lg shadow-primary/20 hover:shadow-xl hover:shadow-primary/30 active:scale-[0.98]"
+                }
+                disabled:cursor-not-allowed
+            `}
         >
-            <ShoppingCart className="mr-2 h-5 w-5" />
-            {isAdded ? "Đã thêm vào giỏ" : "Thêm vào giỏ hàng"}
+            <div className="flex items-center justify-center gap-2">
+                {isAdded ? (
+                    <>
+                        <Check className="h-5 w-5 animate-scale-in" />
+                        <span>Đã thêm vào giỏ</span>
+                        <Sparkles className="absolute -top-1 -right-1 h-4 w-4 text-yellow-500 animate-float" />
+                    </>
+                ) : (
+                    <>
+                        <ShoppingCart className="h-5 w-5" />
+                        <span>Thêm vào giỏ hàng</span>
+                    </>
+                )}
+            </div>
         </button>
     );
 }

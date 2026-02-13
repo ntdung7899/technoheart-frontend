@@ -1,7 +1,8 @@
 import Link from 'next/link';
-import { ShoppingCart, Menu, Search, User, Heart, ChevronDown, X, Sparkles } from 'lucide-react';
+import { Menu, Search, User, Heart, ChevronDown, X, Sparkles } from 'lucide-react';
 import prisma from '@/lib/prisma';
 import { getSession } from "@/lib/auth-utils";
+import { CartIcon } from './CartIcon';
 
 export async function Header() {
     const session = await getSession();
@@ -114,12 +115,7 @@ export async function Header() {
                             <Search className="h-5 w-5" />
                         </button>
 
-                        <Link href="/cart" className="group relative p-2.5 text-muted-foreground hover:text-foreground hover:bg-secondary/60 rounded-xl transition-all">
-                            <ShoppingCart className="h-5 w-5" />
-                            <span className="absolute right-1 top-1 flex h-4.5 w-4.5 items-center justify-center rounded-full bg-primary text-[9px] font-black text-primary-foreground ring-2 ring-background shadow-sm">
-                                0
-                            </span>
-                        </Link>
+                        <CartIcon />
 
                         <Link
                             href={session ? "/account" : "/login"}
