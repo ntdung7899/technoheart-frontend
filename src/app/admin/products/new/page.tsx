@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
-import { Loader2, ArrowLeft, Image as ImageIcon, Sparkles, Package, DollarSign, Tag, ChevronDown } from "lucide-react";
+import { Loader2, ArrowLeft, Image as ImageIcon, Sparkles, Package, DollarSign, Tag, ChevronDown, ShieldCheck } from "lucide-react";
 import Link from "next/link";
 
 export default function NewProductPage() {
@@ -16,6 +16,10 @@ export default function NewProductPage() {
         stock: "",
         categoryId: "",
         imageUrl: "https://ik.imagekit.io/demo/img/default-product.jpg",
+        warranty: "Bảo hành 12 tháng chính hãng",
+        shippingInfo: "Giao hàng nhanh 1-2 ngày",
+        returnPolicy: "Hỗ trợ đổi trả trong 7 ngày",
+        origin: "",
     });
 
     useEffect(() => {
@@ -162,6 +166,63 @@ export default function NewProductPage() {
                                         onChange={handleChange}
                                     />
                                 </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    {/* Product Information */}
+                    <div className="p-8 rounded-[2.5rem] bg-white border border-zinc-200 shadow-2xl shadow-zinc-200/30 space-y-6">
+                        <div className="flex items-center gap-3 mb-2">
+                            <div className="h-10 w-10 rounded-xl bg-violet-50 text-violet-600 flex items-center justify-center">
+                                <ShieldCheck className="h-5 w-5" />
+                            </div>
+                            <h3 className="font-black uppercase tracking-widest text-sm">Thông tin sản phẩm</h3>
+                        </div>
+
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            <div className="space-y-1.5">
+                                <label className="text-[10px] font-black uppercase tracking-[0.2em] text-zinc-400 ml-1">Bảo hành</label>
+                                <input
+                                    type="text"
+                                    name="warranty"
+                                    placeholder="VD: Bảo hành 12 tháng chính hãng"
+                                    className="h-14 w-full rounded-2xl border border-zinc-200 bg-zinc-50 px-5 text-sm font-medium focus:outline-none focus:ring-4 focus:ring-primary/10 transition-all focus:border-primary/30"
+                                    value={formData.warranty}
+                                    onChange={handleChange}
+                                />
+                            </div>
+                            <div className="space-y-1.5">
+                                <label className="text-[10px] font-black uppercase tracking-[0.2em] text-zinc-400 ml-1">Giao hàng</label>
+                                <input
+                                    type="text"
+                                    name="shippingInfo"
+                                    placeholder="VD: Giao hàng nhanh 1-2 ngày"
+                                    className="h-14 w-full rounded-2xl border border-zinc-200 bg-zinc-50 px-5 text-sm font-medium focus:outline-none focus:ring-4 focus:ring-primary/10 transition-all focus:border-primary/30"
+                                    value={formData.shippingInfo}
+                                    onChange={handleChange}
+                                />
+                            </div>
+                            <div className="space-y-1.5">
+                                <label className="text-[10px] font-black uppercase tracking-[0.2em] text-zinc-400 ml-1">Chính sách đổi trả</label>
+                                <input
+                                    type="text"
+                                    name="returnPolicy"
+                                    placeholder="VD: Hỗ trợ đổi trả trong 7 ngày"
+                                    className="h-14 w-full rounded-2xl border border-zinc-200 bg-zinc-50 px-5 text-sm font-medium focus:outline-none focus:ring-4 focus:ring-primary/10 transition-all focus:border-primary/30"
+                                    value={formData.returnPolicy}
+                                    onChange={handleChange}
+                                />
+                            </div>
+                            <div className="space-y-1.5">
+                                <label className="text-[10px] font-black uppercase tracking-[0.2em] text-zinc-400 ml-1">Xuất xứ</label>
+                                <input
+                                    type="text"
+                                    name="origin"
+                                    placeholder="VD: Apple VN"
+                                    className="h-14 w-full rounded-2xl border border-zinc-200 bg-zinc-50 px-5 text-sm font-medium focus:outline-none focus:ring-4 focus:ring-primary/10 transition-all focus:border-primary/30"
+                                    value={formData.origin}
+                                    onChange={handleChange}
+                                />
                             </div>
                         </div>
                     </div>

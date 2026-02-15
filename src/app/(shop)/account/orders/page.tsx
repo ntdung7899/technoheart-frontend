@@ -5,6 +5,8 @@ import Link from "next/link";
 import { StatusBadge } from "@/components/account/StatusBadge";
 import { EmptyState } from "@/components/account/EmptyState";
 import { ShoppingBag, ChevronRight, Loader2 } from "lucide-react";
+import { formatPrice } from "@/lib/utils";
+
 
 interface OrderItem {
     id: string;
@@ -66,8 +68,8 @@ export default function OrdersPage() {
                         key={tab.value}
                         onClick={() => setFilter(tab.value)}
                         className={`px-4 py-2 rounded-full text-xs font-bold whitespace-nowrap transition-all ${filter === tab.value
-                                ? "bg-primary text-primary-foreground shadow-md"
-                                : "bg-secondary/50 text-muted-foreground hover:bg-secondary"
+                            ? "bg-primary text-primary-foreground shadow-md"
+                            : "bg-secondary/50 text-muted-foreground hover:bg-secondary"
                             }`}
                     >
                         {tab.label}
@@ -121,7 +123,7 @@ export default function OrdersPage() {
                                     </p>
                                 </div>
                                 <p className="text-lg font-extrabold">
-                                    {Number(order.total).toLocaleString("vi-VN")}₫
+                                    {formatPrice(order.total)}
                                 </p>
                             </div>
                         </Link>

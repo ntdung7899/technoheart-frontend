@@ -6,6 +6,8 @@ import Link from "next/link";
 import Image from "next/image";
 import { Trash2, Plus, Minus, ArrowRight, ShoppingBag, Truck, ShieldCheck, RefreshCcw } from "lucide-react";
 import { useEffect, useState } from "react";
+import { formatPrice } from "@/lib/utils";
+
 
 export function CartClient() {
     const { items, removeItem, updateQuantity, total } = useCartStore();
@@ -77,7 +79,7 @@ export function CartClient() {
                                             {item.name}
                                         </Link>
                                         <div className="text-sm font-semibold text-primary">
-                                            ${Number(item.price).toLocaleString()}
+                                            {formatPrice(item.price)}
                                         </div>
                                     </div>
                                 </div>
@@ -105,7 +107,7 @@ export function CartClient() {
                                 {/* Item Total */}
                                 <div className="md:col-span-2 text-right hidden md:block">
                                     <span className="text-lg font-bold tracking-tight">
-                                        ${(item.price * item.quantity).toLocaleString()}
+                                        {formatPrice(item.price * item.quantity)}
                                     </span>
                                 </div>
 
@@ -138,7 +140,7 @@ export function CartClient() {
                         <div className="space-y-3">
                             <div className="flex justify-between text-sm font-medium">
                                 <span className="text-muted-foreground">Tạm tính</span>
-                                <span className="text-foreground">${total().toLocaleString()}</span>
+                                <span className="text-foreground">{formatPrice(total())}</span>
                             </div>
                             <div className="flex justify-between text-sm font-medium">
                                 <span className="text-muted-foreground">Phí vận chuyển</span>
@@ -152,7 +154,7 @@ export function CartClient() {
                             <span className="text-lg font-bold">Tổng cộng</span>
                             <div className="text-right">
                                 <span className="text-3xl font-black tracking-tighter text-primary">
-                                    ${total().toLocaleString()}
+                                    {formatPrice(total())}
                                 </span>
                                 <p className="text-[10px] text-muted-foreground font-bold uppercase tracking-widest mt-1">Đã bao gồm thuế VAT</p>
                             </div>
@@ -176,7 +178,7 @@ export function CartClient() {
                         </div>
                         <div className="text-xs">
                             <p className="font-bold">Giao hàng miễn phí</p>
-                            <p className="text-muted-foreground">Cho tất cả đơn hàng từ $500</p>
+                            <p className="text-muted-foreground">Cho tất cả đơn hàng từ {formatPrice(500000)}</p>
                         </div>
                     </div>
                     <div className="flex items-center gap-4 p-4 rounded-2xl bg-secondary/20 border border-border/40">

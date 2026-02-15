@@ -5,6 +5,8 @@ import { useParams } from "next/navigation";
 import Link from "next/link";
 import { StatusBadge } from "@/components/account/StatusBadge";
 import { ArrowLeft, Loader2, Package, MapPin, Truck, CheckCircle2, XCircle } from "lucide-react";
+import { formatPrice } from "@/lib/utils";
+
 
 interface OrderDetail {
     id: string;
@@ -121,10 +123,10 @@ export default function OrderDetailPage() {
                                     <div className="flex flex-col items-center gap-1.5">
                                         <div
                                             className={`h-10 w-10 rounded-full flex items-center justify-center transition-all ${isActive
-                                                    ? "bg-primary text-primary-foreground shadow-lg"
-                                                    : isCompleted
-                                                        ? "bg-primary/20 text-primary"
-                                                        : "bg-secondary text-muted-foreground"
+                                                ? "bg-primary text-primary-foreground shadow-lg"
+                                                : isCompleted
+                                                    ? "bg-primary/20 text-primary"
+                                                    : "bg-secondary text-muted-foreground"
                                                 }`}
                                         >
                                             <Icon className="h-4 w-4" />
@@ -180,7 +182,7 @@ export default function OrderDetailPage() {
                                 </p>
                             </div>
                             <p className="text-sm font-bold whitespace-nowrap">
-                                {Number(item.price).toLocaleString("vi-VN")}₫
+                                {formatPrice(item.price)}
                             </p>
                         </div>
                     ))}
@@ -203,16 +205,16 @@ export default function OrderDetailPage() {
             <div className="rounded-2xl border border-border/40 bg-card/50 p-5 space-y-3">
                 <div className="flex justify-between text-sm">
                     <span className="text-muted-foreground">Tạm tính</span>
-                    <span>{subtotal.toLocaleString("vi-VN")}₫</span>
+                    <span>{formatPrice(subtotal)}</span>
                 </div>
                 <div className="flex justify-between text-sm">
                     <span className="text-muted-foreground">Phí vận chuyển</span>
-                    <span>{Number(order.shippingFee).toLocaleString("vi-VN")}₫</span>
+                    <span>{formatPrice(order.shippingFee)}</span>
                 </div>
                 <div className="border-t border-border/40 pt-3 flex justify-between">
                     <span className="font-bold">Tổng cộng</span>
                     <span className="text-lg font-extrabold">
-                        {Number(order.total).toLocaleString("vi-VN")}₫
+                        {formatPrice(order.total)}
                     </span>
                 </div>
             </div>

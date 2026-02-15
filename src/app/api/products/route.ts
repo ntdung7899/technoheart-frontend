@@ -16,7 +16,7 @@ export async function GET() {
 export async function POST(req: Request) {
     try {
         const body = await req.json();
-        const { name, description, price, stock, categoryId, imageUrl } = body;
+        const { name, description, price, stock, categoryId, imageUrl, warranty, shippingInfo, returnPolicy, origin } = body;
 
         // Basic validation
         if (!name || !price || !categoryId) {
@@ -34,7 +34,11 @@ export async function POST(req: Request) {
                 price: Number(price),
                 stock: Number(stock),
                 categoryId: validCategoryId,
-                images: imageUrl ? [imageUrl] : []
+                images: imageUrl ? [imageUrl] : [],
+                ...(warranty && { warranty }),
+                ...(shippingInfo && { shippingInfo }),
+                ...(returnPolicy && { returnPolicy }),
+                ...(origin && { origin }),
             }
         });
 

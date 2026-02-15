@@ -1,8 +1,8 @@
 "use client";
 
 import { useState } from "react";
-import { Minus, Plus } from "lucide-react";
-import { AddToCartButton } from "./AddToCartButton";
+import { Minus, Plus, ShoppingCart, Check, Sparkles, ArrowRight, CreditCard } from "lucide-react";
+import { useCartStore } from "@/store/cart";
 
 interface ProductBuySectionProps {
     product: {
@@ -15,38 +15,94 @@ interface ProductBuySectionProps {
 
 export function ProductBuySection({ product }: ProductBuySectionProps) {
     const [quantity, setQuantity] = useState(1);
+    const addItem = useCartStore((state) => state.addItem);
+    const [status, setStatus] = useState<'idle' | 'loading' | 'success'>('idle');
+    const isAdded = status === 'success';
 
     const decrease = () => setQuantity(prev => Math.max(1, prev - 1));
     const increase = () => setQuantity(prev => Math.min(99, prev + 1));
 
+    const handleAdd = () => {
+        setStatus('loading');
+        setTimeout(() => {
+            addItem({
+                id: product.id,
+                name: product.name,
+                price: Number(product.price),
+                quantity: quantity,
+                image: product.images[0],
+            });
+            setStatus('success');
+            setTimeout(() => setStatus('idle'), 2000);
+        }, 600);
+    };
+
     return (
-        <div className="space-y-6">
-            <div className="flex flex-col gap-3">
-                <span className="text-[10px] font-black uppercase tracking-[0.2em] text-zinc-400 ml-1">Số lượng</span>
-                <div className="flex items-center h-14 w-fit rounded-2xl border border-border/50 bg-secondary/20 p-1.5 gap-2">
+        <div className="space-y-4">
+            {/* Quantity Selector */}
+            <div className="flex items-center gap-4">
+                <span className="text-xs font-bold uppercase tracking-widest text-zinc-400">Số lượng</span>
+                <div className="flex items-center h-10 rounded-lg border border-zinc-200 bg-white overflow-hidden">
                     <button
                         onClick={decrease}
-                        className="flex h-11 w-11 items-center justify-center rounded-xl bg-background hover:bg-primary hover:text-primary-foreground transition-all shadow-sm active:scale-90 disabled:opacity-50"
+                        className="flex h-full w-10 items-center justify-center text-zinc-500 hover:bg-zinc-50 hover:text-zinc-800 transition-colors active:scale-95 disabled:opacity-40"
                         disabled={quantity <= 1}
                     >
-                        <Minus className="h-4 w-4 line-clamp-1" />
+                        <Minus className="h-3.5 w-3.5" />
                     </button>
-
-                    <div className="w-12 text-center text-sm font-black tabular-nums">
+                    <div className="w-10 text-center text-sm font-bold tabular-nums border-x border-zinc-200 h-full flex items-center justify-center">
                         {quantity}
                     </div>
-
                     <button
                         onClick={increase}
-                        className="flex h-11 w-11 items-center justify-center rounded-xl bg-background hover:bg-primary hover:text-primary-foreground transition-all shadow-sm active:scale-90 disabled:opacity-50"
+                        className="flex h-full w-10 items-center justify-center text-zinc-500 hover:bg-zinc-50 hover:text-zinc-800 transition-colors active:scale-95 disabled:opacity-40"
                         disabled={quantity >= 99}
                     >
-                        <Plus className="h-4 w-4" />
+                        <Plus className="h-3.5 w-3.5" />
                     </button>
                 </div>
             </div>
 
-            <AddToCartButton product={product} quantity={quantity} />
+            {/* Action Buttons */}
+            <div className="grid grid-cols-2 gap-3">
+                {/* Mua ngay */}
+                <button className="flex items-center justify-center gap-2 rounded-xl bg-primary text-white font-bold text-sm py-3.5 px-6 shadow-lg shadow-primary/25 hover:shadow-xl hover:shadow-primary/35 hover:bg-blue-600 transition-all active:scale-[0.98]">
+                    <ArrowRight className="h-4.5 w-4.5" />
+                    <span>Mua ngay</span>
+                </button>
+
+                {/* Thêm vào giỏ hàng */}
+                <button
+                    onClick={handleAdd}
+                    disabled={isAdded}
+                    className={`
+                        flex items-center justify-center gap-2 rounded-xl font-bold text-sm py-3.5 px-6 transition-all active:scale-[0.98] border-2
+                        ${isAdded
+                            ? "bg-emerald-50 text-emerald-600 border-emerald-200"
+                            : "bg-white text-primary border-primary hover:bg-primary/5"
+                        }
+                        disabled:cursor-not-allowed
+                    `}
+                >
+                    {isAdded ? (
+                        <>
+                            <Check className="h-4.5 w-4.5" />
+                            <span>Đã thêm</span>
+                        </>
+                    ) : (
+                        <>
+                            <ShoppingCart className="h-4.5 w-4.5" />
+                            <span>Thêm vào giỏ hàng</span>
+                        </>
+                    )}
+                </button>
+            </div>
+
+            {/* Trả góp */}
+            <button className="flex items-center justify-center gap-2 w-full rounded-xl border border-zinc-300 bg-white text-zinc-700 font-semibold text-sm py-3 px-6 hover:bg-zinc-50 hover:border-zinc-400 transition-all">
+                <CreditCard className="h-4 w-4 text-zinc-500" />
+                <span>Trả góp <span className="font-bold text-zinc-900">0%</span></span>
+            </button>
         </div>
     );
 }

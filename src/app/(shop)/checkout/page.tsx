@@ -7,6 +7,8 @@ import { useRouter } from "next/navigation";
 import { Loader2, ArrowLeft, ShieldCheck, Truck, CreditCard, MapPin } from "lucide-react";
 import Link from "next/link";
 import Image from "next/image";
+import { formatPrice } from "@/lib/utils";
+
 
 export default function CheckoutPage() {
     const { items, total, clearCart } = useCartStore();
@@ -205,7 +207,7 @@ export default function CheckoutPage() {
                                             Đang xử lý đơn hàng...
                                         </>
                                     ) : (
-                                        `Hoàn tất đặt hàng - $${total().toLocaleString()}`
+                                        `Hoàn tất đặt hàng - ${formatPrice(total())}`
                                     )}
                                 </button>
                                 <p className="text-center text-[10px] text-muted-foreground font-bold uppercase tracking-[0.2em] mt-6 flex items-center justify-center gap-2">
@@ -238,10 +240,10 @@ export default function CheckoutPage() {
                                         </div>
                                         <div className="flex-1 min-w-0">
                                             <h3 className="font-bold text-sm truncate">{item.name}</h3>
-                                            <p className="text-[10px] text-muted-foreground font-bold uppercase tracking-widest">Đơn giá: ${Number(item.price).toLocaleString()}</p>
+                                            <p className="text-[10px] text-muted-foreground font-bold uppercase tracking-widest">Đơn giá: {formatPrice(item.price)}</p>
                                         </div>
                                         <div className="text-right">
-                                            <span className="font-bold text-sm">${(item.price * item.quantity).toLocaleString()}</span>
+                                            <span className="font-bold text-sm">{formatPrice(item.price * item.quantity)}</span>
                                         </div>
                                     </li>
                                 ))}
@@ -250,7 +252,7 @@ export default function CheckoutPage() {
                             <div className="space-y-4 pt-6 border-t border-border/40">
                                 <div className="flex justify-between text-sm font-medium">
                                     <span className="text-muted-foreground">Tạm tính</span>
-                                    <span>${total().toLocaleString()}</span>
+                                    <span>{formatPrice(total())}</span>
                                 </div>
                                 <div className="flex justify-between text-sm font-medium">
                                     <span className="text-muted-foreground">Giao hàng</span>
@@ -258,7 +260,7 @@ export default function CheckoutPage() {
                                 </div>
                                 <div className="pt-4 flex justify-between items-baseline">
                                     <span className="text-xl font-black">Tổng cộng</span>
-                                    <span className="text-3xl font-black text-primary tracking-tighter">${total().toLocaleString()}</span>
+                                    <span className="text-3xl font-black text-primary tracking-tighter">{formatPrice(total())}</span>
                                 </div>
                                 <p className="text-[10px] text-muted-foreground font-bold uppercase tracking-widest text-right">Đã bao gồm thuế VAT</p>
                             </div>

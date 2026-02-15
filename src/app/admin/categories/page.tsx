@@ -21,6 +21,8 @@ export default function AdminCategoriesPage() {
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [formData, setFormData] = useState({ name: "", image: "" });
+    const [editingId, setEditingId] = useState<string | null>(null);
+
 
     useEffect(() => {
         fetchCategories();
@@ -38,17 +40,48 @@ export default function AdminCategoriesPage() {
         }
     };
 
+    const handleEdit = (category: any) => {
+        setEditingId(category.id);
+        setFormData({ name: category.name, image: category.image || "" });
+        setIsModalOpen(true);
+    };
+
+    const handleDelete = async (id: string) => {
+        if (!confirm("Bạn có chắc chắn muốn xóa danh mục này?")) return;
+
+        try {
+            const res = await fetch(`/api/categories/${id}`, {
+                method: "DELETE",
+            });
+            if (res.ok) {
+                fetchCategories();
+            }
+        } catch (error) {
+            console.error(error);
+        }
+    };
+
+    const openCreateModal = () => {
+        setEditingId(null);
+        setFormData({ name: "", image: "" });
+        setIsModalOpen(true);
+    };
+
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         setIsSubmitting(true);
         try {
-            const res = await fetch("/api/categories", {
-                method: "POST",
+            const url = editingId ? `/api/categories/${editingId}` : "/api/categories";
+            const method = editingId ? "PATCH" : "POST";
+
+            const res = await fetch(url, {
+                method,
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify(formData)
             });
             if (res.ok) {
                 setFormData({ name: "", image: "" });
+                setEditingId(null);
                 setIsModalOpen(false);
                 fetchCategories();
             }
@@ -72,7 +105,7 @@ export default function AdminCategoriesPage() {
                     <p className="text-zinc-500 font-medium text-lg">Quản lý các nhóm sản phẩm trong cửa hàng của bạn.</p>
                 </div>
                 <button
-                    onClick={() => setIsModalOpen(true)}
+                    onClick={openCreateModal}
                     className="h-14 px-8 rounded-2xl bg-primary text-primary-foreground font-black text-xs uppercase tracking-widest shadow-xl shadow-primary/20 hover:scale-[1.02] active:scale-95 transition-all flex items-center gap-3"
                 >
                     <Plus className="h-5 w-5" />
@@ -141,10 +174,16 @@ export default function AdminCategoriesPage() {
                                         </td>
                                         <td className="px-8 py-6 text-right">
                                             <div className="flex items-center justify-end gap-2 text-zinc-400">
-                                                <button className="h-10 w-10 flex items-center justify-center rounded-xl bg-zinc-50 hover:bg-primary hover:text-primary-foreground transition-all shadow-sm">
+                                                <button
+                                                    onClick={() => handleEdit(category)}
+                                                    className="h-10 w-10 flex items-center justify-center rounded-xl bg-zinc-50 hover:bg-primary hover:text-primary-foreground transition-all shadow-sm"
+                                                >
                                                     <Edit className="h-4 w-4" />
                                                 </button>
-                                                <button className="h-10 w-10 flex items-center justify-center rounded-xl bg-zinc-50 hover:bg-red-500 hover:text-white transition-all shadow-sm">
+                                                <button
+                                                    onClick={() => handleDelete(category.id)}
+                                                    className="h-10 w-10 flex items-center justify-center rounded-xl bg-zinc-50 hover:bg-red-500 hover:text-white transition-all shadow-sm"
+                                                >
                                                     <Trash2 className="h-4 w-4" />
                                                 </button>
                                                 <button className="h-10 w-10 flex items-center justify-center rounded-xl bg-zinc-50 hover:bg-zinc-200 transition-all shadow-sm opacity-0 group-hover:opacity-100">
@@ -165,8 +204,12 @@ export default function AdminCategoriesPage() {
                 <div className="fixed inset-0 z-[60] flex items-center justify-center bg-black/40 backdrop-blur-sm p-4">
                     <div className="bg-white w-full max-w-lg rounded-[2.5rem] p-10 shadow-2xl relative animate-in fade-in zoom-in duration-300">
                         <div className="space-y-2 mb-8">
-                            <h3 className="text-3xl font-black tracking-tight text-zinc-900">Thêm danh mục</h3>
-                            <p className="text-zinc-500 text-sm font-medium">Nhập thông tin cho danh mục sản phẩm mới.</p>
+                            <h3 className="text-3xl font-black tracking-tight text-zinc-900">
+                                {editingId ? "Chỉnh sửa danh mục" : "Thêm danh mục"}
+                            </h3>
+                            <p className="text-zinc-500 text-sm font-medium">
+                                {editingId ? "Cập nhật thông tin cho danh mục sản phẩm." : "Nhập thông tin cho danh mục sản phẩm mới."}
+                            </p>
                         </div>
 
                         <form onSubmit={handleSubmit} className="space-y-6">

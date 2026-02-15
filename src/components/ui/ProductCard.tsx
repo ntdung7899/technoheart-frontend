@@ -2,6 +2,8 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { ArrowRight, ShoppingBag } from 'lucide-react';
 import { Product, Category } from '@prisma/client';
+import { formatPrice } from '@/lib/utils';
+
 
 interface ProductWithCategory extends Product {
     category: Category;
@@ -63,7 +65,7 @@ export function ProductCard({ product }: ProductCardProps) {
                         <div className="flex flex-col">
                             <span className="text-[10px] text-muted-foreground font-medium uppercase tracking-wider">Giá</span>
                             <span className="text-lg font-bold tracking-tight text-primary">
-                                ${Number(product.price).toLocaleString()}
+                                {formatPrice(Number(product.price))}
                             </span>
                         </div>
 

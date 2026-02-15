@@ -4,6 +4,8 @@ import { ProductCard } from "@/components/ui/ProductCard";
 import Link from "next/link";
 import Image from "next/image";
 import { ArrowRight, Truck, ShieldCheck, RefreshCw, Zap, Star } from "lucide-react";
+import { formatPrice } from "@/lib/utils";
+
 
 async function getFeaturedProducts() {
   return await prisma.product.findMany({
@@ -88,10 +90,11 @@ export default async function Home() {
                       className="object-contain p-8 transition-transform hover:scale-105 duration-700"
                       priority
                     />
-                  </div>
-                  {/* Price badge */}
-                  <div className="absolute -bottom-4 -right-4 bg-primary text-primary-foreground px-5 py-2.5 rounded-2xl shadow-lg font-bold text-lg animate-float">
-                    ${Number(heroProduct.price).toLocaleString()}
+                    <div className="absolute left-4 top-4">
+                      <span className="rounded-lg bg-primary/10 border border-primary/20 px-3 py-1.5 text-xs font-bold text-primary backdrop-blur-md">
+                        Nổi bật
+                      </span>
+                    </div>
                   </div>
                 </div>
               </div>

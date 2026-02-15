@@ -33,6 +33,10 @@ model Product {
   stock         Int
   images        String[]
   categoryId    String
+  warranty      String         @default("12 tháng chính hãng")
+  shippingInfo  String         @default("Giao hàng nhanh 1-2 ngày")
+  returnPolicy  String         @default("Hỗ trợ đổi trả trong 7 ngày")
+  origin        String         @default("Chính hãng")
   createdAt     DateTime       @default(now())
   updatedAt     DateTime       @updatedAt
   orderItems    OrderItem[]
