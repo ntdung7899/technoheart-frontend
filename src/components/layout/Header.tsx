@@ -1,5 +1,6 @@
 import Link from 'next/link';
 import { Menu, Search, User, Heart, ChevronDown, X, Sparkles } from 'lucide-react';
+import { SearchModal } from '@/components/ui/SearchModal';
 import prisma from '@/lib/prisma';
 import { getSession } from "@/lib/auth-utils";
 import { CartIcon } from './CartIcon';
@@ -102,18 +103,8 @@ export async function Header() {
                     {/* Right Actions */}
                     <div className="flex items-center gap-1 sm:gap-2 flex-shrink-0">
                         {/* Search */}
-                        <div className="hidden lg:flex items-center relative group">
-                            <Search className="absolute left-3.5 h-4 w-4 text-muted-foreground group-focus-within:text-primary transition-colors" />
-                            <input
-                                type="text"
-                                placeholder="Tìm kiếm sản phẩm..."
-                                className="h-10 w-52 rounded-xl border border-border/60 bg-secondary/40 pl-10 pr-4 text-sm focus:w-72 transition-all duration-300 placeholder:text-muted-foreground/60"
-                            />
-                        </div>
-
-                        <button className="lg:hidden p-2.5 text-muted-foreground hover:text-foreground hover:bg-secondary/60 rounded-xl transition-colors">
-                            <Search className="h-5 w-5" />
-                        </button>
+                        <SearchModal variant="compact" />
+                        <SearchModal variant="icon" />
 
                         <CartIcon />
 

@@ -3,6 +3,7 @@ import Image from 'next/image';
 import { ArrowRight, ShoppingBag } from 'lucide-react';
 import { Product, Category } from '@prisma/client';
 import { formatPrice } from '@/lib/utils';
+import { WishlistButton } from './WishlistButton';
 
 
 interface ProductWithCategory extends Product {
@@ -40,6 +41,11 @@ export function ProductCard({ product }: ProductCardProps) {
                         <span className="inline-flex items-center rounded-lg bg-background/90 backdrop-blur-sm px-2.5 py-1 text-[10px] font-bold uppercase tracking-wider border border-border/50 text-muted-foreground">
                             {product.category.name}
                         </span>
+                    </div>
+
+                    {/* Wishlist Button */}
+                    <div className="absolute right-3 top-3 z-30">
+                        <WishlistButton productId={product.id} variant="icon" />
                     </div>
 
                     {/* Hover Overlay */}

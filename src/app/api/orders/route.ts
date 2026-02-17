@@ -1,38 +1,34 @@
 
 import prisma from "@/lib/prisma";
 import { NextResponse } from "next/server";
+import { getSession } from "@/lib/auth-utils";
 
 export async function POST(req: Request) {
     try {
         const body = await req.json();
-        const { items, address, total, userId } = body;
+        const { items, address, total } = body;
 
         // Validate body (basic)
         if (!items || items.length === 0 || !address) {
             return NextResponse.json({ error: "Invalid order data" }, { status: 400 });
         }
 
-        // In a real app, verify prices from DB to avoid client-side manipulation.
-        // Also, handle user authentication. If userId is provided, use it.
-        // For this MVP, we might create a guest user or use a dummy user if not logged in.
+        // Get logged-in user from session
+        const session = await getSession();
         let connectedUser;
 
-        if (userId) {
-            connectedUser = { connect: { id: userId } };
+        if (session?.id) {
+            connectedUser = { connect: { id: session.id as string } };
         } else {
-            // Find or create a guest user? Or just leave it optional if schema allows.
-            // My schema has `userId String` and `user User @relation...`. So User IS required.
-            // I will create a "Guest User" or require login.
-            // For simplicity, I'll find the first user (seeded one) or create a guest.
+            // Guest fallback
             const guestUser = await prisma.user.findUnique({ where: { email: 'guest@example.com' } });
             if (guestUser) {
                 connectedUser = { connect: { id: guestUser.id } };
             } else {
-                // Create a guest user
                 const newGuest = await prisma.user.create({
                     data: {
                         email: `guest_${Date.now()}@example.com`,
-                        password: 'guest', // Insecure but MVP
+                        password: 'guest',
                         name: 'Guest User',
                         role: 'USER'
                     }
@@ -48,6 +44,24 @@ export async function POST(req: Request) {
                 user: connectedUser
             }
         });
+
+        // Validate that all products exist before creating order
+        const productIds = items.map((item: any) => item.id);
+        const existingProducts = await prisma.product.findMany({
+            where: { id: { in: productIds } },
+            select: { id: true }
+        });
+        const existingIds = new Set(existingProducts.map(p => p.id));
+        const missingItems = items.filter((item: any) => !existingIds.has(item.id));
+
+        if (missingItems.length > 0) {
+            // Clean up the address we just created
+            await prisma.address.delete({ where: { id: newAddress.id } });
+            return NextResponse.json({
+                error: "Một số sản phẩm không còn tồn tại. Vui lòng xóa giỏ hàng và thêm lại sản phẩm.",
+                invalidItems: missingItems.map((item: any) => item.name)
+            }, { status: 400 });
+        }
 
         // Create Order
         const order = await prisma.order.create({

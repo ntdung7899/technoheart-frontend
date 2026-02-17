@@ -2,19 +2,20 @@
 import { getSession } from "@/lib/auth-utils";
 import prisma from "@/lib/prisma";
 import { SummaryCard } from "@/components/account/SummaryCard";
-import { ShoppingBag, Clock, Star } from "lucide-react";
+import { ShoppingBag, Clock, Star, Heart } from "lucide-react";
 
 export default async function AccountDashboard() {
     const session = await getSession();
     const userId = session?.id as string;
 
-    const [user, totalOrders, pendingOrders] = await Promise.all([
+    const [user, totalOrders, pendingOrders, wishlistCount] = await Promise.all([
         prisma.user.findUnique({
             where: { id: userId },
             select: { name: true, points: true },
         }),
         prisma.order.count({ where: { userId } }),
         prisma.order.count({ where: { userId, status: "PENDING" } }),
+        prisma.wishlistItem.count({ where: { userId } }),
     ]);
 
     return (
@@ -30,7 +31,7 @@ export default async function AccountDashboard() {
             </div>
 
             {/* Summary Cards */}
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
                 <SummaryCard
                     icon={<ShoppingBag className="h-5 w-5" />}
                     label="Tổng đơn hàng"
@@ -42,6 +43,12 @@ export default async function AccountDashboard() {
                     label="Đang chờ"
                     value={pendingOrders}
                     subtitle="Đơn hàng chờ xử lý"
+                />
+                <SummaryCard
+                    icon={<Heart className="h-5 w-5" />}
+                    label="Yêu thích"
+                    value={wishlistCount}
+                    subtitle="Sản phẩm đã lưu"
                 />
                 <SummaryCard
                     icon={<Star className="h-5 w-5" />}

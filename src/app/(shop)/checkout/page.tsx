@@ -47,7 +47,12 @@ export default function CheckoutPage() {
                 clearCart();
                 router.push("/checkout/success");
             } else {
-                alert("Không thể đặt hàng. Vui lòng thử lại.");
+                const errorData = await response.json().catch(() => null);
+                if (errorData?.invalidItems) {
+                    alert(`Sản phẩm không còn tồn tại: ${errorData.invalidItems.join(", ")}. Vui lòng xóa giỏ hàng và thêm lại.`);
+                } else {
+                    alert("Không thể đặt hàng. Vui lòng thử lại.");
+                }
             }
         } catch (error) {
             console.error("Lỗi thanh toán:", error);

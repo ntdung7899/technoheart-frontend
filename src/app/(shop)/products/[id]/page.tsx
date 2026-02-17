@@ -4,6 +4,7 @@ import { notFound } from "next/navigation";
 import Link from "next/link";
 import { ArrowLeft, Star, ShieldCheck, Truck, RefreshCw, CheckCircle2, ChevronRight, Heart, Apple, Search } from "lucide-react";
 import { ProductBuySection } from "@/components/ui/ProductBuySection";
+import { WishlistButton } from "@/components/ui/WishlistButton";
 import { formatPrice } from "@/lib/utils";
 
 interface Props {
@@ -161,6 +162,11 @@ export default async function ProductDetailPage({ params }: Props) {
                                     price: Number(product.price),
                                     images: product.images
                                 }} />
+                            </div>
+
+                            {/* Wishlist Button */}
+                            <div className="mb-4">
+                                <WishlistButton productId={product.id} variant="full" />
                             </div>
 
                             {/* Bottom text */}

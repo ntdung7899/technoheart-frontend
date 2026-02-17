@@ -1,7 +1,8 @@
 "use client";
 
 import { useState } from "react";
-import { Minus, Plus, ShoppingCart, Check, Sparkles, ArrowRight, CreditCard } from "lucide-react";
+import { useRouter } from "next/navigation";
+import { Minus, Plus, ShoppingCart, Check, Sparkles, ArrowRight, CreditCard, Loader2 } from "lucide-react";
 import { useCartStore } from "@/store/cart";
 
 interface ProductBuySectionProps {
@@ -14,9 +15,11 @@ interface ProductBuySectionProps {
 }
 
 export function ProductBuySection({ product }: ProductBuySectionProps) {
+    const router = useRouter();
     const [quantity, setQuantity] = useState(1);
     const addItem = useCartStore((state) => state.addItem);
     const [status, setStatus] = useState<'idle' | 'loading' | 'success'>('idle');
+    const [buyingNow, setBuyingNow] = useState(false);
     const isAdded = status === 'success';
 
     const decrease = () => setQuantity(prev => Math.max(1, prev - 1));
@@ -35,6 +38,18 @@ export function ProductBuySection({ product }: ProductBuySectionProps) {
             setStatus('success');
             setTimeout(() => setStatus('idle'), 2000);
         }, 600);
+    };
+
+    const handleBuyNow = () => {
+        setBuyingNow(true);
+        addItem({
+            id: product.id,
+            name: product.name,
+            price: Number(product.price),
+            quantity: quantity,
+            image: product.images[0],
+        });
+        router.push("/checkout");
     };
 
     return (
@@ -66,9 +81,22 @@ export function ProductBuySection({ product }: ProductBuySectionProps) {
             {/* Action Buttons */}
             <div className="grid grid-cols-2 gap-3">
                 {/* Mua ngay */}
-                <button className="flex items-center justify-center gap-2 rounded-xl bg-primary text-white font-bold text-sm py-3.5 px-6 shadow-lg shadow-primary/25 hover:shadow-xl hover:shadow-primary/35 hover:bg-blue-600 transition-all active:scale-[0.98]">
-                    <ArrowRight className="h-4.5 w-4.5" />
-                    <span>Mua ngay</span>
+                <button
+                    onClick={handleBuyNow}
+                    disabled={buyingNow}
+                    className="flex items-center justify-center gap-2 rounded-xl bg-primary text-white font-bold text-sm py-3.5 px-6 shadow-lg shadow-primary/25 hover:shadow-xl hover:shadow-primary/35 hover:bg-blue-600 transition-all active:scale-[0.98] disabled:opacity-70 disabled:cursor-not-allowed"
+                >
+                    {buyingNow ? (
+                        <>
+                            <Loader2 className="h-4.5 w-4.5 animate-spin" />
+                            <span>Đang chuyển...</span>
+                        </>
+                    ) : (
+                        <>
+                            <ArrowRight className="h-4.5 w-4.5" />
+                            <span>Mua ngay</span>
+                        </>
+                    )}
                 </button>
 
                 {/* Thêm vào giỏ hàng */}
@@ -106,3 +134,4 @@ export function ProductBuySection({ product }: ProductBuySectionProps) {
         </div>
     );
 }
+

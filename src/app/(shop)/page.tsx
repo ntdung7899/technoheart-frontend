@@ -1,6 +1,7 @@
 
 import prisma from "@/lib/prisma";
 import { ProductCard } from "@/components/ui/ProductCard";
+import { SearchModal } from "@/components/ui/SearchModal";
 import Link from "next/link";
 import Image from "next/image";
 import { ArrowRight, Truck, ShieldCheck, RefreshCw, Zap, Star } from "lucide-react";
@@ -76,6 +77,12 @@ export default async function Home() {
                 <span className="text-muted-foreground/40">|</span>
                 <span>2,000+ đánh giá</span>
               </div>
+
+              {/* Hero Search Bar */}
+              <div className="pt-4">
+                <SearchModal variant="hero" />
+              </div>
+
             </div>
 
             {heroProduct && heroProduct.images.length > 0 && (
