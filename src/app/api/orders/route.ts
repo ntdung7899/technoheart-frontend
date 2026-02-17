@@ -6,7 +6,7 @@ import { getSession } from "@/lib/auth-utils";
 export async function POST(req: Request) {
     try {
         const body = await req.json();
-        const { items, address, total } = body;
+        const { items, address, total, referralCode } = body;
 
         // Validate body (basic)
         if (!items || items.length === 0 || !address) {
@@ -70,6 +70,7 @@ export async function POST(req: Request) {
                 address: { connect: { id: newAddress.id } },
                 total,
                 status: 'PENDING',
+                referralCode: referralCode || null,
                 items: {
                     create: items.map((item: any) => ({
                         product: { connect: { id: item.id } },

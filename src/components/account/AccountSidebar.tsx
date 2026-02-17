@@ -11,12 +11,14 @@ import {
     Gift,
     Shield,
     LogOut,
+    TrendingUp,
 } from "lucide-react";
 
 const navItems = [
     { label: "Tổng quan", href: "/account", icon: LayoutDashboard },
     { label: "Đơn hàng", href: "/account/orders", icon: ShoppingBag },
     { label: "Yêu thích", href: "/account/wishlist", icon: Heart },
+    { label: "Affiliate", href: "/account/affiliate", icon: TrendingUp },
     { label: "Hồ sơ", href: "/account/profile", icon: UserCircle },
     { label: "Địa chỉ", href: "/account/addresses", icon: MapPin },
     { label: "Ưu đãi", href: "/account/rewards", icon: Gift },
@@ -50,8 +52,8 @@ export function AccountSidebar() {
                                         <Link
                                             href={item.href}
                                             className={`flex items-center gap-3 px-4 py-2.5 rounded-xl text-sm font-medium transition-all ${isActive
-                                                    ? "bg-primary text-primary-foreground shadow-md"
-                                                    : "text-muted-foreground hover:text-foreground hover:bg-secondary/50"
+                                                ? "bg-primary text-primary-foreground shadow-md"
+                                                : "text-muted-foreground hover:text-foreground hover:bg-secondary/50"
                                                 }`}
                                         >
                                             <Icon className="h-4 w-4" />
@@ -87,8 +89,8 @@ export function AccountSidebar() {
                                 key={item.href}
                                 href={item.href}
                                 className={`flex flex-col items-center gap-0.5 px-2 py-2 rounded-xl text-[10px] font-medium transition-all ${isActive
-                                        ? "text-primary"
-                                        : "text-muted-foreground"
+                                    ? "text-primary"
+                                    : "text-muted-foreground"
                                     }`}
                             >
                                 <Icon className="h-5 w-5" />

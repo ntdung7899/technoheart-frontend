@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 import { useRouter, useParams } from "next/navigation";
 import { Loader2, ArrowLeft, Image as ImageIcon, Sparkles, Package, DollarSign, Tag, ChevronDown, Save, ShieldCheck } from "lucide-react";
 import Link from "next/link";
+import RichTextEditor from "@/components/admin/RichTextEditor";
 
 export default function EditProductPage() {
     const router = useRouter();
@@ -146,14 +147,10 @@ export default function EditProductPage() {
 
                             <div className="space-y-1.5">
                                 <label className="text-[10px] font-black uppercase tracking-[0.2em] text-zinc-400 ml-1">Mô tả sản phẩm</label>
-                                <textarea
-                                    name="description"
-                                    required
-                                    rows={6}
-                                    placeholder="Mô tả chi tiết về sản phẩm, tính năng, thông số..."
-                                    className="w-full rounded-2xl border border-zinc-200 bg-zinc-50 p-5 text-sm font-medium focus:outline-none focus:ring-4 focus:ring-primary/10 transition-all focus:border-primary/30 resize-none text-zinc-700"
+                                <RichTextEditor
                                     value={formData.description}
-                                    onChange={handleChange}
+                                    onChange={(val) => setFormData({ ...formData, description: val })}
+                                    placeholder="Mô tả chi tiết về sản phẩm, tính năng, thông số..."
                                 />
                             </div>
                         </div>

@@ -62,9 +62,7 @@ export function ProductCard({ product }: ProductCardProps) {
                         <h3 className="font-semibold text-base leading-tight transition-colors group-hover:text-primary line-clamp-2">
                             {product.name}
                         </h3>
-                        <p className="line-clamp-2 text-xs text-muted-foreground leading-relaxed">
-                            {product.description}
-                        </p>
+
                     </div>
 
                     <div className="mt-3 flex items-center justify-between pt-3 border-t border-border/40">

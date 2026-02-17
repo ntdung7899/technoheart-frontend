@@ -20,6 +20,7 @@ export default function CheckoutPage() {
         state: "",
         zip: "",
         country: "",
+        referralCode: "",
     });
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -38,8 +39,15 @@ export default function CheckoutPage() {
                 },
                 body: JSON.stringify({
                     items,
-                    address: formData,
+                    address: {
+                        street: formData.street,
+                        city: formData.city,
+                        state: formData.state,
+                        zip: formData.zip,
+                        country: formData.country,
+                    },
                     total: total(),
+                    referralCode: formData.referralCode || undefined,
                 }),
             });
 
@@ -175,6 +183,20 @@ export default function CheckoutPage() {
                                 </div>
                             </div>
 
+                            {/* Referral Code */}
+                            <div className="space-y-2 pt-4">
+                                <label className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground ml-1">
+                                    Mã giới thiệu (không bắt buộc)
+                                </label>
+                                <input
+                                    type="text"
+                                    name="referralCode"
+                                    placeholder="VD: TH-ABC123"
+                                    className="h-12 w-full rounded-2xl border border-border/50 bg-secondary/30 px-4 text-sm font-mono uppercase focus:outline-none focus:ring-2 focus:ring-primary/20 transition-all"
+                                    value={formData.referralCode}
+                                    onChange={handleChange}
+                                />
+                            </div>
                             <div className="flex items-center gap-4 pt-4 mb-4">
                                 <div className="h-12 w-12 rounded-2xl bg-primary/10 flex items-center justify-center text-primary">
                                     <CreditCard className="h-6 w-6" />

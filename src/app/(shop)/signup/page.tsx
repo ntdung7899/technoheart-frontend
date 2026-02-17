@@ -3,11 +3,13 @@
 
 import Link from 'next/link';
 import { useState } from 'react';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { Mail, Lock, User, Eye, EyeOff, ArrowRight, Github, Chrome, Heart, CheckCircle2, Loader2 } from 'lucide-react';
 
 export default function SignupPage() {
     const router = useRouter();
+    const searchParams = useSearchParams();
+    const referralCode = searchParams.get('ref') || '';
     const [showPassword, setShowPassword] = useState(false);
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState('');
@@ -44,6 +46,7 @@ export default function SignupPage() {
                     name: formData.name,
                     email: formData.email,
                     password: formData.password,
+                    referralCode: referralCode || undefined,
                 }),
             });
 
@@ -111,6 +114,12 @@ export default function SignupPage() {
 
                     <div className="rounded-2xl border border-border/50 bg-card p-7 shadow-xl">
                         <form onSubmit={handleSubmit} className="space-y-4">
+                            {referralCode && (
+                                <div className="rounded-xl bg-primary/10 border border-primary/20 px-4 py-3 text-sm text-primary flex items-center gap-2 animate-fade-in">
+                                    <CheckCircle2 className="h-4 w-4 shrink-0" />
+                                    Bạn được giới thiệu bởi mã: <strong>{referralCode}</strong>
+                                </div>
+                            )}
                             {error && (
                                 <div className="rounded-xl bg-destructive/10 border border-destructive/20 px-4 py-3 text-sm text-destructive flex items-center gap-2 animate-fade-in">
                                     <svg className="h-4 w-4 shrink-0" fill="currentColor" viewBox="0 0 20 20"><path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clipRule="evenodd" /></svg>

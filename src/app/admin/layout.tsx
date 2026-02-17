@@ -1,7 +1,8 @@
 "use client";
 
 import Link from 'next/link';
-import { usePathname } from 'next/navigation';
+import { usePathname, useRouter } from 'next/navigation';
+import { useState, useEffect } from 'react';
 import {
     Package,
     ShoppingBag,
@@ -14,7 +15,9 @@ import {
     Bell,
     Search,
     ChevronRight,
-    LayoutGrid
+    LayoutGrid,
+    Loader2,
+    ShieldAlert
 } from 'lucide-react';
 
 export default function AdminLayout({
@@ -23,6 +26,43 @@ export default function AdminLayout({
     children: React.ReactNode;
 }) {
     const pathname = usePathname();
+    const router = useRouter();
+    const [authState, setAuthState] = useState<'loading' | 'authorized' | 'unauthorized'>('loading');
+
+    useEffect(() => {
+        fetch('/api/auth/me')
+            .then(res => res.json())
+            .then(data => {
+                if (data.user?.role === 'ADMIN') {
+                    setAuthState('authorized');
+                } else {
+                    setAuthState('unauthorized');
+                    router.replace('/login');
+                }
+            })
+            .catch(() => {
+                setAuthState('unauthorized');
+                router.replace('/login');
+            });
+    }, [router]);
+
+    if (authState === 'loading') {
+        return (
+            <div className="min-h-screen flex flex-col items-center justify-center bg-zinc-50 gap-4">
+                <Loader2 className="h-10 w-10 animate-spin text-primary" />
+                <p className="text-sm font-bold text-zinc-400 uppercase tracking-widest">Đang xác thực...</p>
+            </div>
+        );
+    }
+
+    if (authState === 'unauthorized') {
+        return (
+            <div className="min-h-screen flex flex-col items-center justify-center bg-zinc-50 gap-4">
+                <ShieldAlert className="h-12 w-12 text-red-400" />
+                <p className="text-sm font-bold text-zinc-500">Bạn không có quyền truy cập trang này</p>
+            </div>
+        );
+    }
 
     const navItems = [
         { label: 'Tổng quan', href: '/admin', icon: LayoutDashboard },

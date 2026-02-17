@@ -33,7 +33,11 @@ export default function LoginPage() {
                 return;
             }
 
-            router.push('/account');
+            if (data.user?.role === 'ADMIN') {
+                router.push('/admin');
+            } else {
+                router.push('/account');
+            }
             router.refresh();
         } catch (error) {
             setError('Không thể kết nối đến máy chủ. Vui lòng thử lại.');

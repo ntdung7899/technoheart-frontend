@@ -127,10 +127,10 @@ export function ProductBuySection({ product }: ProductBuySectionProps) {
             </div>
 
             {/* Trả góp */}
-            <button className="flex items-center justify-center gap-2 w-full rounded-xl border border-zinc-300 bg-white text-zinc-700 font-semibold text-sm py-3 px-6 hover:bg-zinc-50 hover:border-zinc-400 transition-all">
+            {/* <button className="flex items-center justify-center gap-2 w-full rounded-xl border border-zinc-300 bg-white text-zinc-700 font-semibold text-sm py-3 px-6 hover:bg-zinc-50 hover:border-zinc-400 transition-all">
                 <CreditCard className="h-4 w-4 text-zinc-500" />
                 <span>Trả góp <span className="font-bold text-zinc-900">0%</span></span>
-            </button>
+            </button> */}
         </div>
     );
 }

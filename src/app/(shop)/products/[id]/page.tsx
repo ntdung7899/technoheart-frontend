@@ -192,11 +192,42 @@ export default async function ProductDetailPage({ params }: Props) {
                                 <h2 className="text-xl font-bold tracking-tight text-zinc-900">Mô tả sản phẩm</h2>
                             </div>
 
-                            <div className="prose prose-zinc max-w-none">
-                                <p className="text-base text-zinc-600 leading-relaxed">
-                                    {product.description}
-                                </p>
-                            </div>
+                            <div
+                                className="product-description text-base text-zinc-600 leading-relaxed overflow-hidden break-words"
+                                style={{ overflowWrap: "anywhere" }}
+                                dangerouslySetInnerHTML={{ __html: product.description }}
+                            />
+                            <style>{`
+                                .product-description { word-break: break-word; }
+                                .product-description h1 { font-size: 1.5em; font-weight: 700; color: rgb(24 24 27); margin: 1em 0 0.5em; }
+                                .product-description h2 { font-size: 1.25em; font-weight: 700; color: rgb(24 24 27); margin: 0.8em 0 0.4em; }
+                                .product-description h3 { font-size: 1.1em; font-weight: 600; color: rgb(39 39 42); margin: 0.6em 0 0.3em; }
+                                .product-description p { margin-bottom: 0.6em; line-height: 1.75; }
+                                .product-description strong, .product-description b { font-weight: 700; color: rgb(39 39 42); }
+                                .product-description em, .product-description i { font-style: italic; }
+                                .product-description u { text-decoration: underline; }
+                                .product-description s { text-decoration: line-through; }
+                                .product-description ul { list-style: disc; padding-left: 1.5em; margin: 0.5em 0; }
+                                .product-description ol { list-style: decimal; padding-left: 1.5em; margin: 0.5em 0; }
+                                .product-description li { margin-bottom: 0.25em; }
+                                .product-description blockquote {
+                                    border-left: 3px solid hsl(var(--primary));
+                                    padding: 0.5em 1em;
+                                    margin: 0.8em 0;
+                                    color: rgb(113 113 122);
+                                    background: rgb(250 250 250);
+                                    border-radius: 0 0.5rem 0.5rem 0;
+                                }
+                                .product-description a { color: hsl(var(--primary)); text-decoration: underline; }
+                                .product-description a:hover { opacity: 0.8; }
+                                .product-description img { max-width: 100%; height: auto; border-radius: 0.75rem; margin: 1em 0; }
+                                .product-description .ql-align-center { text-align: center; }
+                                .product-description .ql-align-right { text-align: right; }
+                                .product-description .ql-align-justify { text-align: justify; }
+                                .product-description .ql-indent-1 { padding-left: 3em; }
+                                .product-description .ql-indent-2 { padding-left: 6em; }
+                                .product-description .ql-indent-3 { padding-left: 9em; }
+                            `}</style>
                         </div>
                     </div>
                 </div>

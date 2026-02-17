@@ -46,9 +46,7 @@ export default async function Home() {
               <h1 className="text-4xl font-extrabold tracking-tight sm:text-5xl xl:text-6xl leading-[1.1]">
                 {heroProduct?.name || "Điện Máy Cao Cấp"}
               </h1>
-              <p className="max-w-[540px] text-muted-foreground text-lg leading-relaxed">
-                {heroProduct?.description || "Trải nghiệm tương lai với bộ sưu tập thiết bị công nghệ mới nhất của chúng tôi."}
-              </p>
+
               <div className="flex flex-col gap-3 sm:flex-row pt-2">
                 <Link
                   href={heroProduct ? `/products/${heroProduct.id}` : "/products"}
@@ -122,7 +120,7 @@ export default async function Home() {
             </p>
           </div>
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-5 stagger-children">
-            {categories.map((category: any) => (
+            {categories.slice(0, 6).map((category: any) => (
               <Link
                 href={`/products?category=${category.id}`}
                 key={category.id}
@@ -149,6 +147,17 @@ export default async function Home() {
               </Link>
             ))}
           </div>
+          {categories.length > 6 && (
+            <div className="text-center mt-8">
+              <Link
+                href="/products"
+                className="inline-flex items-center gap-2 rounded-xl bg-primary text-primary-foreground font-semibold px-6 py-3 text-sm shadow-lg shadow-primary/20 hover:shadow-xl hover:shadow-primary/30 active:scale-[0.98] transition-all"
+              >
+                Xem tất cả danh mục
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M5 12h14" /><path d="m12 5 7 7-7 7" /></svg>
+              </Link>
+            </div>
+          )}
         </div>
       </section>
 

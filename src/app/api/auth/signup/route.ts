@@ -5,7 +5,7 @@ import bcrypt from "bcryptjs";
 export async function POST(req: Request) {
     try {
         const body = await req.json();
-        const { name, email, password } = body;
+        const { name, email, password, referralCode } = body;
 
         // --- Validation ---
         if (!email || !password) {
@@ -60,6 +60,45 @@ export async function POST(req: Request) {
         // Return user data without the password
         // eslint-disable-next-line @typescript-eslint/no-unused-vars
         const { password: _, ...userWithoutPassword } = user;
+
+        // --- Handle referral code ---
+        if (referralCode) {
+            try {
+                const referrerProfile = await prisma.affiliateProfile.findUnique({
+                    where: { referralCode: referralCode.trim().toUpperCase() },
+                });
+
+                if (referrerProfile && referrerProfile.userId !== user.id) {
+                    // Create F1 referral (direct)
+                    await prisma.referral.create({
+                        data: {
+                            referrerId: referrerProfile.userId,
+                            refereeId: user.id,
+                            level: 1,
+                        },
+                    });
+
+                    // Check if the referrer has their own referrer for F2
+                    const referrerOfReferrer = await prisma.referral.findFirst({
+                        where: { refereeId: referrerProfile.userId, level: 1 },
+                    });
+
+                    if (referrerOfReferrer) {
+                        // Create F2 referral (indirect)
+                        await prisma.referral.create({
+                            data: {
+                                referrerId: referrerOfReferrer.referrerId,
+                                refereeId: user.id,
+                                level: 2,
+                            },
+                        });
+                    }
+                }
+            } catch (refError) {
+                console.error("Referral processing error:", refError);
+                // Don't fail signup if referral fails
+            }
+        }
 
         return NextResponse.json(
             {
