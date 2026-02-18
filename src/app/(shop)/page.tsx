@@ -85,17 +85,23 @@ export default async function Home() {
 
             {heroProduct && heroProduct.images.length > 0 && (
               <div className="flex items-center justify-center animate-fade-in" style={{ animationDelay: '0.2s' }}>
-                <div className="relative w-full max-w-[480px] aspect-square">
-                  <div className="absolute inset-0 bg-primary/5 rounded-[2rem] rotate-6 scale-95" />
-                  <div className="relative aspect-square w-full overflow-hidden rounded-[2rem] bg-white p-6 shadow-2xl border border-border/40">
+                <div className="relative w-full max-w-[500px] aspect-square">
+                  {/* Decorative background blur */}
+                  <div className="absolute inset-0 bg-primary/5 rounded-[2.5rem] rotate-6 scale-95" />
+
+                  {/* Image Container with NO padding */}
+                  <div className="relative aspect-square w-full overflow-hidden rounded-[2.5rem] bg-white shadow-2xl border border-border/40">
                     <Image
                       src={heroProduct.images[0]}
                       alt={heroProduct.name}
                       fill
-                      className="object-contain p-8 transition-transform hover:scale-105 duration-700"
+                      className="object-cover transition-transform hover:scale-105 duration-700"
+                      sizes="(max-width: 768px) 100vw, 500px"
                       priority
                     />
-                    <div className="absolute left-4 top-4">
+
+                    {/* Badge */}
+                    <div className="absolute left-6 top-6 z-10">
                       <span className="rounded-lg bg-primary/10 border border-primary/20 px-3 py-1.5 text-xs font-bold text-primary backdrop-blur-md">
                         Nổi bật
                       </span>

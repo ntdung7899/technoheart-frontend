@@ -1,6 +1,7 @@
 import prisma from "@/lib/prisma";
 import Link from "next/link";
 import { Eye, Search, Filter, ShoppingBag, MoreHorizontal, Calendar } from "lucide-react";
+import OrderStatusSelector from "@/components/admin/OrderStatusSelector";
 
 export default async function AdminOrdersPage() {
     const orders = await prisma.order.findMany({
@@ -83,14 +84,7 @@ export default async function AdminOrdersPage() {
                                         </span>
                                     </td>
                                     <td className="px-8 py-6">
-                                        <span className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-[10px] font-black uppercase tracking-widest ring-1 ring-inset ${order.status === 'DELIVERED' ? 'bg-emerald-50 text-emerald-600 ring-emerald-200' :
-                                                order.status === 'SHIPPED' ? 'bg-blue-50 text-blue-600 ring-blue-200' :
-                                                    order.status === 'PENDING' ? 'bg-orange-50 text-orange-600 ring-orange-200' :
-                                                        'bg-zinc-50 text-zinc-500 ring-zinc-200'
-                                            }`}>
-                                            <div className={`h-1.5 w-1.5 rounded-full ${order.status === 'PENDING' ? 'bg-orange-500 animate-pulse' : order.status === 'DELIVERED' ? 'bg-emerald-500' : 'bg-blue-500'}`}></div>
-                                            {order.status}
-                                        </span>
+                                        <OrderStatusSelector orderId={order.id} currentStatus={order.status} />
                                     </td>
                                     <td className="px-8 py-6 text-right">
                                         <span className="font-black text-sm tabular-nums tracking-tight text-zinc-900">
