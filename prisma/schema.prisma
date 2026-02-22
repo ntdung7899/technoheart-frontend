@@ -222,19 +222,32 @@ model LoginHistory {
 }
 
 model News {
-  id        String   @id @default(cuid())
-  title     String
-  excerpt   String
-  content   String
-  category  String   @default("Công nghệ")
-  image     String?
-  featured  Boolean  @default(false)
-  published Boolean  @default(false)
-  readTime  String   @default("5 phút")
-  authorId  String
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-  author    User     @relation(fields: [authorId], references: [id])
+  id             String        @id @default(cuid())
+  title          String
+  excerpt        String
+  content        String
+  category       String        @default("Công nghệ")
+  image          String?
+  featured       Boolean       @default(false)
+  published      Boolean       @default(false)
+  readTime       String        @default("5 phút")
+  authorId       String
+  newsCategoryId String?
+  createdAt      DateTime      @default(now())
+  updatedAt      DateTime      @updatedAt
+  author         User          @relation(fields: [authorId], references: [id])
+  newsCategory   NewsCategory? @relation(fields: [newsCategoryId], references: [id])
+}
+
+model NewsCategory {
+  id          String   @id @default(cuid())
+  name        String   @unique
+  slug        String   @unique
+  description String?
+  color       String   @default("#3b82f6")
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  news        News[]
 }
 
 enum Role {
@@ -248,4 +261,29 @@ enum OrderStatus {
   SHIPPED
   DELIVERED
   CANCELLED
+}
+
+model ContactMessage {
+  id        String   @id @default(cuid())
+  name      String
+  email     String
+  subject   String
+  body      String
+  read      Boolean  @default(false)
+  createdAt DateTime @default(now())
+}
+
+model ContactInfo {
+  id          String  @id @default(cuid())
+  email       String  @default("support@technoheart.vn")
+  emailSub    String  @default("Hỗ trợ kỹ thuật & Mua hàng")
+  phone       String  @default("1900 1234 (Miễn phí)")
+  phoneSub    String  @default("Thứ 2 - Chủ Nhật, 8:00 - 22:00")
+  address     String  @default("123 Đường Công Nghệ, Q.1, TP. HCM")
+  addressSub  String  @default("Trụ sở chính")
+  facebook    String  @default("#")
+  instagram   String  @default("#")
+  twitter     String  @default("#")
+  website     String  @default("#")
+  mapEmbed    String  @default("")
 }

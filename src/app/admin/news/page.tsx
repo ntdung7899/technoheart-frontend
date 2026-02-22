@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import Link from "next/link";
 import {
     Plus, Pencil, Trash2, Newspaper, Eye, EyeOff,
-    Star, StarOff, Search, Calendar, Loader2
+    Star, StarOff, Search, Calendar, Loader2, Tag
 } from "lucide-react";
 
 interface NewsArticle {
@@ -78,13 +78,22 @@ export default function AdminNewsPage() {
                     <h1 className="text-5xl font-black tracking-tight text-zinc-900">Quản lý Tin tức</h1>
                     <p className="text-zinc-500 font-medium text-lg">Viết và quản lý các bài đăng trên trang tin tức.</p>
                 </div>
-                <Link
-                    href="/admin/news/new"
-                    className="inline-flex items-center gap-3 h-14 px-8 rounded-2xl bg-primary text-primary-foreground font-black text-sm uppercase tracking-widest shadow-xl shadow-primary/20 hover:scale-[1.02] active:scale-95 transition-all"
-                >
-                    <Plus className="h-5 w-5" />
-                    Viết bài mới
-                </Link>
+                <div className="flex items-center gap-3">
+                    <Link
+                        href="/admin/news/categories"
+                        className="inline-flex items-center gap-2 h-14 px-6 rounded-2xl border border-zinc-200 bg-white text-zinc-700 font-black text-xs uppercase tracking-widest hover:bg-zinc-50 transition-all shadow-sm"
+                    >
+                        <Tag className="h-4 w-4" />
+                        Danh mục
+                    </Link>
+                    <Link
+                        href="/admin/news/new"
+                        className="inline-flex items-center gap-3 h-14 px-8 rounded-2xl bg-primary text-primary-foreground font-black text-sm uppercase tracking-widest shadow-xl shadow-primary/20 hover:scale-[1.02] active:scale-95 transition-all"
+                    >
+                        <Plus className="h-5 w-5" />
+                        Viết bài mới
+                    </Link>
+                </div>
             </div>
 
             {/* Stats row */}

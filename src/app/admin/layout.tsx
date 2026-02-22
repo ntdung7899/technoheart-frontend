@@ -18,7 +18,8 @@ import {
     LayoutGrid,
     Loader2,
     ShieldAlert,
-    Newspaper
+    Newspaper,
+    MessageSquare
 } from 'lucide-react';
 
 export default function AdminLayout({
@@ -73,6 +74,7 @@ export default function AdminLayout({
         { label: 'Tin tức', href: '/admin/news', icon: Newspaper },
         { label: 'Khách hàng', href: '/admin/users', icon: Users },
         { label: 'Báo cáo', href: '/admin/analytics', icon: BarChart3 },
+        { label: 'Liên hệ', href: '/admin/contact', icon: MessageSquare },
     ];
 
     return (

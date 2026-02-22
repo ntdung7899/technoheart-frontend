@@ -1,188 +1,377 @@
+"use client";
 
-import { Mail, Phone, MapPin, MessageSquare, Clock, Send, Globe, Facebook, Instagram, Twitter } from 'lucide-react';
+import { useState, useEffect } from "react";
+import {
+    Mail, Phone, MapPin, MessageSquare, Clock, Send,
+    Globe, Facebook, Instagram, Twitter, CheckCircle2,
+    Loader2, ArrowRight, Sparkles, Headphones, Users
+} from "lucide-react";
 
-export const metadata = {
-    title: "Liên hệ | TechnoHeart",
-    description: "Gửi tin nhắn hoặc gọi cho chúng tôi. TechnoHeart luôn sẵn sàng hỗ trợ bạn.",
+interface ContactInfo {
+    email: string; emailSub: string;
+    phone: string; phoneSub: string;
+    address: string; addressSub: string;
+    facebook: string; instagram: string; twitter: string; website: string;
+    mapEmbed: string;
+}
+
+const DEFAULT_INFO: ContactInfo = {
+    email: "support@technoheart.vn", emailSub: "Hỗ trợ kỹ thuật & Mua hàng",
+    phone: "1900 1234 (Miễn phí)", phoneSub: "Thứ 2 - Chủ Nhật, 8:00 - 22:00",
+    address: "123 Đường Công Nghệ, Q.1, TP. HCM", addressSub: "Trụ sở chính",
+    facebook: "#", instagram: "#", twitter: "#", website: "#",
+    mapEmbed: "",
 };
 
 export default function ContactPage() {
+    const [info, setInfo] = useState<ContactInfo>(DEFAULT_INFO);
+    const [form, setForm] = useState({ name: "", email: "", subject: "", body: "" });
+    const [sending, setSending] = useState(false);
+    const [sent, setSent] = useState(false);
+    const [error, setError] = useState("");
+
+    useEffect(() => {
+        fetch("/api/contact-info")
+            .then(r => r.json())
+            .then(d => { if (d.email) setInfo(d); })
+            .catch(() => { });
+    }, []);
+
+    const handleSubmit = async (e: React.FormEvent) => {
+        e.preventDefault();
+        setError("");
+        setSending(true);
+        try {
+            const res = await fetch("/api/contact", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify(form),
+            });
+            if (res.ok) {
+                setSent(true);
+                setForm({ name: "", email: "", subject: "", body: "" });
+            } else {
+                const d = await res.json();
+                setError(d.error || "Có lỗi xảy ra, vui lòng thử lại.");
+            }
+        } catch {
+            setError("Không thể kết nối, vui lòng thử lại.");
+        }
+        setSending(false);
+    };
+
+    const contactCards = [
+        {
+            icon: Mail,
+            title: "Email",
+            sub: info.emailSub,
+            value: info.email,
+            href: `mailto:${info.email}`,
+            gradient: "from-blue-500/10 to-indigo-500/10",
+            iconColor: "text-blue-600",
+            iconBg: "bg-blue-500/10",
+        },
+        {
+            icon: Phone,
+            title: "Điện thoại",
+            sub: info.phoneSub,
+            value: info.phone,
+            href: `tel:${info.phone.replace(/\D/g, "")}`,
+            gradient: "from-emerald-500/10 to-teal-500/10",
+            iconColor: "text-emerald-600",
+            iconBg: "bg-emerald-500/10",
+        },
+        {
+            icon: MapPin,
+            title: "Văn phòng",
+            sub: info.addressSub,
+            value: info.address,
+            href: null,
+            gradient: "from-orange-500/10 to-amber-500/10",
+            iconColor: "text-orange-600",
+            iconBg: "bg-orange-500/10",
+        },
+    ];
+
+    const socials = [
+        { icon: Facebook, label: "Facebook", href: info.facebook, color: "hover:bg-[#1877F2] hover:text-white" },
+        { icon: Instagram, label: "Instagram", href: info.instagram, color: "hover:bg-gradient-to-br hover:from-[#E1306C] hover:to-[#F77737] hover:text-white" },
+        { icon: Twitter, label: "Twitter", href: info.twitter, color: "hover:bg-[#1DA1F2] hover:text-white" },
+        { icon: Globe, label: "Website", href: info.website, color: "hover:bg-primary hover:text-white" },
+    ];
+
+    const features = [
+        {
+            icon: Clock,
+            title: "Phản hồi nhanh",
+            desc: "Chúng tôi cam kết phản hồi trong vòng 2 giờ làm việc.",
+            accent: "text-blue-600 bg-blue-50",
+        },
+        {
+            icon: Headphones,
+            title: "Hỗ trợ đa kênh",
+            desc: "Liên hệ qua email, điện thoại, Zalo hoặc trực tiếp tại cửa hàng.",
+            accent: "text-purple-600 bg-purple-50",
+        },
+        {
+            icon: Users,
+            title: "Đội ngũ chuyên nghiệp",
+            desc: "Nhân viên được đào tạo bài bản, sẵn sàng giải đáp mọi thắc mắc.",
+            accent: "text-emerald-600 bg-emerald-50",
+        },
+    ];
+
     return (
         <div className="min-h-screen bg-background">
-            {/* Header */}
-            <section className="relative py-16 md:py-20 gradient-hero overflow-hidden">
-                <div className="absolute inset-0 pointer-events-none">
-                    <div className="absolute top-[-20%] right-[-10%] w-[400px] h-[400px] bg-primary/5 rounded-full blur-[120px]" />
-                    <div className="absolute bottom-[-20%] left-[-10%] w-[300px] h-[300px] bg-purple-500/5 rounded-full blur-[120px]" />
+            {/* ── Hero Section ── */}
+            <section className="relative py-20 md:py-28 overflow-hidden bg-gradient-to-b from-primary/[0.03] via-background to-background">
+                {/* Decorative elements */}
+                <div className="absolute inset-0 pointer-events-none overflow-hidden">
+                    <div className="absolute top-10 right-[15%] w-72 h-72 bg-primary/5 rounded-full blur-[100px]" />
+                    <div className="absolute bottom-0 left-[10%] w-96 h-96 bg-purple-500/5 rounded-full blur-[120px]" />
+                    <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] rounded-full border border-primary/[0.04]" />
+                    <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] rounded-full border border-primary/[0.02]" />
                 </div>
+
                 <div className="container mx-auto px-4 lg:px-8 relative text-center">
-                    <h1 className="text-4xl md:text-5xl font-extrabold tracking-tight mb-4 animate-fade-in-up">
+                    <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-primary/5 border border-primary/10 text-primary text-xs font-semibold mb-6">
+                        <Sparkles className="h-3.5 w-3.5" />
+                        Luôn sẵn sàng hỗ trợ bạn 24/7
+                    </div>
+                    <h1 className="text-4xl md:text-6xl font-extrabold tracking-tight mb-5 bg-gradient-to-b from-foreground to-foreground/70 bg-clip-text text-transparent">
                         Liên hệ với chúng tôi
                     </h1>
-                    <p className="text-muted-foreground text-lg max-w-2xl mx-auto animate-fade-in-up" style={{ animationDelay: '0.1s' }}>
-                        Bạn có câu hỏi hay cần hỗ trợ? Đội ngũ TechnoHeart luôn sẵn sàng hỗ trợ bạn 24/7.
+                    <p className="text-muted-foreground text-lg md:text-xl max-w-2xl mx-auto leading-relaxed">
+                        Bạn có câu hỏi hoặc cần hỗ trợ? Đội ngũ TechnoHeart luôn lắng nghe và phản hồi nhanh chóng.
                     </p>
                 </div>
             </section>
 
-            <div className="container mx-auto px-4 py-14 lg:px-8">
-                <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 items-start">
+            <div className="container mx-auto px-4 lg:px-8">
+                {/* ── Contact Cards ── */}
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-5 -mt-8 relative z-10 mb-16">
+                    {contactCards.map((item) => (
+                        <div
+                            key={item.title}
+                            className={`group relative p-6 rounded-2xl bg-card border border-border/50 shadow-lg shadow-black/[0.03] hover:shadow-xl hover:shadow-black/[0.06] hover:-translate-y-1 transition-all duration-300`}
+                        >
+                            <div className={`absolute inset-0 rounded-2xl bg-gradient-to-br ${item.gradient} opacity-0 group-hover:opacity-100 transition-opacity duration-300`} />
+                            <div className="relative">
+                                <div className={`h-12 w-12 rounded-2xl ${item.iconBg} flex items-center justify-center ${item.iconColor} mb-4 group-hover:scale-110 transition-transform duration-300`}>
+                                    <item.icon className="h-5 w-5" />
+                                </div>
+                                <h3 className="font-bold text-foreground mb-0.5">{item.title}</h3>
+                                <p className="text-muted-foreground text-xs mb-2">{item.sub}</p>
+                                {item.href ? (
+                                    <a href={item.href} className="text-primary font-semibold text-sm hover:underline inline-flex items-center gap-1 group/link">
+                                        {item.value}
+                                        <ArrowRight className="h-3.5 w-3.5 opacity-0 -translate-x-1 group-hover/link:opacity-100 group-hover/link:translate-x-0 transition-all" />
+                                    </a>
+                                ) : (
+                                    <p className="text-foreground font-semibold text-sm">{item.value}</p>
+                                )}
+                            </div>
+                        </div>
+                    ))}
+                </div>
 
-                    {/* Contact Info */}
-                    <div className="lg:col-span-5 space-y-6 animate-fade-in-up">
-                        <h2 className="text-2xl font-bold mb-2">Thông tin liên hệ</h2>
+                {/* ── Main Content: Form + Sidebar ── */}
+                <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 items-start mb-20">
+                    {/* Form */}
+                    <div className="lg:col-span-7">
+                        <div className="rounded-3xl border border-border/50 bg-card shadow-xl shadow-black/[0.04] overflow-hidden">
+                            {/* Form header */}
+                            <div className="relative px-8 pt-8 pb-6 border-b border-border/50 bg-gradient-to-r from-primary/[0.03] to-transparent">
+                                <div className="flex items-center gap-3">
+                                    <div className="h-10 w-10 rounded-xl bg-primary/10 flex items-center justify-center text-primary">
+                                        <MessageSquare className="h-5 w-5" />
+                                    </div>
+                                    <div>
+                                        <h2 className="text-xl font-bold">Gửi lời nhắn</h2>
+                                        <p className="text-muted-foreground text-xs">Chúng tôi sẽ phản hồi trong vòng 24 giờ.</p>
+                                    </div>
+                                </div>
+                            </div>
+
+                            {/* Form body */}
+                            <div className="p-8">
+                                {sent ? (
+                                    <div className="flex flex-col items-center justify-center py-10 gap-5 text-center">
+                                        <div className="relative">
+                                            <div className="h-20 w-20 rounded-full bg-emerald-50 flex items-center justify-center">
+                                                <CheckCircle2 className="h-10 w-10 text-emerald-500" />
+                                            </div>
+                                            <div className="absolute inset-0 rounded-full bg-emerald-500/20 animate-ping" />
+                                        </div>
+                                        <div className="space-y-2">
+                                            <h3 className="text-2xl font-bold text-foreground">Gửi thành công!</h3>
+                                            <p className="text-muted-foreground text-sm max-w-xs mx-auto">
+                                                Cảm ơn bạn đã liên hệ với chúng tôi. Chúng tôi sẽ phản hồi sớm nhất có thể.
+                                            </p>
+                                        </div>
+                                        <button
+                                            onClick={() => setSent(false)}
+                                            className="mt-2 h-11 px-6 rounded-xl bg-primary text-primary-foreground font-semibold text-sm hover:scale-[1.02] active:scale-95 transition-all shadow-lg shadow-primary/20"
+                                        >
+                                            Gửi tin nhắn khác
+                                        </button>
+                                    </div>
+                                ) : (
+                                    <form onSubmit={handleSubmit} className="space-y-5">
+                                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                            <div className="space-y-2">
+                                                <label className="text-xs font-semibold text-muted-foreground">Họ và tên <span className="text-red-400">*</span></label>
+                                                <input
+                                                    type="text"
+                                                    value={form.name}
+                                                    onChange={e => setForm(p => ({ ...p, name: e.target.value }))}
+                                                    placeholder="Nguyễn Văn A"
+                                                    className="h-12 w-full rounded-xl border border-border/60 bg-secondary/20 px-4 text-sm placeholder:text-muted-foreground/40 focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary/30 transition-all"
+                                                    required
+                                                />
+                                            </div>
+                                            <div className="space-y-2">
+                                                <label className="text-xs font-semibold text-muted-foreground">Email <span className="text-red-400">*</span></label>
+                                                <input
+                                                    type="email"
+                                                    value={form.email}
+                                                    onChange={e => setForm(p => ({ ...p, email: e.target.value }))}
+                                                    placeholder="name@example.com"
+                                                    className="h-12 w-full rounded-xl border border-border/60 bg-secondary/20 px-4 text-sm placeholder:text-muted-foreground/40 focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary/30 transition-all"
+                                                    required
+                                                />
+                                            </div>
+                                        </div>
+
+                                        <div className="space-y-2">
+                                            <label className="text-xs font-semibold text-muted-foreground">Chủ đề <span className="text-red-400">*</span></label>
+                                            <input
+                                                type="text"
+                                                value={form.subject}
+                                                onChange={e => setForm(p => ({ ...p, subject: e.target.value }))}
+                                                placeholder="Bạn muốn hỏi về vấn đề gì?"
+                                                className="h-12 w-full rounded-xl border border-border/60 bg-secondary/20 px-4 text-sm placeholder:text-muted-foreground/40 focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary/30 transition-all"
+                                                required
+                                            />
+                                        </div>
+
+                                        <div className="space-y-2">
+                                            <label className="text-xs font-semibold text-muted-foreground">Nội dung <span className="text-red-400">*</span></label>
+                                            <textarea
+                                                rows={5}
+                                                value={form.body}
+                                                onChange={e => setForm(p => ({ ...p, body: e.target.value }))}
+                                                placeholder="Nhập chi tiết yêu cầu của bạn..."
+                                                className="w-full rounded-xl border border-border/60 bg-secondary/20 p-4 text-sm placeholder:text-muted-foreground/40 resize-none focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary/30 transition-all"
+                                                required
+                                            />
+                                        </div>
+
+                                        {error && (
+                                            <div className="flex items-center gap-2 px-4 py-3 rounded-xl bg-red-50 border border-red-100 text-red-600 text-sm font-medium">
+                                                <span className="h-1.5 w-1.5 rounded-full bg-red-400" />
+                                                {error}
+                                            </div>
+                                        )}
+
+                                        <button
+                                            type="submit"
+                                            disabled={sending}
+                                            className="w-full h-13 py-3.5 rounded-xl bg-primary text-primary-foreground font-semibold shadow-lg shadow-primary/20 hover:shadow-xl hover:shadow-primary/25 active:scale-[0.98] transition-all flex items-center justify-center gap-2 disabled:opacity-70 group"
+                                        >
+                                            {sending ? (
+                                                <Loader2 className="h-4 w-4 animate-spin" />
+                                            ) : (
+                                                <Send className="h-4 w-4 group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-transform" />
+                                            )}
+                                            {sending ? "Đang gửi..." : "Gửi tin nhắn"}
+                                        </button>
+                                    </form>
+                                )}
+                            </div>
+                        </div>
+                    </div>
+
+                    {/* Sidebar */}
+                    <div className="lg:col-span-5 space-y-6">
+                        {/* Features */}
                         <div className="space-y-4">
-                            {[
-                                {
-                                    icon: Mail,
-                                    title: "Email",
-                                    sub: "Hỗ trợ kỹ thuật & Mua hàng",
-                                    value: "support@technoheart.vn",
-                                    href: "mailto:support@technoheart.vn"
-                                },
-                                {
-                                    icon: Phone,
-                                    title: "Điện thoại",
-                                    sub: "Thứ 2 - Chủ Nhật, 8:00 - 22:00",
-                                    value: "1900 1234 (Miễn phí)",
-                                    href: "tel:19001234"
-                                },
-                                {
-                                    icon: MapPin,
-                                    title: "Văn phòng",
-                                    sub: "Trụ sở chính",
-                                    value: "123 Đường Công Nghệ, Q.1, TP. HCM",
-                                    href: null
-                                }
-                            ].map((item) => (
-                                <div key={item.title} className="flex gap-4 p-5 rounded-xl bg-card border border-border/50 card-hover">
-                                    <div className="h-11 w-11 rounded-xl bg-primary/10 flex items-center justify-center text-primary shrink-0">
+                            {features.map((item, idx) => (
+                                <div
+                                    key={idx}
+                                    className="group flex gap-4 p-5 rounded-2xl bg-card border border-border/50 hover:shadow-lg hover:shadow-black/[0.04] hover:-translate-y-0.5 transition-all duration-300"
+                                >
+                                    <div className={`h-11 w-11 rounded-xl ${item.accent} flex items-center justify-center shrink-0 group-hover:scale-110 transition-transform`}>
                                         <item.icon className="h-5 w-5" />
                                     </div>
                                     <div>
-                                        <h3 className="font-bold mb-0.5">{item.title}</h3>
-                                        <p className="text-muted-foreground text-xs mb-1">{item.sub}</p>
-                                        {item.href ? (
-                                            <a href={item.href} className="text-primary font-medium text-sm hover:underline">{item.value}</a>
-                                        ) : (
-                                            <p className="text-foreground font-medium text-sm">{item.value}</p>
-                                        )}
+                                        <h3 className="font-bold text-foreground mb-1">{item.title}</h3>
+                                        <p className="text-muted-foreground text-sm leading-relaxed">{item.desc}</p>
                                     </div>
                                 </div>
                             ))}
                         </div>
 
-                        <div className="pt-4">
-                            <h3 className="font-bold mb-3">Mạng xã hội</h3>
-                            <div className="flex gap-2">
-                                {[
-                                    { icon: Facebook, label: 'Facebook' },
-                                    { icon: Instagram, label: 'Instagram' },
-                                    { icon: Twitter, label: 'Twitter' },
-                                    { icon: Globe, label: 'Website' },
-                                ].map((social) => (
+                        {/* Social Links */}
+                        <div className="p-6 rounded-2xl bg-card border border-border/50">
+                            <h3 className="font-bold text-foreground mb-4">Kết nối với chúng tôi</h3>
+                            <div className="grid grid-cols-4 gap-3">
+                                {socials.map((social) => (
                                     <a
                                         key={social.label}
-                                        href="#"
-                                        className="h-10 w-10 rounded-xl border border-border/50 flex items-center justify-center hover:bg-primary hover:text-primary-foreground hover:border-primary transition-all"
+                                        href={social.href || "#"}
+                                        target={social.href && social.href !== "#" ? "_blank" : undefined}
+                                        rel="noopener noreferrer"
+                                        className={`h-14 rounded-xl border border-border/50 flex flex-col items-center justify-center gap-1 transition-all duration-300 ${social.color}`}
                                         aria-label={social.label}
                                     >
-                                        <social.icon className="h-4 w-4" />
+                                        <social.icon className="h-5 w-5" />
+                                        <span className="text-[10px] font-medium">{social.label}</span>
                                     </a>
                                 ))}
                             </div>
                         </div>
-                    </div>
 
-                    {/* Contact Form */}
-                    <div className="lg:col-span-7 animate-slide-in-right">
-                        <div className="rounded-2xl border border-border/50 bg-card p-7 md:p-10 shadow-xl">
-                            <h2 className="text-2xl font-bold mb-1">Gửi lời nhắn</h2>
-                            <p className="text-muted-foreground mb-6 text-sm">Chúng tôi sẽ phản hồi bạn trong vòng 24 giờ.</p>
-
-                            <form className="space-y-5">
-                                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                    <div className="space-y-1.5">
-                                        <label className="text-xs font-semibold text-muted-foreground">Họ và tên</label>
-                                        <input
-                                            type="text"
-                                            placeholder="Nguyễn Văn A"
-                                            className="h-11 w-full rounded-xl border border-border/60 bg-secondary/30 px-4 text-sm placeholder:text-muted-foreground/50"
-                                            required
-                                        />
-                                    </div>
-                                    <div className="space-y-1.5">
-                                        <label className="text-xs font-semibold text-muted-foreground">Email</label>
-                                        <input
-                                            type="email"
-                                            placeholder="name@example.com"
-                                            className="h-11 w-full rounded-xl border border-border/60 bg-secondary/30 px-4 text-sm placeholder:text-muted-foreground/50"
-                                            required
-                                        />
-                                    </div>
-                                </div>
-
-                                <div className="space-y-1.5">
-                                    <label className="text-xs font-semibold text-muted-foreground">Chủ đề</label>
-                                    <input
-                                        type="text"
-                                        placeholder="Bạn muốn hỏi về vấn đề gì?"
-                                        className="h-11 w-full rounded-xl border border-border/60 bg-secondary/30 px-4 text-sm placeholder:text-muted-foreground/50"
-                                        required
-                                    />
-                                </div>
-
-                                <div className="space-y-1.5">
-                                    <label className="text-xs font-semibold text-muted-foreground">Nội dung</label>
-                                    <textarea
-                                        rows={5}
-                                        placeholder="Nhập chi tiết yêu cầu của bạn..."
-                                        className="w-full rounded-xl border border-border/60 bg-secondary/30 p-4 text-sm placeholder:text-muted-foreground/50 resize-none"
-                                        required
-                                    />
-                                </div>
-
-                                <button
-                                    type="submit"
-                                    className="w-full h-12 rounded-xl bg-primary text-primary-foreground font-semibold shadow-lg shadow-primary/20 hover:shadow-xl hover:shadow-primary/30 active:scale-[0.98] transition-all flex items-center justify-center gap-2"
-                                >
-                                    Gửi tin nhắn <Send className="h-4 w-4" />
-                                </button>
-                            </form>
-                        </div>
-                    </div>
-                </div>
-
-                {/* Info Cards */}
-                <div className="mt-16 grid grid-cols-1 md:grid-cols-3 gap-5 stagger-children">
-                    {[
-                        { icon: Clock, title: "Giờ làm việc", desc: "Thứ 2 - Thứ 6: 8:00 - 20:00\nThứ 7 - CN: 9:00 - 18:00" },
-                        { icon: MessageSquare, title: "Chat trực tuyến", desc: "Phản hồi tức thì qua Zalo OA\nhoặc hỗ trợ trên Web.", cta: "Chat ngay →" },
-                        { icon: Globe, title: "Cộng đồng", desc: "Tham gia nhóm TechnoHub để\ncập nhật thủ thuật công nghệ.", cta: "Tham gia →" }
-                    ].map((item: any, idx) => (
-                        <div key={idx} className="p-7 rounded-2xl bg-secondary/20 border border-border/40 text-center card-hover space-y-3">
-                            <div className="h-11 w-11 bg-background rounded-xl flex items-center justify-center mx-auto shadow-sm text-primary">
-                                <item.icon className="h-5 w-5" />
+                        {/* Working hours */}
+                        <div className="p-6 rounded-2xl bg-gradient-to-br from-primary/5 to-primary/[0.02] border border-primary/10">
+                            <div className="flex items-center gap-2 mb-3">
+                                <Clock className="h-4 w-4 text-primary" />
+                                <h3 className="font-bold text-foreground text-sm">Giờ làm việc</h3>
                             </div>
-                            <h3 className="font-bold text-lg">{item.title}</h3>
-                            <p className="text-sm text-muted-foreground whitespace-pre-line leading-relaxed">{item.desc}</p>
-                            {item.cta && (
-                                <button className="text-primary font-semibold text-sm hover:underline">{item.cta}</button>
-                            )}
+                            <div className="space-y-2 text-sm">
+                                <div className="flex items-center justify-between">
+                                    <span className="text-muted-foreground">Thứ 2 - Thứ 6</span>
+                                    <span className="font-semibold text-foreground">8:00 - 20:00</span>
+                                </div>
+                                <div className="h-px bg-border/50" />
+                                <div className="flex items-center justify-between">
+                                    <span className="text-muted-foreground">Thứ 7 - Chủ nhật</span>
+                                    <span className="font-semibold text-foreground">9:00 - 18:00</span>
+                                </div>
+                            </div>
                         </div>
-                    ))}
+                    </div>
                 </div>
 
-                {/* Map */}
-                <div className="mt-16 rounded-2xl overflow-hidden border border-border/40 h-[350px] relative grayscale hover:grayscale-0 transition-all duration-700 shadow-lg">
-                    <iframe
-                        src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3919.46023242831!2d106.664402375838!3d10.77601938937307!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x31752eda16067f5b%3A0x6734c26a798f041d!2zMTIzIMSQLiBDw7RuZyBOZ2jhu4csIFBox4gMTAsIFF14bqtbiAxLCBUaMOgbmggcGjhu5EgSOG7kyBDaMOtIE1pbmgsIFZpZXRuYW0!5e0!3m2!1sen!2s!4v1700000000000!5m2!1sen!2s"
-                        className="w-full h-full border-0"
-                        allowFullScreen
-                        loading="lazy"
-                        referrerPolicy="no-referrer-when-downgrade"
-                    />
-                </div>
+                {/* ── Map Section ── */}
+                {info.mapEmbed && (
+                    <div className="mb-16">
+                        <div className="flex items-center gap-2 mb-5">
+                            <MapPin className="h-5 w-5 text-primary" />
+                            <h2 className="text-xl font-bold">Vị trí của chúng tôi</h2>
+                        </div>
+                        <div className="rounded-2xl overflow-hidden border border-border/40 h-[380px] relative grayscale hover:grayscale-0 transition-all duration-700 shadow-lg group">
+                            <iframe
+                                src={info.mapEmbed}
+                                className="w-full h-full border-0"
+                                allowFullScreen
+                                loading="lazy"
+                                referrerPolicy="no-referrer-when-downgrade"
+                            />
+                            <div className="absolute inset-0 bg-gradient-to-t from-background/20 to-transparent pointer-events-none opacity-100 group-hover:opacity-0 transition-opacity duration-500" />
+                        </div>
+                    </div>
+                )}
             </div>
         </div>
     );

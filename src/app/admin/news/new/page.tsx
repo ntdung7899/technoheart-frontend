@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import {
@@ -8,19 +8,30 @@ import {
 } from "lucide-react";
 import RichTextEditor from "@/components/admin/RichTextEditor";
 
-const CATEGORIES = ["Công nghệ", "Đánh giá", "Đời sống", "Khuyến mãi", "Mẹo vặt"];
+interface NewsCategory {
+    id: string;
+    name: string;
+    color: string;
+}
 
 export default function NewNewsPage() {
     const router = useRouter();
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState("");
     const [preview, setPreview] = useState(false);
+    const [categories, setCategories] = useState<NewsCategory[]>([]);
+
+    useEffect(() => {
+        fetch("/api/news-categories")
+            .then(r => r.json())
+            .then(data => setCategories(Array.isArray(data) ? data : []));
+    }, []);
 
     const [form, setForm] = useState({
         title: "",
         excerpt: "",
         content: "",
-        category: "Công nghệ",
+        category: "",
         image: "",
         readTime: "5 phút",
         featured: false,
@@ -148,21 +159,40 @@ export default function NewNewsPage() {
                     {/* Category */}
                     <div className="rounded-[2rem] border border-zinc-200 bg-white shadow-sm p-6 space-y-3">
                         <p className="text-[10px] font-black uppercase tracking-[0.2em] text-zinc-400">Danh mục</p>
-                        <div className="flex flex-wrap gap-2">
-                            {CATEGORIES.map(cat => (
-                                <button
-                                    key={cat}
-                                    type="button"
-                                    onClick={() => set("category", cat)}
-                                    className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all ${form.category === cat
-                                        ? "bg-primary text-white shadow-md shadow-primary/20"
-                                        : "bg-zinc-100 text-zinc-600 hover:bg-zinc-200"
-                                        }`}
-                                >
-                                    {cat}
-                                </button>
-                            ))}
-                        </div>
+                        {categories.length === 0 ? (
+                            <div className="space-y-2">
+                                <p className="text-xs text-zinc-400 font-medium">
+                                    Chưa có danh mục nào. <Link href="/admin/news/categories" className="text-primary font-bold hover:underline">Tạo danh mục</Link>
+                                </p>
+                                <input
+                                    type="text"
+                                    value={form.category}
+                                    onChange={e => set("category", e.target.value)}
+                                    placeholder="Hoặc nhập danh mục thủ công..."
+                                    className="w-full h-10 rounded-xl border border-zinc-200 bg-zinc-50 px-4 text-sm font-medium focus:outline-none focus:ring-2 focus:ring-primary/20"
+                                />
+                            </div>
+                        ) : (
+                            <div className="flex flex-wrap gap-2">
+                                {categories.map(cat => (
+                                    <button
+                                        key={cat.id}
+                                        type="button"
+                                        onClick={() => set("category", cat.name)}
+                                        className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all border-2 ${form.category === cat.name
+                                            ? "text-white shadow-md"
+                                            : "bg-zinc-100 text-zinc-600 hover:bg-zinc-200 border-transparent"
+                                            }`}
+                                        style={form.category === cat.name ? {
+                                            backgroundColor: cat.color,
+                                            borderColor: cat.color,
+                                        } : {}}
+                                    >
+                                        {cat.name}
+                                    </button>
+                                ))}
+                            </div>
+                        )}
                     </div>
 
                     {/* Read time */}
