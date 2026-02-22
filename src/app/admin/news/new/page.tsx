@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
+import Image from "next/image";
 import {
     ArrowLeft, Send, Loader2, ImageIcon, Eye, EyeOff, Star
 } from "lucide-react";
@@ -223,8 +224,8 @@ export default function NewNewsPage() {
                             className="w-full h-10 rounded-xl border border-zinc-200 bg-zinc-50 px-4 text-sm font-medium focus:outline-none focus:ring-2 focus:ring-primary/20"
                         />
                         {form.image && (
-                            <div className="aspect-video rounded-xl overflow-hidden border border-zinc-100 bg-zinc-50">
-                                <img src={form.image} alt="preview" className="w-full h-full object-cover" onError={e => { (e.target as HTMLImageElement).style.display = "none" }} />
+                            <div className="aspect-video rounded-xl overflow-hidden border border-zinc-100 bg-zinc-50 relative">
+                                <Image src={form.image} alt="preview" fill className="object-cover" unoptimized onError={e => { (e.target as HTMLImageElement).style.display = "none" }} />
                             </div>
                         )}
                     </div>

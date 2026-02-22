@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { Loader2, Save, Lock, Eye, EyeOff } from "lucide-react";
+import Image from "next/image";
 
 interface UserProfile {
     id: string;
@@ -130,7 +131,7 @@ export default function ProfilePage() {
                 <div className="flex items-center gap-4">
                     <div className="h-16 w-16 rounded-2xl bg-secondary/50 flex items-center justify-center text-muted-foreground text-2xl font-bold overflow-hidden">
                         {user?.avatar ? (
-                            <img src={user.avatar} alt="Avatar" className="h-full w-full object-cover" />
+                            <Image src={user.avatar} alt="Avatar" width={64} height={64} className="h-full w-full object-cover" unoptimized />
                         ) : (
                             user?.name?.charAt(0)?.toUpperCase() || "U"
                         )}

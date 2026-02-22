@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import Image from "next/image";
 import { Users, Loader2, UserCircle, Crown, Star, Shield, Zap, Award } from "lucide-react";
 
 interface TeamMember {
@@ -134,7 +135,7 @@ export default function TeamPage() {
                                 <div className="flex h-11 w-11 items-center justify-center rounded-full bg-secondary/50">
                                     {member.user.avatar ? (
                                         // eslint-disable-next-line @next/next/no-img-element
-                                        <img src={member.user.avatar} alt="" className="h-11 w-11 rounded-full object-cover" />
+                                        <Image src={member.user.avatar} alt="" width={44} height={44} className="h-11 w-11 rounded-full object-cover" unoptimized />
                                     ) : (
                                         <UserCircle className="h-6 w-6 text-muted-foreground" />
                                     )}

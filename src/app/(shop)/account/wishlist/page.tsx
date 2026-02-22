@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
+import Image from "next/image";
 import { EmptyState } from "@/components/account/EmptyState";
 import { Heart, Loader2, Trash2, ShoppingCart, Package } from "lucide-react";
 
@@ -82,10 +83,13 @@ export default function WishlistPage() {
                                 className="h-20 w-20 rounded-xl bg-secondary/50 flex items-center justify-center shrink-0 overflow-hidden"
                             >
                                 {item.product.images?.[0] ? (
-                                    <img
+                                    <Image
                                         src={item.product.images[0]}
                                         alt={item.product.name}
+                                        width={80}
+                                        height={80}
                                         className="h-full w-full object-cover"
+                                        unoptimized
                                     />
                                 ) : (
                                     <Package className="h-6 w-6 text-muted-foreground" />

@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 import { useRouter, useParams } from "next/navigation";
 import { Loader2, ArrowLeft, Image as ImageIcon, Sparkles, Package, DollarSign, Tag, ChevronDown, Save, ShieldCheck } from "lucide-react";
 import Link from "next/link";
+import Image from "next/image";
 import RichTextEditor from "@/components/admin/RichTextEditor";
 
 export default function EditProductPage() {
@@ -299,7 +300,7 @@ export default function EditProductPage() {
                         <div className="space-y-4">
                             <div className="aspect-square rounded-2xl border-2 border-dashed border-zinc-200 bg-zinc-50 flex flex-col items-center justify-center p-6 text-center group overflow-hidden relative">
                                 {formData.imageUrl ? (
-                                    <img src={formData.imageUrl} alt="Preview" className="w-full h-full object-contain" />
+                                    <Image src={formData.imageUrl} alt="Preview" fill className="object-contain" unoptimized />
                                 ) : (
                                     <>
                                         <div className="h-12 w-12 rounded-2xl bg-white shadow-sm flex items-center justify-center mb-3 group-hover:scale-110 transition-transform">

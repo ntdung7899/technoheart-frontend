@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { useParams } from "next/navigation";
 import Link from "next/link";
+import Image from "next/image";
 import { StatusBadge } from "@/components/account/StatusBadge";
 import { ArrowLeft, Loader2, Package, MapPin, Truck, CheckCircle2, XCircle } from "lucide-react";
 import { formatPrice } from "@/lib/utils";
@@ -166,10 +167,13 @@ export default function OrderDetailPage() {
                         <div key={item.id} className="flex items-center gap-4 px-5 py-4">
                             <div className="h-14 w-14 rounded-xl bg-secondary/50 flex items-center justify-center shrink-0 overflow-hidden">
                                 {item.product.images?.[0] ? (
-                                    <img
+                                    <Image
                                         src={item.product.images[0]}
                                         alt={item.product.name}
+                                        width={56}
+                                        height={56}
                                         className="h-full w-full object-cover"
+                                        unoptimized
                                     />
                                 ) : (
                                     <Package className="h-5 w-5 text-muted-foreground" />
