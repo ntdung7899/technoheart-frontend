@@ -123,8 +123,8 @@ export default function AdminOrdersClient({ initialOrders }: { initialOrders: Or
             </div>
 
             {/* Orders Table */}
-            <div className="rounded-[2.5rem] border border-zinc-200 bg-white shadow-xl shadow-zinc-200/30 overflow-hidden">
-                <div className="overflow-x-auto">
+            <div className={`rounded-2xl border border-zinc-200 bg-white shadow-xl shadow-zinc-200/30 overflow-visible ${menuOpen ? 'pb-48' : ''}`}>
+                <div className="overflow-visible">
                     <table className="w-full">
                         <thead>
                             <tr className="bg-zinc-50 border-b border-zinc-200">

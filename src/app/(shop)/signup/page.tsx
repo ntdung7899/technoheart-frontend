@@ -2,11 +2,11 @@
 "use client";
 
 import Link from 'next/link';
-import { useState } from 'react';
+import { useState, Suspense } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { Mail, Lock, User, Eye, EyeOff, ArrowRight, Github, Chrome, Heart, CheckCircle2, Loader2 } from 'lucide-react';
 
-export default function SignupPage() {
+function SignupContent() {
     const router = useRouter();
     const searchParams = useSearchParams();
     const referralCode = searchParams.get('ref') || '';
@@ -249,5 +249,13 @@ export default function SignupPage() {
                 </div>
             </div>
         </div>
+    );
+}
+
+export default function SignupPage() {
+    return (
+        <Suspense fallback={<div className="min-h-[calc(100vh-4rem)] flex items-center justify-center"><Loader2 className="h-8 w-8 animate-spin text-primary" /></div>}>
+            <SignupContent />
+        </Suspense>
     );
 }
