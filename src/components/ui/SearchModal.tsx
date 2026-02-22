@@ -187,7 +187,7 @@ export function SearchModal({ variant = "compact" }: SearchModalProps) {
     if (variant === "hero") {
         return (
             <div ref={containerRef} className="relative w-full max-w-xl">
-                <form onSubmit={handleSubmit} className="relative">
+                {/* <form onSubmit={handleSubmit} className="relative">
                     <Search className="absolute left-5 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground/60 z-10" />
                     <input
                         type="text"
@@ -204,7 +204,7 @@ export function SearchModal({ variant = "compact" }: SearchModalProps) {
                         <Search className="h-4 w-4" />
                         Tìm kiếm
                     </button>
-                </form>
+                </form> */}
 
                 {/* Dropdown Results */}
                 {isOpen && (
