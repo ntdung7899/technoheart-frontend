@@ -26,6 +26,7 @@ model User {
   affiliate      AffiliateProfile?
   referralsMade  Referral[]        @relation("Referrer")
   referralsOf    Referral[]        @relation("Referee")
+  news           News[]
 }
 
 model Product {
@@ -218,6 +219,22 @@ model LoginHistory {
   userAgent String?
   createdAt DateTime @default(now())
   user      User     @relation(fields: [userId], references: [id])
+}
+
+model News {
+  id        String   @id @default(cuid())
+  title     String
+  excerpt   String
+  content   String
+  category  String   @default("Công nghệ")
+  image     String?
+  featured  Boolean  @default(false)
+  published Boolean  @default(false)
+  readTime  String   @default("5 phút")
+  authorId  String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  author    User     @relation(fields: [authorId], references: [id])
 }
 
 enum Role {

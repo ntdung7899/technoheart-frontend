@@ -83,8 +83,8 @@ export default async function AdminUsersPage() {
                                     </td>
                                     <td className="px-8 py-6">
                                         <span className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-[10px] font-black uppercase tracking-widest ring-1 ring-inset ${user.role === 'ADMIN'
-                                                ? 'bg-purple-50 text-purple-600 ring-purple-200'
-                                                : 'bg-zinc-50 text-zinc-500 ring-zinc-200'
+                                            ? 'bg-purple-50 text-purple-600 ring-purple-200'
+                                            : 'bg-zinc-50 text-zinc-500 ring-zinc-200'
                                             }`}>
                                             {user.role === 'ADMIN' ? <ShieldCheck className="h-3 w-3" /> : <UserIcon className="h-3 w-3" />}
                                             {user.role}
@@ -105,15 +105,21 @@ export default async function AdminUsersPage() {
                                     </td>
                                     <td className="px-8 py-6 text-right">
                                         <div className="flex items-center justify-end gap-2 text-zinc-400">
-                                            <button className="h-10 w-10 flex items-center justify-center rounded-xl bg-zinc-50 hover:bg-primary hover:text-primary-foreground transition-all shadow-sm">
-                                                <Edit className="h-4 w-4" />
-                                            </button>
-                                            <button className="h-10 w-10 flex items-center justify-center rounded-xl bg-zinc-50 hover:bg-red-500 hover:text-white transition-all shadow-sm">
-                                                <Trash2 className="h-4 w-4" />
-                                            </button>
-                                            <button className="h-10 w-10 flex items-center justify-center rounded-xl bg-zinc-50 hover:bg-zinc-200 transition-all shadow-sm opacity-0 group-hover:opacity-100">
-                                                <MoreHorizontal className="h-4 w-4" />
-                                            </button>
+                                            {user.role === 'ADMIN' ? (
+                                                <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-purple-50 text-purple-400 text-[10px] font-black uppercase tracking-widest" title="Không thể chỉnh sửa tài khoản admin">
+                                                    <ShieldCheck className="h-3.5 w-3.5" />
+                                                    Được bảo vệ
+                                                </span>
+                                            ) : (
+                                                <>
+                                                    <button className="h-10 w-10 flex items-center justify-center rounded-xl bg-zinc-50 hover:bg-primary hover:text-primary-foreground transition-all shadow-sm">
+                                                        <Edit className="h-4 w-4" />
+                                                    </button>
+                                                    <button className="h-10 w-10 flex items-center justify-center rounded-xl bg-zinc-50 hover:bg-red-500 hover:text-white transition-all shadow-sm">
+                                                        <Trash2 className="h-4 w-4" />
+                                                    </button>
+                                                </>
+                                            )}
                                         </div>
                                     </td>
                                 </tr>

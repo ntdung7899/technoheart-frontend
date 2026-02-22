@@ -5,26 +5,23 @@ import "react-quill-new/dist/quill.snow.css";
 
 const ReactQuill = dynamic(() => import("react-quill-new"), { ssr: false });
 
-const MODULES = {
+const modules = {
     toolbar: [
-        [{ header: [1, 2, 3, false] }],
+        [{ header: [2, 3, 4, false] }],
         ["bold", "italic", "underline", "strike"],
         [{ color: [] }, { background: [] }],
         [{ list: "ordered" }, { list: "bullet" }],
-        [{ align: [] }],
-        ["blockquote"],
+        ["blockquote", "code-block"],
         ["link", "image"],
         ["clean"],
     ],
 };
 
-const FORMATS = [
-    "header",
-    "bold", "italic", "underline", "strike",
+const formats = [
+    "header", "bold", "italic", "underline", "strike",
     "color", "background",
     "list",
-    "align",
-    "blockquote",
+    "blockquote", "code-block",
     "link", "image",
 ];
 
@@ -41,52 +38,59 @@ export default function RichTextEditor({ value, onChange, placeholder }: RichTex
                 theme="snow"
                 value={value}
                 onChange={onChange}
-                modules={MODULES}
-                formats={FORMATS}
-                placeholder={placeholder}
+                modules={modules}
+                formats={formats}
+                placeholder={placeholder || "Viết nội dung bài viết ở đây..."}
             />
             <style jsx global>{`
                 .rich-text-editor .ql-container {
-                    min-height: 200px;
+                    min-height: 320px;
                     font-size: 14px;
                     font-family: inherit;
-                    border-bottom-left-radius: 1rem;
-                    border-bottom-right-radius: 1rem;
-                    border-color: rgb(228 228 231);
-                    background: rgb(250 250 250);
+                    border: none;
+                    border-top: 1px solid #e4e4e7;
                 }
                 .rich-text-editor .ql-toolbar {
-                    border-top-left-radius: 1rem;
-                    border-top-right-radius: 1rem;
-                    border-color: rgb(228 228 231);
-                    background: white;
+                    border: none;
+                    border-bottom: 1px solid #e4e4e7;
+                    background: #fafafa;
+                    border-radius: 0;
+                    padding: 12px;
+                }
+                .rich-text-editor .ql-toolbar .ql-formats {
+                    margin-right: 12px;
                 }
                 .rich-text-editor .ql-editor {
-                    min-height: 200px;
-                    color: rgb(63 63 70);
-                    font-weight: 500;
+                    padding: 24px;
+                    line-height: 1.8;
+                    color: #3f3f46;
                 }
                 .rich-text-editor .ql-editor.ql-blank::before {
-                    color: rgb(161 161 170);
+                    color: #d4d4d8;
                     font-style: normal;
                 }
-                .rich-text-editor .ql-container:focus-within {
-                    border-color: hsl(var(--primary) / 0.3);
-                    box-shadow: 0 0 0 4px hsl(var(--primary) / 0.1);
+                .rich-text-editor .ql-snow .ql-stroke {
+                    stroke: #71717a;
                 }
-                .rich-text-editor .ql-toolbar:has(+ .ql-container:focus-within) {
-                    border-color: hsl(var(--primary) / 0.3);
+                .rich-text-editor .ql-snow .ql-fill {
+                    fill: #71717a;
                 }
-                .rich-text-editor .ql-editor h1 { font-size: 1.5em; font-weight: 700; }
-                .rich-text-editor .ql-editor h2 { font-size: 1.25em; font-weight: 700; }
-                .rich-text-editor .ql-editor h3 { font-size: 1.1em; font-weight: 600; }
-                .rich-text-editor .ql-editor p { margin-bottom: 0.5em; }
-                .rich-text-editor .ql-editor ul,
-                .rich-text-editor .ql-editor ol { padding-left: 1.5em; }
-                .rich-text-editor .ql-editor blockquote {
-                    border-left: 3px solid hsl(var(--primary));
-                    padding-left: 1em;
-                    color: rgb(113 113 122);
+                .rich-text-editor .ql-snow .ql-picker-label {
+                    color: #71717a;
+                }
+                .rich-text-editor .ql-snow button:hover .ql-stroke,
+                .rich-text-editor .ql-snow .ql-picker-label:hover .ql-stroke {
+                    stroke: var(--color-primary, #2563eb);
+                }
+                .rich-text-editor .ql-snow button:hover .ql-fill,
+                .rich-text-editor .ql-snow .ql-picker-label:hover .ql-fill {
+                    fill: var(--color-primary, #2563eb);
+                }
+                .rich-text-editor .ql-snow button.ql-active .ql-stroke {
+                    stroke: var(--color-primary, #2563eb);
+                }
+                .rich-text-editor .ql-snow button.ql-active .ql-fill {
+                    fill: var(--color-primary, #2563eb);
                 }
             `}</style>
         </div>

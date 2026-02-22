@@ -32,12 +32,40 @@ export default async function AdminPage() {
         include: { user: true }
     });
 
+    // Calculate real revenue
+    const now = new Date();
+    const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
+    const startOfLastMonth = new Date(now.getFullYear(), now.getMonth() - 1, 1);
+
+    const [thisMonthOrders, lastMonthOrders, allDelivered] = await Promise.all([
+        prisma.order.findMany({ where: { createdAt: { gte: startOfMonth } } }),
+        prisma.order.findMany({ where: { createdAt: { gte: startOfLastMonth, lt: startOfMonth } } }),
+        prisma.order.findMany({ where: { status: 'DELIVERED' } }),
+    ]);
+
+    const totalRevenue = allDelivered.reduce((s, o) => s + Number(o.total), 0);
+    const thisMonthRevenue = thisMonthOrders.reduce((s, o) => s + Number(o.total), 0);
+    const lastMonthRevenue = lastMonthOrders.reduce((s, o) => s + Number(o.total), 0);
+
+    const revenueTrend = lastMonthRevenue > 0 ? ((thisMonthRevenue - lastMonthRevenue) / lastMonthRevenue * 100) : 0;
+    const ordersTrend = lastMonthOrders.length > 0 ? ((thisMonthOrders.length - lastMonthOrders.length) / lastMonthOrders.length * 100) : 0;
+
+    const thisMonthUsers = await prisma.user.count({ where: { createdAt: { gte: startOfMonth } } });
+    const lastMonthUsers = await prisma.user.count({ where: { createdAt: { gte: startOfLastMonth, lt: startOfMonth } } });
+    const usersTrend = lastMonthUsers > 0 ? ((thisMonthUsers - lastMonthUsers) / lastMonthUsers * 100) : 0;
+
+    const thisMonthProducts = await prisma.product.count({ where: { createdAt: { gte: startOfMonth } } });
+    const lastMonthProducts = await prisma.product.count({ where: { createdAt: { gte: startOfLastMonth, lt: startOfMonth } } });
+    const productsTrend = lastMonthProducts > 0 ? ((thisMonthProducts - lastMonthProducts) / lastMonthProducts * 100) : 0;
+
+    const fmt = (n: number) => n >= 0 ? `+${n.toFixed(1)}%` : `${n.toFixed(1)}%`;
+
     const stats = [
         {
             label: 'Tổng doanh thu',
-            value: '$12,450.00',
-            trend: '+12.5%',
-            up: true,
+            value: totalRevenue.toLocaleString('vi-VN', { style: 'currency', currency: 'VND' }),
+            trend: fmt(revenueTrend),
+            up: revenueTrend >= 0,
             icon: DollarSign,
             color: 'bg-emerald-50 text-emerald-600',
             gradient: 'from-emerald-50 to-transparent'
@@ -45,8 +73,8 @@ export default async function AdminPage() {
         {
             label: 'Đơn hàng mới',
             value: ordersCount.toString(),
-            trend: '+5.2%',
-            up: true,
+            trend: fmt(ordersTrend),
+            up: ordersTrend >= 0,
             icon: ShoppingBag,
             color: 'bg-blue-50 text-blue-600',
             gradient: 'from-blue-50 to-transparent'
@@ -54,8 +82,8 @@ export default async function AdminPage() {
         {
             label: 'Khách hàng',
             value: usersCount.toString(),
-            trend: '+8.1%',
-            up: true,
+            trend: fmt(usersTrend),
+            up: usersTrend >= 0,
             icon: Users,
             color: 'bg-purple-50 text-purple-600',
             gradient: 'from-purple-50 to-transparent'
@@ -63,8 +91,8 @@ export default async function AdminPage() {
         {
             label: 'Sản phẩm',
             value: productsCount.toString(),
-            trend: '-2.4%',
-            up: false,
+            trend: fmt(productsTrend),
+            up: productsTrend >= 0,
             icon: Package,
             color: 'bg-orange-50 text-orange-600',
             gradient: 'from-orange-50 to-transparent'
@@ -168,8 +196,8 @@ export default async function AdminPage() {
                                             </td>
                                             <td className="px-8 py-6">
                                                 <span className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-[10px] font-black uppercase tracking-widest ring-1 ring-inset ${order.status === 'PENDING'
-                                                        ? 'bg-orange-50 text-orange-600 ring-orange-200'
-                                                        : 'bg-emerald-50 text-emerald-600 ring-emerald-200'
+                                                    ? 'bg-orange-50 text-orange-600 ring-orange-200'
+                                                    : 'bg-emerald-50 text-emerald-600 ring-emerald-200'
                                                     }`}>
                                                     <div className={`h-1.5 w-1.5 rounded-full ${order.status === 'PENDING' ? 'bg-orange-500 animate-pulse' : 'bg-emerald-500'}`}></div>
                                                     {order.status === 'PENDING' ? 'Đang chờ' : order.status}

@@ -17,7 +17,8 @@ import {
     ChevronRight,
     LayoutGrid,
     Loader2,
-    ShieldAlert
+    ShieldAlert,
+    Newspaper
 } from 'lucide-react';
 
 export default function AdminLayout({
@@ -69,6 +70,7 @@ export default function AdminLayout({
         { label: 'Sản phẩm', href: '/admin/products', icon: Package },
         { label: 'Danh mục', href: '/admin/categories', icon: LayoutGrid },
         { label: 'Đơn hàng', href: '/admin/orders', icon: ShoppingBag },
+        { label: 'Tin tức', href: '/admin/news', icon: Newspaper },
         { label: 'Khách hàng', href: '/admin/users', icon: Users },
         { label: 'Báo cáo', href: '/admin/analytics', icon: BarChart3 },
     ];

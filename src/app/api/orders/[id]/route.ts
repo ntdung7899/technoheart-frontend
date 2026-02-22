@@ -5,9 +5,10 @@ import { getSession } from "@/lib/auth-utils";
 
 export async function PATCH(
     req: Request,
-    { params }: { params: { id: string } }
+    { params }: { params: Promise<{ id: string }> }
 ) {
     try {
+        const { id } = await params;
         const session = await getSession() as any;
 
         if (!session || session.role !== 'ADMIN') {
@@ -18,7 +19,7 @@ export async function PATCH(
         const { status } = body;
 
         const order = await prisma.order.update({
-            where: { id: params.id },
+            where: { id },
             data: { status }
         });
 
