@@ -68,7 +68,7 @@ const coreValues = [
 const stats = [
   { value: "200+", label: "Sản phẩm khoa học", icon: Zap },
   { value: "50+", label: "Chuyên gia & Đối tác", icon: Users },
-  { value: "10+", label: "Năm kinh nghiệm", icon: Award },
+  { value: "5+", label: "5 năm kinh nghiệm", icon: Award },
   { value: "98%", label: "Khách hàng hài lòng", icon: Star },
 ];
 
@@ -276,7 +276,6 @@ export default async function Home() {
                     </div>
                     <div>
                       <p className="text-[10px] font-medium uppercase tracking-wider" style={{ color: "#60A5FA" }}>Sản phẩm kinh doanh</p>
-                      <p className="text-sm font-bold text-white">200+</p>
                     </div>
                   </div>
                 </div>
@@ -288,7 +287,6 @@ export default async function Home() {
                     </div>
                     <div>
                       <p className="text-[10px] font-medium uppercase tracking-wider" style={{ color: "#60A5FA" }}>Chương trình đào tạo kinh doanh</p>
-                      <p className="text-sm font-bold text-white">50+</p>
                     </div>
                   </div>
                 </div>
@@ -421,7 +419,7 @@ export default async function Home() {
       <section
         id="values"
         className="w-full"
-        style={{ background: "linear-gradient(180deg, #0D1F3C 0%, #0A1628 100%)", paddingTop: "96px", paddingBottom: "96px" }}
+        style={{ background: "linear-gradient(180deg, #0D1F3C 0%, #0A1628 100%)", paddingBottom: "12px" }}
       >
         <div className="container mx-auto px-4 md:px-6">
           <div className="text-center mb-14">
@@ -436,7 +434,7 @@ export default async function Home() {
               Giá Trị <span style={{ color: "#60A5FA" }}>Cốt Lõi</span>
             </h2>
             <p className="text-lg max-w-2xl mx-auto" style={{ color: "#93C5FD" }}>
-              Năm nguyên tắc định hướng mọi hoạt động của Technoheart – từ nghiên cứu đến sản phẩm và phụng sự cộng đồng.
+              5 nguyên tắc định hướng mọi hoạt động của Technoheart – từ nghiên cứu đến sản phẩm và phụng sự cộng đồng.
             </p>
           </div>
 
@@ -464,81 +462,6 @@ export default async function Home() {
               </div>
             ))}
           </div>
-        </div>
-      </section>
-
-      {/* ═══════════════════════════════════════════════════
-          SẢN PHẨM NỔI BẬT
-      ═══════════════════════════════════════════════════ */}
-      <section
-        id="products"
-        className="w-full"
-        style={{
-          background: "linear-gradient(180deg, #0A1628 0%, #0c1a30 50%, #0A1628 100%)",
-          paddingTop: "96px",
-          paddingBottom: "96px",
-        }}
-      >
-        {/* Decorative blobs */}
-        <div className="relative">
-          <div
-            className="absolute top-0 left-1/4 pointer-events-none"
-            style={{ width: "500px", height: "500px", background: "radial-gradient(circle, rgba(59,130,246,0.07) 0%, transparent 70%)", filter: "blur(60px)", transform: "translateY(-50%)" }}
-          />
-        </div>
-
-        <div className="container mx-auto px-4 md:px-6 relative">
-          {/* Header */}
-          <div className="flex flex-col sm:flex-row items-start sm:items-end justify-between gap-6 mb-14">
-            <div className="space-y-3">
-              <div
-                className="inline-flex items-center gap-2 rounded-full px-4 py-1.5 text-xs font-bold uppercase tracking-widest"
-                style={{ background: "rgba(59,130,246,0.1)", border: "1px solid rgba(59,130,246,0.25)", color: "#60A5FA" }}
-              >
-                <span className="h-1.5 w-1.5 rounded-full animate-pulse" style={{ background: "#FACC15" }} />
-                Được yêu thích nhất
-              </div>
-              <h2 className="font-extrabold tracking-tight" style={{ fontSize: "clamp(1.8rem, 3.5vw, 2.8rem)", color: "#FFFFFF" }}>
-                Sản Phẩm{" "}
-                <span style={{ color: "#60A5FA" }}>Nổi Bật</span>
-              </h2>
-              <p className="text-base max-w-md" style={{ color: "#93C5FD" }}>
-                Tuyển chọn những sản phẩm khoa học chất lượng cao – được chứng minh bằng dữ liệu và thực tiễn.
-              </p>
-            </div>
-            <Link
-              href="/products"
-              className="group inline-flex items-center gap-2 rounded-xl px-5 py-2.5 text-sm font-semibold transition-all duration-200"
-              style={{ border: "1px solid rgba(96,165,250,0.3)", color: "#60A5FA", background: "rgba(59,130,246,0.06)" }}
-            >
-              Xem tất cả sản phẩm
-              <ArrowRight className="h-4 w-4 group-hover:translate-x-0.5 transition-transform" />
-            </Link>
-          </div>
-
-          {/* Product Grid */}
-          {featuredProducts.length > 0 ? (
-            <>
-              <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 md:gap-5 stagger-children">
-                {featuredProducts.map((product: any) => (
-                  <ProductCard key={product.id} product={product} />
-                ))}
-              </div>
-              <div className="mt-14 text-center">
-                <Link href="/products" className="th-btn-primary inline-flex items-center gap-2.5">
-                  Khám Phá Toàn Bộ Sản Phẩm
-                  <ArrowRight className="h-4 w-4" />
-                </Link>
-              </div>
-            </>
-          ) : (
-            <div className="text-center py-20">
-              <p className="text-lg" style={{ color: "#60A5FA" }}>Sản phẩm đang được cập nhật...</p>
-              <Link href="/products" className="th-btn-primary inline-flex items-center gap-2 mt-6">
-                Xem tất cả <ArrowRight className="h-4 w-4" />
-              </Link>
-            </div>
-          )}
         </div>
       </section>
 
@@ -624,7 +547,7 @@ export default async function Home() {
       <section
         id="why"
         className="w-full"
-        style={{ background: "linear-gradient(180deg, #0A1628 0%, #0D1F3C 100%)", paddingTop: "96px", paddingBottom: "96px" }}
+        style={{ background: "linear-gradient(180deg, #0A1628 0%, #0D1F3C 100%)", paddingBottom: "12px" }}
       >
         <div className="container mx-auto px-4 md:px-6">
           <div className="grid lg:grid-cols-2 gap-16 items-center">
@@ -675,7 +598,7 @@ export default async function Home() {
             {/* Right – USP cards */}
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
               {[
-                { icon: Truck, title: "Giao Hàng Nhanh", desc: "Miễn phí toàn quốc cho đơn từ 500.000đ. Nhận hàng trong 1–3 ngày làm việc.", color: "#3B82F6" },
+                { icon: Truck, title: "Giao Hàng Nhanh", desc: "Miễn phí toàn quốc cho đơn từ 1.000.000đ. Nhận hàng trong 1–3 ngày làm việc.", color: "#3B82F6" },
                 { icon: ShieldCheck, title: "Bảo Hành Uy Tín", desc: "Cam kết 100% sản phẩm chính hãng. Bảo hành lên đến 24 tháng toàn quốc.", color: "#60A5FA" },
                 { icon: RefreshCw, title: "Đổi Trả Dễ Dàng", desc: "Hoàn tiền 100% trong 30 ngày nếu sản phẩm không đúng mô tả hoặc lỗi kỹ thuật.", color: "#FACC15" },
                 { icon: Award, title: "Chứng Nhận Khoa Học", desc: "Tất cả sản phẩm được kiểm định bởi Viện Khoa học Phát triển Tài năng Việt Nam.", color: "#FACC15" },
@@ -754,7 +677,7 @@ export default async function Home() {
       <section
         id="testimonials"
         className="w-full"
-        style={{ background: "linear-gradient(135deg, #0D1F3C 0%, #0A1628 50%, #0D2044 100%)", paddingTop: "96px", paddingBottom: "96px" }}
+        style={{ background: "linear-gradient(135deg, #0D1F3C 0%, #0A1628 50%, #0D2044 100%)", paddingTop: "12px", }}
       >
         <div className="container mx-auto px-4 md:px-6">
           <div className="text-center mb-14">
@@ -801,8 +724,79 @@ export default async function Home() {
       </section>
 
       {/* ═══════════════════════════════════════════════════
-          LIÊN HỆ
+          SẢN PHẨM NỔI BẬT
       ═══════════════════════════════════════════════════ */}
+      <section
+        id="products"
+        className="w-full"
+        style={{
+          background: "linear-gradient(180deg, #0A1628 0%, #0c1a30 50%, #0A1628 100%)",
+          paddingTop: "96px",
+          paddingBottom: "96px",
+        }}
+      >
+        {/* Decorative blobs */}
+        <div className="relative">
+          <div
+            className="absolute top-0 left-1/4 pointer-events-none"
+            style={{ width: "500px", height: "500px", background: "radial-gradient(circle, rgba(59,130,246,0.07) 0%, transparent 70%)", filter: "blur(60px)", transform: "translateY(-50%)" }}
+          />
+        </div>
+
+        <div className="container mx-auto px-4 md:px-6 relative">
+          {/* Header */}
+          <div className="flex flex-col sm:flex-row items-start sm:items-end justify-between gap-6 mb-14">
+            <div className="space-y-3">
+              <div
+                className="inline-flex items-center gap-2 rounded-full px-4 py-1.5 text-xs font-bold uppercase tracking-widest"
+                style={{ background: "rgba(59,130,246,0.1)", border: "1px solid rgba(59,130,246,0.25)", color: "#60A5FA" }}
+              >
+                <span className="h-1.5 w-1.5 rounded-full animate-pulse" style={{ background: "#FACC15" }} />
+                Được yêu thích nhất
+              </div>
+              <h2 className="font-extrabold tracking-tight" style={{ fontSize: "clamp(1.8rem, 3.5vw, 2.8rem)", color: "#FFFFFF" }}>
+                Sản Phẩm{" "}
+                <span style={{ color: "#60A5FA" }}>Nổi Bật</span>
+              </h2>
+              <p className="text-base max-w-md" style={{ color: "#93C5FD" }}>
+                Tuyển chọn những sản phẩm khoa học chất lượng cao – được chứng minh bằng dữ liệu và thực tiễn.
+              </p>
+            </div>
+            <Link
+              href="/products"
+              className="group inline-flex items-center gap-2 rounded-xl px-5 py-2.5 text-sm font-semibold transition-all duration-200"
+              style={{ border: "1px solid rgba(96,165,250,0.3)", color: "#60A5FA", background: "rgba(59,130,246,0.06)" }}
+            >
+              Xem tất cả sản phẩm
+              <ArrowRight className="h-4 w-4 group-hover:translate-x-0.5 transition-transform" />
+            </Link>
+          </div>
+
+          {/* Product Grid */}
+          {featuredProducts.length > 0 ? (
+            <>
+              <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 md:gap-5 stagger-children">
+                {featuredProducts.map((product: any) => (
+                  <ProductCard key={product.id} product={product} />
+                ))}
+              </div>
+              <div className="mt-14 text-center">
+                <Link href="/products" className="th-btn-primary inline-flex items-center gap-2.5">
+                  Khám Phá Toàn Bộ Sản Phẩm
+                  <ArrowRight className="h-4 w-4" />
+                </Link>
+              </div>
+            </>
+          ) : (
+            <div className="text-center py-20">
+              <p className="text-lg" style={{ color: "#60A5FA" }}>Sản phẩm đang được cập nhật...</p>
+              <Link href="/products" className="th-btn-primary inline-flex items-center gap-2 mt-6">
+                Xem tất cả <ArrowRight className="h-4 w-4" />
+              </Link>
+            </div>
+          )}
+        </div>
+      </section>
 
     </div>
   );
