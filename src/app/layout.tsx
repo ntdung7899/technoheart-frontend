@@ -10,22 +10,34 @@ const inter = Inter({
 });
 
 export const metadata: Metadata = {
-  title: "TechnoHeart | IT Solutions & Custom Software Development",
+  title: "TechnoHeart | Công nghệ & Sản phẩm chăm sóc sức khỏe tiên tiến",
   description:
-    "TechnoHeart is a premium IT solutions and software development company specializing in custom software, cloud infrastructure, cybersecurity, and AI-powered solutions.",
+    "TTechnoheart G9 – Ứng dụng khoa học và công nghệ tiên tiến trong chăm sóc sức khỏe, máy lọc nước, thiết bị bảo vệ sức khỏe và giải pháp công nghệ nhân văn.",
   keywords: [
-    "IT solutions",
-    "software development",
-    "custom software",
-    "cloud infrastructure",
-    "digital transformation",
-    "AI solutions",
-    "TechnoHeart",
+    "Technoheart G9",
+    "công nghệ chăm sóc sức khỏe",
+    "máy lọc nước",
+    "công nghệ lượng tử",
+    "thiết bị bảo vệ sức khỏe",
+    "sản phẩm sức khỏe",
+    "chuyển giao công nghệ",
+    "Việt Nam",
   ],
+
   openGraph: {
-    title: "TechnoHeart | IT Solutions & Custom Software Development",
+    title: "Technoheart G9 – Công nghệ & Sản phẩm chăm sóc sức khỏe tiên tiến",
     description:
-      "Premium IT solutions and software development. Build, scale, and lead with technology.",
+      "Kết nối khoa học – công nghệ – con người. Khám phá các sản phẩm và giải pháp chăm sóc sức khỏe tại Technoheart G9.",
+    siteName: "Technoheart G9",
+    images: [
+      {
+        url: "https://technoheartg9.com/og-image.jpg",
+        width: 1200,
+        height: 630,
+        alt: "Technoheart G9",
+      },
+    ],
+    locale: "vi_VN",
     type: "website",
   },
 };
