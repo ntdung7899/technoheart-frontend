@@ -40,7 +40,7 @@ export async function Header() {
 
             {/* Main Header */}
             <header className="th-header sticky top-0 z-50 w-full">
-                <div className="container mx-auto flex h-16 lg:h-24 items-center justify-between px-4 sm:px-6 lg:px-8 gap-4">
+                <div className="container mx-auto flex h-24 lg:h-24 items-center justify-between px-4 sm:px-6 lg:px-8 gap-4">
                     {/* Logo */}
                     <div className="flex-shrink-0">
                         <Link href="/" className="group flex items-center transition-all duration-300 group-hover:opacity-80">
@@ -49,7 +49,7 @@ export async function Header() {
                                 alt="Technoheart Logo"
                                 width={400}
                                 height={128}
-                                className="h-14 lg:h-24 w-auto object-contain transition-transform duration-300 group-hover:scale-105"
+                                className="h-20 lg:h-24 w-auto object-contain transition-transform duration-300 group-hover:scale-105"
                                 priority
                             />
                         </Link>
