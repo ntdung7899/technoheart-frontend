@@ -677,7 +677,7 @@ export default async function Home() {
       {/* ═══════════════════════════════════════════════════
           TESTIMONIALS
       ═══════════════════════════════════════════════════ */}
-      <section
+      {/* <section
         id="testimonials"
         className="w-full"
         style={{ background: "linear-gradient(135deg, #0D1F3C 0%, #0A1628 50%, #0D2044 100%)", paddingTop: "24px", paddingBottom: "12px", }}
@@ -724,7 +724,7 @@ export default async function Home() {
             ))}
           </div>
         </div>
-      </section>
+      </section> */}
 
       {/* ═══════════════════════════════════════════════════
           SẢN PHẨM NỔI BẬT
