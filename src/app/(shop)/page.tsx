@@ -571,11 +571,11 @@ export default async function Home() {
             {philosophy.map((item, idx) => (
               <div
                 key={idx}
-                className="th-service-card group"
-                style={{ gridColumn: idx === 4 ? "2" : undefined }}
+                className={`th-service-card group ${idx === 4 ? "lg:col-start-2" : ""
+                  }`}
               >
                 <div
-                  className="h-10 w-10 rounded-xl flex items-center justify-center mb-4 font-extrabold text-lg"
+                  className="h-10 w-10 rounded-xl flex items-center justify-center mb-4 font-extrabold text-lg shrink-0"
                   style={{ background: "rgba(59,130,246,0.15)", border: "1.5px solid rgba(59,130,246,0.3)", color: "#60A5FA" }}
                 >
                   {String(idx + 1).padStart(2, "0")}
@@ -703,6 +703,50 @@ export default async function Home() {
         </div>
       </section>
 
+      <section
+        id="reputation"
+        className="w-full relative overflow-hidden py-16 md:py-20"
+        style={{
+          background: "linear-gradient(180deg, #0A1628 0%, #0D1F3C 100%)"
+        }}
+      >
+        <div className="container mx-auto px-4 text-center relative z-10">
+          <h2
+            className="font-extrabold tracking-tight mb-4" style={{ fontSize: "clamp(1.8rem, 3.5vw, 2.8rem)", color: "#FFFFFF", lineHeight: "1.2" }}
+          >
+            UY TÍN <span style={{ color: "#60A5FA" }}>GHI NHẬN</span>
+          </h2>
+          <div className="max-w-5xl mx-auto space-y-4">
+            <p className="text-white text-lg md:text-xl leading-relaxed font-medium">
+              Các bài báo, phỏng vấn và giải thưởng vinh danh Giáo sư Trần Văn Tín.
+              Chứng nhận của Viện Khoa học & Phát triển Tài năng Việt Nam.
+              Sự công nhận của cộng đồng khoa học & truyền thông trong và ngoài nước.
+            </p>
+          </div>
+
+          {/* Video Frames */}
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mt-12 max-w-6xl mx-auto">
+            {[
+              "dbOe2JLqApg",
+              "8A97HlzWm6A",
+              "Zo_LGxcBOcw"
+            ].map((videoId, index) => (
+              <div
+                key={index}
+                className="relative aspect-video rounded-2xl overflow-hidden shadow-2xl border border-white/10 group"
+              >
+                <iframe
+                  className="absolute inset-0 w-full h-full"
+                  src={`https://www.youtube.com/embed/${videoId}`}
+                  title={`TechnoHeart Reputation Video ${index + 1}`}
+                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                  allowFullScreen
+                ></iframe>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
       {/* ═══════════════════════════════════════════════════
           TESTIMONIALS
       ═══════════════════════════════════════════════════ */}
