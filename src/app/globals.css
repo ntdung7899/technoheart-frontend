@@ -2,31 +2,24 @@
 @import "tailwindcss";
 
 
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --color-primary: var(--primary);
-  --color-primary-foreground: var(--primary-foreground);
-  --color-secondary: var(--secondary);
-  --color-secondary-foreground: var(--secondary-foreground);
-  --color-muted: var(--muted);
-  --color-muted-foreground: var(--muted-foreground);
-  --color-accent: var(--accent);
-  --color-accent-foreground: var(--accent-foreground);
-  --color-destructive: var(--destructive);
-  --color-destructive-foreground: var(--destructive-foreground);
-  --color-border: var(--border);
-  --color-input: var(--input);
-  --color-ring: var(--ring);
-  --color-card: var(--card);
-  --color-card-foreground: var(--card-foreground);
-  --radius-lg: var(--radius);
-  --radius-md: calc(var(--radius) - 2px);
-  --radius-sm: calc(var(--radius) - 4px);
-  --font-sans: 'Inter', system-ui, -apple-system, sans-serif;
-}
-
+/* =========================================
+   TECHNOHEART DESIGN TOKENS
+   ========================================= */
 :root {
+  /* Brand Colors */
+  --th-bg: #0A1628;
+  --th-bg-alt: #0D1F3C;
+  --th-primary: #3B82F6;
+  --th-primary-lt: #60A5FA;
+  --th-yellow: #FACC15;
+  --th-yellow-lt: #FFD700;
+  --th-white: #FFFFFF;
+  --th-text-muted: #93C5FD;
+  --th-text-dim: #CBD5E1;
+  --th-border: rgba(59, 130, 246, 0.2);
+  --th-card-bg: rgba(255, 255, 255, 0.03);
+
+  /* Legacy (kept for admin / other pages) */
   --background: #fafafa;
   --foreground: #0a0a0a;
   --primary: #2563eb;
@@ -67,6 +60,31 @@
   --card-foreground: #f8fafc;
 }
 
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-destructive: var(--destructive);
+  --color-destructive-foreground: var(--destructive-foreground);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --radius-lg: var(--radius);
+  --radius-md: calc(var(--radius) - 2px);
+  --radius-sm: calc(var(--radius) - 4px);
+  --font-sans: 'Inter', system-ui, -apple-system, sans-serif;
+}
+
+
 /* ===== BASE ===== */
 html {
   scroll-behavior: smooth;
@@ -77,29 +95,40 @@ body {
   font-family: 'Inter', system-ui, -apple-system, sans-serif;
 }
 
-/* ===== CUSTOM SCROLLBAR ===== */
+/* TechnoHeart page background */
+.bg-th-bg {
+  background-color: var(--th-bg);
+}
+
+
+/* =========================================
+   CUSTOM SCROLLBAR
+   ========================================= */
 ::-webkit-scrollbar {
   width: 6px;
 }
 
 ::-webkit-scrollbar-track {
-  background: transparent;
+  background: #0A1628;
 }
 
 ::-webkit-scrollbar-thumb {
-  background: var(--border);
+  background: rgba(59, 130, 246, 0.3);
   border-radius: 999px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: var(--muted-foreground);
+  background: rgba(59, 130, 246, 0.5);
 }
 
-/* ===== ANIMATIONS ===== */
+
+/* =========================================
+   ANIMATIONS
+   ========================================= */
 @keyframes fade-in-up {
   from {
     opacity: 0;
-    transform: translateY(20px);
+    transform: translateY(24px);
   }
 
   to {
@@ -133,7 +162,7 @@ body {
 @keyframes slide-in-right {
   from {
     opacity: 0;
-    transform: translateX(20px);
+    transform: translateX(24px);
   }
 
   to {
@@ -145,7 +174,7 @@ body {
 @keyframes slide-in-left {
   from {
     opacity: 0;
-    transform: translateX(-20px);
+    transform: translateX(-24px);
   }
 
   to {
@@ -172,7 +201,7 @@ body {
   }
 
   50% {
-    transform: translateY(-10px);
+    transform: translateY(-12px);
   }
 }
 
@@ -180,11 +209,42 @@ body {
 
   0%,
   100% {
-    box-shadow: 0 0 20px rgba(37, 99, 235, 0.15);
+    box-shadow: 0 0 20px rgba(59, 130, 246, 0.2);
   }
 
   50% {
-    box-shadow: 0 0 40px rgba(37, 99, 235, 0.3);
+    box-shadow: 0 0 50px rgba(59, 130, 246, 0.4);
+  }
+}
+
+@keyframes pulse-glow-blue {
+
+  0%,
+  100% {
+    opacity: 0.6;
+    transform: scale(1);
+  }
+
+  50% {
+    opacity: 1;
+    transform: scale(1.05);
+  }
+}
+
+@keyframes ping-slow {
+  0% {
+    transform: scale(1);
+    opacity: 1;
+  }
+
+  75% {
+    transform: scale(2);
+    opacity: 0;
+  }
+
+  100% {
+    transform: scale(2);
+    opacity: 0;
   }
 }
 
@@ -243,11 +303,11 @@ body {
 }
 
 .animate-fade-in-up {
-  animation: fade-in-up 0.6s ease-out forwards;
+  animation: fade-in-up 0.7s ease-out forwards;
 }
 
 .animate-fade-in {
-  animation: fade-in 0.5s ease-out forwards;
+  animation: fade-in 0.6s ease-out forwards;
 }
 
 .animate-scale-in {
@@ -263,11 +323,20 @@ body {
 }
 
 .animate-float {
-  animation: float 3s ease-in-out infinite;
+  animation: float 4s ease-in-out infinite;
 }
 
 .animate-pulse-glow {
   animation: pulse-glow 2s ease-in-out infinite;
+}
+
+.animate-pulse-glow-blue {
+  animation: pulse-glow-blue 3s ease-in-out infinite;
+}
+
+.animate-ping-slow {
+  animation: ping-slow 2s cubic-bezier(0, 0, 0.2, 1) infinite;
+  display: inline-block;
 }
 
 .animate-gradient {
@@ -290,7 +359,7 @@ body {
 }
 
 .stagger-children>*:nth-child(2) {
-  animation-delay: 0.1s;
+  animation-delay: 0.10s;
 }
 
 .stagger-children>*:nth-child(3) {
@@ -298,7 +367,7 @@ body {
 }
 
 .stagger-children>*:nth-child(4) {
-  animation-delay: 0.2s;
+  animation-delay: 0.20s;
 }
 
 .stagger-children>*:nth-child(5) {
@@ -306,7 +375,7 @@ body {
 }
 
 .stagger-children>*:nth-child(6) {
-  animation-delay: 0.3s;
+  animation-delay: 0.30s;
 }
 
 .stagger-children>*:nth-child(7) {
@@ -314,10 +383,237 @@ body {
 }
 
 .stagger-children>*:nth-child(8) {
-  animation-delay: 0.4s;
+  animation-delay: 0.40s;
 }
 
-/* ===== UTILITY CLASSES ===== */
+
+/* =========================================
+   TECHNOHEART COMPONENT CLASSES
+   ========================================= */
+
+/* ---- Buttons ---- */
+.th-btn-primary {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 12px 28px;
+  border-radius: 12px;
+  font-size: 0.9375rem;
+  font-weight: 700;
+  background: linear-gradient(135deg, #3B82F6 0%, #60A5FA 100%);
+  color: #FFFFFF;
+  border: none;
+  cursor: pointer;
+  transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow: 0 4px 20px rgba(59, 130, 246, 0.35), 0 1px 0 rgba(255, 255, 255, 0.1) inset;
+  text-decoration: none;
+}
+
+.th-btn-primary:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 30px rgba(59, 130, 246, 0.5);
+  background: linear-gradient(135deg, #2563EB 0%, #3B82F6 100%);
+}
+
+.th-btn-primary:active {
+  transform: translateY(0);
+}
+
+.th-btn-outline {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 12px 28px;
+  border-radius: 12px;
+  font-size: 0.9375rem;
+  font-weight: 700;
+  background: transparent;
+  color: #FFFFFF;
+  border: 1.5px solid rgba(96, 165, 250, 0.5);
+  cursor: pointer;
+  transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+  text-decoration: none;
+}
+
+.th-btn-outline:hover {
+  transform: translateY(-2px);
+  background: rgba(59, 130, 246, 0.1);
+  border-color: #60A5FA;
+  box-shadow: 0 0 20px rgba(59, 130, 246, 0.15);
+}
+
+/* ---- Header ---- */
+.th-header {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 50;
+  width: 100%;
+  background: rgba(10, 22, 40, 0.88);
+  backdrop-filter: blur(24px);
+  -webkit-backdrop-filter: blur(24px);
+  border-bottom: 1px solid rgba(59, 130, 246, 0.12);
+}
+
+.th-logo-icon {
+  background: linear-gradient(135deg, #3B82F6, #60A5FA);
+  box-shadow: 0 4px 14px rgba(59, 130, 246, 0.4);
+}
+
+.th-nav-link {
+  color: #93C5FD;
+}
+
+.th-nav-link:hover {
+  color: #FFFFFF;
+  background: rgba(59, 130, 246, 0.1);
+}
+
+.th-header-signin {
+  color: #93C5FD;
+  border: 1px solid rgba(96, 165, 250, 0.25);
+}
+
+.th-header-signin:hover {
+  color: #FFFFFF;
+  border-color: rgba(96, 165, 250, 0.5);
+  background: rgba(59, 130, 246, 0.08);
+}
+
+/* ---- Color utilities ---- */
+.text-th-yellow {
+  color: #FACC15;
+}
+
+/* ---- Header icon buttons ---- */
+.th-icon-btn {
+  color: #93C5FD;
+}
+
+.th-icon-btn:hover {
+  color: #FFFFFF;
+  background: rgba(59, 130, 246, 0.1);
+}
+
+/* ---- Dropdown menu items ---- */
+.th-dropdown-item {
+  color: #93C5FD;
+}
+
+.th-dropdown-item:hover {
+  color: #FFFFFF;
+  background: rgba(59, 130, 246, 0.08);
+}
+
+
+/* ---- Service Cards ---- */
+.th-service-card {
+  padding: 28px;
+  border-radius: 16px;
+  background: rgba(255, 255, 255, 0.025);
+  border: 1px solid rgba(59, 130, 246, 0.15);
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  cursor: pointer;
+}
+
+.th-service-card:hover {
+  background: rgba(59, 130, 246, 0.06);
+  border-color: rgba(59, 130, 246, 0.4);
+  box-shadow: 0 0 40px rgba(59, 130, 246, 0.1), 0 8px 32px rgba(0, 0, 0, 0.3);
+  transform: translateY(-4px);
+}
+
+/* ---- Portfolio Cards ---- */
+.th-portfolio-card {
+  border-radius: 16px;
+  overflow: hidden;
+  background: rgba(255, 255, 255, 0.025);
+  border: 1px solid rgba(59, 130, 246, 0.15);
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.th-portfolio-card:hover {
+  border-color: rgba(59, 130, 246, 0.4);
+  box-shadow: 0 8px 40px rgba(0, 0, 0, 0.4), 0 0 30px rgba(59, 130, 246, 0.1);
+  transform: translateY(-5px);
+}
+
+/* ---- Testimonial Cards ---- */
+.th-testimonial-card {
+  padding: 28px;
+  border-radius: 16px;
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(59, 130, 246, 0.15);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  transition: all 0.3s ease;
+}
+
+.th-testimonial-card:hover {
+  border-color: rgba(250, 204, 21, 0.3);
+  box-shadow: 0 0 30px rgba(250, 204, 21, 0.05), 0 8px 32px rgba(0, 0, 0, 0.3);
+  transform: translateY(-3px);
+}
+
+/* ---- Core Value Cards ---- */
+.th-value-card:hover {
+  background: rgba(255, 255, 255, 0.045) !important;
+  border-color: rgba(59, 130, 246, 0.3) !important;
+  transform: translateX(6px);
+  box-shadow: 0 4px 24px rgba(0, 0, 0, 0.3);
+}
+
+/* ---- Hero decorative ring ---- */
+.hero-ring-spin {
+  animation: hero-spin 30s linear infinite;
+}
+
+/* ---- Floating cards ---- */
+.th-float-card {
+  filter: drop-shadow(0 8px 24px rgba(0, 0, 0, 0.5));
+}
+
+
+.th-glass-card {
+  background: rgba(10, 22, 40, 0.85);
+  backdrop-filter: blur(24px);
+  -webkit-backdrop-filter: blur(24px);
+  border: 1px solid rgba(59, 130, 246, 0.25);
+  border-radius: 14px;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4), 0 0 0 1px rgba(255, 255, 255, 0.04);
+}
+
+/* ---- Inputs ---- */
+.th-input {
+  width: 100%;
+  padding: 12px 16px;
+  border-radius: 12px;
+  font-size: 0.9rem;
+  color: #FFFFFF;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1.5px solid rgba(59, 130, 246, 0.25);
+  outline: none;
+  transition: all 0.2s ease;
+  font-family: 'Inter', sans-serif;
+}
+
+.th-input::placeholder {
+  color: rgba(147, 197, 253, 0.4);
+}
+
+.th-input:focus {
+  border-color: #3B82F6;
+  background: rgba(59, 130, 246, 0.06);
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.15);
+}
+
+
+/* =========================================
+   LEGACY UTILITY CLASSES (for admin/other)
+   ========================================= */
 
 /* Glassmorphism */
 .glass {
@@ -443,7 +739,7 @@ select:focus {
   border-color: var(--primary);
 }
 
-/* ===== HERO SECTION ===== */
+/* ===== HERO SECTION (legacy shop) ===== */
 .hero-section-bg {
   background: linear-gradient(135deg, #eef2ff 0%, #f0f4ff 30%, #f5f3ff 65%, #fdf4ff 100%);
 }
@@ -452,13 +748,11 @@ select:focus {
   background: linear-gradient(135deg, #0a0f1e 0%, #0f172a 40%, #12102b 75%, #1a0f2e 100%);
 }
 
-/* Dot-grid texture overlay */
 .hero-dot-grid {
   background-image: radial-gradient(circle, #6366f1 1px, transparent 1px);
   background-size: 28px 28px;
 }
 
-/* Shimmer badge */
 .hero-shimmer-badge {
   background: linear-gradient(90deg,
       rgba(37, 99, 235, 0.08) 0%,
@@ -469,7 +763,6 @@ select:focus {
   animation: hero-badge-shimmer 3s linear infinite;
 }
 
-/* Rotating decorative rings */
 .hero-ring-spin {
   animation: hero-spin 18s linear infinite;
   transform-origin: center;
@@ -480,7 +773,6 @@ select:focus {
   transform-origin: center;
 }
 
-/* Floating cards */
 .hero-float-card {
   filter: drop-shadow(0 8px 24px rgba(0, 0, 0, 0.10));
 }
