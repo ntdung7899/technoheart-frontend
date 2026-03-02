@@ -326,9 +326,21 @@ export default async function Home() {
       <section
         id="about"
         className="w-full"
-        style={{ background: "linear-gradient(180deg, #0A1628 0%, #0D1F3C 100%)", paddingTop: "96px", paddingBottom: "96px" }}
+        style={{ background: "linear-gradient(180deg, #0A1628 0%, #0D1F3C 100%)", paddingBottom: "12px" }}
       >
         <div className="container mx-auto px-4 md:px-6">
+
+          {/* Badge – căn giữa toàn section */}
+          <div className="flex justify-center pt-10 pb-8">
+            <div
+              className="inline-flex items-center gap-2 rounded-full px-4 py-2 text-sm font-semibold"
+              style={{ background: "rgba(59,130,246,0.1)", border: "1px solid rgba(59,130,246,0.25)", color: "#60A5FA" }}
+            >
+              <FlaskConical className="h-4 w-4" style={{ color: "#FACC15" }} />
+              Giới thiệu về Technoheart
+            </div>
+          </div>
+
           <div className="grid lg:grid-cols-2 gap-16 items-center">
 
             {/* Logo / image */}
@@ -368,13 +380,6 @@ export default async function Home() {
 
             {/* Text */}
             <div className="space-y-6">
-              <div
-                className="inline-flex items-center gap-2 rounded-full px-4 py-2 text-sm font-semibold"
-                style={{ background: "rgba(59,130,246,0.1)", border: "1px solid rgba(59,130,246,0.25)", color: "#60A5FA" }}
-              >
-                <FlaskConical className="h-4 w-4" style={{ color: "#FACC15" }} />
-                Giới thiệu về Technoheart
-              </div>
 
               <h2 className="font-extrabold tracking-tight" style={{ fontSize: "clamp(1.2rem, 3.5vw, 2.6rem)", color: "#FFFFFF", lineHeight: "1.3" }}>
                 Đơn vị tiên phong chuyển giao
@@ -419,7 +424,7 @@ export default async function Home() {
       <section
         id="values"
         className="w-full"
-        style={{ background: "linear-gradient(180deg, #0D1F3C 0%, #0A1628 100%)", paddingBottom: "12px" }}
+        style={{ background: "linear-gradient(180deg, #0D1F3C 0%, #0A1628 100%)", paddingTop: '30px', paddingBottom: "12px" }}
       >
         <div className="container mx-auto px-4 md:px-6">
           <div className="text-center mb-14">
@@ -471,7 +476,7 @@ export default async function Home() {
       <section
         id="philosophy"
         className="w-full"
-        style={{ background: "linear-gradient(180deg, #0D1F3C 0%, #0A1628 100%)", paddingTop: "96px", paddingBottom: "96px" }}
+        style={{ background: "linear-gradient(180deg, #0D1F3C 0%, #0A1628 100%)", paddingTop: '30px', paddingBottom: "12px" }}
       >
         <div className="container mx-auto px-4 md:px-6">
           <div className="text-center mb-14">
@@ -547,7 +552,7 @@ export default async function Home() {
       <section
         id="why"
         className="w-full"
-        style={{ background: "linear-gradient(180deg, #0A1628 0%, #0D1F3C 100%)", paddingBottom: "12px" }}
+        style={{ background: "linear-gradient(180deg, #0A1628 0%, #0D1F3C 100%)", paddingTop: '30px', paddingBottom: "12px" }}
       >
         <div className="container mx-auto px-4 md:px-6">
           <div className="grid lg:grid-cols-2 gap-16 items-center">
@@ -677,7 +682,7 @@ export default async function Home() {
       <section
         id="testimonials"
         className="w-full"
-        style={{ background: "linear-gradient(135deg, #0D1F3C 0%, #0A1628 50%, #0D2044 100%)", paddingTop: "12px", }}
+        style={{ background: "linear-gradient(135deg, #0D1F3C 0%, #0A1628 50%, #0D2044 100%)", paddingTop: "24px", paddingBottom: "12px", }}
       >
         <div className="container mx-auto px-4 md:px-6">
           <div className="text-center mb-14">
