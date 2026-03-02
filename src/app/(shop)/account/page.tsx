@@ -26,7 +26,7 @@ export default async function AccountDashboard() {
                     Xin chào, {user?.name || "bạn"} 👋
                 </h1>
                 <p className="text-muted-foreground text-sm mt-1">
-                    Chào mừng bạn trở lại với TechnoHeart
+                    Chào mừng bạn trở lại với Technoheart
                 </p>
             </div>
 

@@ -28,7 +28,7 @@ export async function Footer() {
                         {/* <Link href="/" className="inline-block transition-opacity hover:opacity-80">
                                 <Image
                                     src="/logo-techno-web.png"
-                                    alt="TechnoHeart Logo"
+                                    alt="Technoheart Logo"
                                     width={180}
                                     height={54}
                                     className="h-12 w-auto object-contain"

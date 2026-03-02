@@ -109,7 +109,7 @@ function SignupContent() {
                             </div>
                         </Link>
                         <h1 className="text-3xl font-extrabold tracking-tight mb-2">Tạo tài khoản mới</h1>
-                        <p className="text-muted-foreground">Bắt đầu hành trình mua sắm cùng TechnoHeart</p>
+                        <p className="text-muted-foreground">Bắt đầu hành trình mua sắm cùng Technoheart</p>
                     </div>
 
                     <div className="rounded-2xl border border-border/50 bg-card p-7 shadow-xl">

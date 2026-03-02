@@ -5,8 +5,8 @@ import { Calendar, Clock, ArrowRight, Tag } from 'lucide-react';
 import prisma from '@/lib/prisma';
 
 export const metadata = {
-    title: "Tin tức | TechnoHeart",
-    description: "Cập nhật xu hướng công nghệ, đánh giá sản phẩm và khuyến mãi từ TechnoHeart.",
+    title: "Tin tức | Technoheart",
+    description: "Cập nhật xu hướng công nghệ, đánh giá sản phẩm và khuyến mãi từ Technoheart.",
 };
 
 export const dynamic = 'force-dynamic';
@@ -36,7 +36,7 @@ export default async function NewsPage() {
                         Tin tức &amp; Sự kiện
                     </h1>
                     <p className="text-muted-foreground text-lg max-w-2xl mx-auto animate-fade-in-up" style={{ animationDelay: '0.1s' }}>
-                        Cập nhật xu hướng công nghệ, đánh giá sản phẩm chuyên sâu và khuyến mãi độc quyền từ TechnoHeart.
+                        Cập nhật xu hướng công nghệ, đánh giá sản phẩm chuyên sâu và khuyến mãi độc quyền từ Technoheart.
                     </p>
                 </div>
             </section>

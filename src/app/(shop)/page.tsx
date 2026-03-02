@@ -108,19 +108,19 @@ const testimonials = [
   {
     name: "Nguyễn Thị Lan",
     role: "Giám đốc điều hành, HealthTech VN",
-    text: "TechnoHeart đã giúp chúng tôi chuyển hóa nền tảng khoa học thành sản phẩm thực tiễn. Đội ngũ chuyên nghiệp và tận tâm, dự án hoàn thành trước tiến độ 2 tuần.",
+    text: "Technoheart đã giúp chúng tôi chuyển hóa nền tảng khoa học thành sản phẩm thực tiễn. Đội ngũ chuyên nghiệp và tận tâm, dự án hoàn thành trước tiến độ 2 tuần.",
     rating: 5,
   },
   {
     name: "Trần Minh Quân",
     role: "CEO, EduSmart Platform",
-    text: "Với sự hỗ trợ của TechnoHeart, hệ thống giáo dục của chúng tôi đã phục vụ hơn 50.000 học viên. Công nghệ AI và blockchain tích hợp hoàn hảo với yêu cầu minh bạch.",
+    text: "Với sự hỗ trợ của Technoheart, hệ thống giáo dục của chúng tôi đã phục vụ hơn 50.000 học viên. Công nghệ AI và blockchain tích hợp hoàn hảo với yêu cầu minh bạch.",
     rating: 5,
   },
   {
     name: "Phạm Thu Hương",
     role: "Trưởng phòng Công nghệ, VinaBio",
-    text: "Nền tảng phân tích dựa trên khoa học mà TechnoHeart xây dựng đã tăng tỷ lệ chuyển đổi của chúng tôi lên 34%. Đội ngũ hiểu sâu về cả khoa học lẫn công nghệ.",
+    text: "Nền tảng phân tích dựa trên khoa học mà Technoheart xây dựng đã tăng tỷ lệ chuyển đổi của chúng tôi lên 34%. Đội ngũ hiểu sâu về cả khoa học lẫn công nghệ.",
     rating: 5,
   },
 ];
@@ -208,7 +208,7 @@ export default async function Home() {
               <div className="space-y-4">
                 <h1
                   className="font-extrabold leading-tight tracking-tight"
-                  style={{ fontSize: "clamp(2.4rem, 5vw, 3.6rem)", color: "#FFFFFF", lineHeight: "1.1" }}
+                  style={{ fontSize: "clamp(2.0rem, 5vw, 3.6rem)", color: "#FFFFFF", lineHeight: "1.1" }}
                 >
                   Khoa học vì{" "}
                   <span style={{ background: "linear-gradient(90deg, #3B82F6, #60A5FA)", WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent", backgroundClip: "text" }}>
@@ -218,7 +218,7 @@ export default async function Home() {
                   <span style={{ color: "#FACC15" }}>Trái tim</span>
                 </h1>
                 <p className="text-lg leading-relaxed max-w-xl" style={{ color: "#93C5FD" }}>
-                  TechnoHeart – đơn vị trực thuộc Viện Khoa học Phát triển Tài năng Việt Nam – Bộ Khoa học & Công nghệ (ID: A‑1940). Tiên phong chuyển giao, thương mại hóa và lan tỏa các công trình khoa học Việt Nam.
+                  Technoheart – đơn vị trực thuộc Viện Khoa học Phát triển Tài năng Việt Nam – Bộ Khoa học & Công nghệ (ID: A‑1940). Tiên phong chuyển giao, thương mại hóa và lan tỏa các công trình khoa học Việt Nam.
                 </p>
               </div>
 
@@ -264,31 +264,31 @@ export default async function Home() {
                     boxShadow: "0 0 0 1px rgba(59,130,246,0.2), 0 32px 64px rgba(0,0,0,0.5), 0 0 80px rgba(59,130,246,0.15)",
                   }}
                 >
-                  <Image src="/hero-dashboard.png" alt="Nền tảng TechnoHeart" width={520} height={390} className="object-cover w-full" priority />
+                  <Image src="/hero-dashboard.png" alt="Nền tảng Technoheart" width={520} height={390} className="object-cover w-full" priority />
                   <div className="absolute inset-0" style={{ background: "linear-gradient(to bottom, transparent 60%, rgba(10,22,40,0.45) 100%)" }} />
                 </div>
 
-                {/* float cards */}
-                <div className="absolute -left-8 top-8 animate-float th-float-card" style={{ animationDelay: "0.5s" }}>
+                {/* float cards – ẩn trên mobile để tránh overflow */}
+                <div className="hidden sm:block absolute -left-8 top-8 animate-float th-float-card" style={{ animationDelay: "0.5s" }}>
                   <div className="th-glass-card flex items-center gap-3 px-4 py-3">
                     <div className="h-9 w-9 rounded-xl flex items-center justify-center shrink-0" style={{ background: "rgba(250,204,21,0.15)" }}>
                       <TrendingUp className="h-4 w-4" style={{ color: "#FACC15" }} />
                     </div>
                     <div>
-                      <p className="text-[10px] font-medium uppercase tracking-wider" style={{ color: "#60A5FA" }}>Sản phẩm</p>
-                      <p className="text-sm font-bold text-white">200+ Khoa học</p>
+                      <p className="text-[10px] font-medium uppercase tracking-wider" style={{ color: "#60A5FA" }}>Sản phẩm kinh doanh</p>
+                      <p className="text-sm font-bold text-white">200+</p>
                     </div>
                   </div>
                 </div>
 
-                <div className="absolute -right-8 bottom-16 animate-float th-float-card" style={{ animationDelay: "1s" }}>
+                <div className="hidden sm:block absolute -right-8 bottom-16 animate-float th-float-card" style={{ animationDelay: "1s" }}>
                   <div className="th-glass-card flex items-center gap-3 px-4 py-3">
                     <div className="h-9 w-9 rounded-xl flex items-center justify-center shrink-0" style={{ background: "rgba(59,130,246,0.2)" }}>
                       <Zap className="h-4 w-4" style={{ color: "#60A5FA" }} />
                     </div>
                     <div>
-                      <p className="text-[10px] font-medium uppercase tracking-wider" style={{ color: "#60A5FA" }}>Đối tác</p>
-                      <p className="text-sm font-bold text-white">50+ Chuyên gia</p>
+                      <p className="text-[10px] font-medium uppercase tracking-wider" style={{ color: "#60A5FA" }}>Chương trình đào tạo kinh doanh</p>
+                      <p className="text-sm font-bold text-white">50+</p>
                     </div>
                   </div>
                 </div>
@@ -341,9 +341,8 @@ export default async function Home() {
                   style={{ background: "radial-gradient(circle, rgba(59,130,246,0.25) 0%, transparent 70%)", filter: "blur(30px)", transform: "scale(1.15)" }}
                 />
                 <div
-                  className="relative rounded-3xl overflow-hidden flex items-center justify-center"
+                  className="relative rounded-3xl overflow-hidden flex items-center justify-center w-full max-w-[340px] mx-auto aspect-square"
                   style={{
-                    width: "340px", height: "340px",
                     background: "linear-gradient(135deg, #0D1F3C 0%, #1E3A5F 100%)",
                     border: "1px solid rgba(59,130,246,0.25)",
                     boxShadow: "0 24px 64px rgba(0,0,0,0.5)",
@@ -353,7 +352,7 @@ export default async function Home() {
                   <div className="text-center flex flex-col items-center justify-center gap-4">
                     <Image
                       src="/logo-techno-web.png"
-                      alt="TechnoHeart Logo"
+                      alt="Technoheart Logo"
                       width={240}
                       height={120}
                       className="object-contain w-auto max-h-40"
@@ -376,10 +375,10 @@ export default async function Home() {
                 style={{ background: "rgba(59,130,246,0.1)", border: "1px solid rgba(59,130,246,0.25)", color: "#60A5FA" }}
               >
                 <FlaskConical className="h-4 w-4" style={{ color: "#FACC15" }} />
-                Giới thiệu về TechnoHeart
+                Giới thiệu về Technoheart
               </div>
 
-              <h2 className="font-extrabold tracking-tight" style={{ fontSize: "clamp(1.8rem, 3.5vw, 2.6rem)", color: "#FFFFFF", lineHeight: "1.2" }}>
+              <h2 className="font-extrabold tracking-tight" style={{ fontSize: "clamp(1.5rem, 3.5vw, 2.6rem)", color: "#FFFFFF", lineHeight: "1.2" }}>
                 Đơn vị tiên phong chuyển giao{" "}
                 <span style={{ color: "#60A5FA" }}>Khoa học Việt Nam</span>{" "}
                 ra thế giới
@@ -387,10 +386,10 @@ export default async function Home() {
 
               <div className="space-y-4 text-base leading-relaxed" style={{ color: "#CBD5E1" }}>
                 <p>
-                  <strong className="text-white">TechnoHeart</strong> – đơn vị trực thuộc Viện Khoa học Phát triển Tài năng Việt Nam – Bộ Khoa học & Công nghệ (ID: A‑1940). Văn phòng: Phòng 410, Tòa nhà SBI, Đường số 3, Lô 6B, Khu Công viên Phần mềm Quang Trung, TP. Hồ Chí Minh.
+                  <strong className="text-white">Technoheart</strong> – đơn vị trực thuộc Viện Khoa học Phát triển Tài năng Việt Nam – Bộ Khoa học & Công nghệ (ID: A‑1940). Văn phòng: Phòng 410, Tòa nhà SBI, Đường số 3, Lô 6B, Khu Công viên Phần mềm Quang Trung, TP. Hồ Chí Minh.
                 </p>
                 <p>
-                  TechnoHeart đã tiên phong trong việc chuyển giao, thương mại hóa và lan tỏa các công trình khoa học Việt Nam, kết nối tri thức đến cộng đồng, biến khoa học thành giá trị sống phục vụ sức khỏe và hạnh phúc con người.
+                  Technoheart đã tiên phong trong việc chuyển giao, thương mại hóa và lan tỏa các công trình khoa học Việt Nam, kết nối tri thức đến cộng đồng, biến khoa học thành giá trị sống phục vụ sức khỏe và hạnh phúc con người.
                 </p>
               </div>
 
@@ -435,7 +434,7 @@ export default async function Home() {
               Giá Trị <span style={{ color: "#60A5FA" }}>Cốt Lõi</span>
             </h2>
             <p className="text-lg max-w-2xl mx-auto" style={{ color: "#93C5FD" }}>
-              Năm nguyên tắc định hướng mọi hoạt động của TechnoHeart – từ nghiên cứu đến sản phẩm và phụng sự cộng đồng.
+              Năm nguyên tắc định hướng mọi hoạt động của Technoheart – từ nghiên cứu đến sản phẩm và phụng sự cộng đồng.
             </p>
           </div>
 
@@ -560,7 +559,7 @@ export default async function Home() {
             </div>
             <h2 className="font-extrabold tracking-tight mb-3" style={{ fontSize: "clamp(1.8rem, 3.5vw, 2.8rem)", color: "#FFFFFF" }}>
               Triết Lý Vận Hành{" "}
-              <span style={{ color: "#60A5FA" }}>TechnoHeart</span>
+              <span style={{ color: "#60A5FA" }}>Technoheart</span>
             </h2>
             <p className="italic text-lg mb-2" style={{ color: "#93C5FD" }}>
               "Khoa học là nền tảng – Phụng sự là động lực – Con người là trung tâm."
@@ -598,7 +597,7 @@ export default async function Home() {
             <Quote className="h-10 w-10 mx-auto mb-4" style={{ color: "#FACC15" }} />
             <h3 className="text-lg font-bold text-white mb-4 uppercase tracking-wide">Thông điệp lãnh đạo</h3>
             <blockquote className="text-base italic leading-relaxed max-w-3xl mx-auto mb-6" style={{ color: "#CBD5E1" }}>
-              "Chúng tôi không chỉ tạo ra công nghệ – chúng tôi kiến tạo tương lai nhân văn. Mỗi bước tiến của TechnoHeart là hành trình đưa khoa học phục vụ con người, để tri thức không còn nằm trong phòng thí nghiệm mà tỏa sáng trong cuộc sống."
+              "Chúng tôi không chỉ tạo ra công nghệ – chúng tôi kiến tạo tương lai nhân văn. Mỗi bước tiến của Technoheart là hành trình đưa khoa học phục vụ con người, để tri thức không còn nằm trong phòng thí nghiệm mà tỏa sáng trong cuộc sống."
             </blockquote>
 
             {/* Brand spirit */}
@@ -618,7 +617,7 @@ export default async function Home() {
       </section>
 
       {/* ═══════════════════════════════════════════════════
-          TẠI SAO CHỌN TECHNOHEART
+          TẠI SAO CHỌN Technoheart
       ═══════════════════════════════════════════════════ */}
       <section
         id="why"
@@ -639,10 +638,10 @@ export default async function Home() {
                 </div>
                 <h2 className="font-extrabold tracking-tight mb-4" style={{ fontSize: "clamp(1.8rem, 3.5vw, 2.8rem)", color: "#FFFFFF", lineHeight: "1.2" }}>
                   Tại Sao Chọn{" "}
-                  <span style={{ color: "#60A5FA" }}>TechnoHeart?</span>
+                  <span style={{ color: "#60A5FA" }}>Technoheart?</span>
                 </h2>
                 <p className="text-lg leading-relaxed" style={{ color: "#93C5FD" }}>
-                  06 lý do khiến hàng nghìn khách hàng tin tưởng lựa chọn TechnoHeart là đối tác phát triển khoa học – công nghệ của họ.
+                  06 lý do khiến hàng nghìn khách hàng tin tưởng lựa chọn Technoheart là đối tác phát triển khoa học – công nghệ của họ.
                 </p>
               </div>
 
@@ -738,7 +737,7 @@ export default async function Home() {
                 <iframe
                   className="absolute inset-0 w-full h-full"
                   src={`https://www.youtube.com/embed/${videoId}`}
-                  title={`TechnoHeart Reputation Video ${index + 1}`}
+                  title={`Technoheart Reputation Video ${index + 1}`}
                   allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
                   allowFullScreen
                 ></iframe>

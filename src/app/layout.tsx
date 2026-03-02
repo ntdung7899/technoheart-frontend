@@ -10,7 +10,7 @@ const inter = Inter({
 });
 
 export const metadata: Metadata = {
-  title: "TechnoHeart | Công nghệ & Sản phẩm chăm sóc sức khỏe tiên tiến",
+  title: "Technoheart | Công nghệ & Sản phẩm chăm sóc sức khỏe tiên tiến",
   description:
     "TTechnoheart G9 – Ứng dụng khoa học và công nghệ tiên tiến trong chăm sóc sức khỏe, máy lọc nước, thiết bị bảo vệ sức khỏe và giải pháp công nghệ nhân văn.",
   keywords: [

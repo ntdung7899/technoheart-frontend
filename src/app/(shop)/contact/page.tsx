@@ -142,7 +142,7 @@ export default function ContactPage() {
                         Liên hệ với chúng tôi
                     </h1>
                     <p className="text-muted-foreground text-lg md:text-xl max-w-2xl mx-auto leading-relaxed">
-                        Bạn có câu hỏi hoặc cần hỗ trợ? Đội ngũ TechnoHeart luôn lắng nghe và phản hồi nhanh chóng.
+                        Bạn có câu hỏi hoặc cần hỗ trợ? Đội ngũ Technoheart luôn lắng nghe và phản hồi nhanh chóng.
                     </p>
                 </div>
             </section>

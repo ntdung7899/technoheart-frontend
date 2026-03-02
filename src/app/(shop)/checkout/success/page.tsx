@@ -8,7 +8,7 @@ export default function CheckoutSuccessPage() {
             <CheckCircle className="h-16 w-16 text-green-500 mb-6" />
             <h1 className="text-3xl font-bold tracking-tight mb-2">Đặt hàng thành công!</h1>
             <p className="text-muted-foreground max-w-md mb-8">
-                Cảm ơn bạn đã mua sắm tại TechnoHeart. Chúng tôi đã nhận được đơn hàng của bạn và sẽ sớm tiến hành xử lý.
+                Cảm ơn bạn đã mua sắm tại Technoheart. Chúng tôi đã nhận được đơn hàng của bạn và sẽ sớm tiến hành xử lý.
             </p>
             <div className="flex gap-4">
                 <Link

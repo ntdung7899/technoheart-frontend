@@ -7,8 +7,8 @@ import { Metadata } from "next";
 import clsx from "clsx";
 
 export const metadata: Metadata = {
-    title: "Sản phẩm | TechnoHeart",
-    description: "Khám phá bộ sưu tập sản phẩm công nghệ cao cấp của TechnoHeart.",
+    title: "Sản phẩm | Technoheart",
+    description: "Khám phá bộ sưu tập sản phẩm công nghệ cao cấp của Technoheart.",
 };
 
 interface Props {

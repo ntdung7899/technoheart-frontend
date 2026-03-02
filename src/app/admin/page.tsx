@@ -18,8 +18,8 @@ import {
 import { Metadata } from "next";
 
 export const metadata: Metadata = {
-    title: "Quản trị hệ thống | TechnoHeart",
-    description: "Trang quản trị cửa hàng TechnoHeart.",
+    title: "Quản trị hệ thống | Technoheart",
+    description: "Trang quản trị cửa hàng Technoheart.",
 };
 
 export default async function AdminPage() {

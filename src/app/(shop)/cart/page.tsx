@@ -5,7 +5,7 @@ import Link from "next/link";
 import { ChevronRight } from "lucide-react";
 
 export const metadata: Metadata = {
-    title: "Giỏ hàng | TechnoHeart",
+    title: "Giỏ hàng | Technoheart",
     description: "Xem lại các sản phẩm đã chọn.",
 };
 

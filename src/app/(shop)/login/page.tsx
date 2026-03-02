@@ -88,7 +88,7 @@ export default function LoginPage() {
                             </div>
                         </Link>
                         <h1 className="text-3xl font-extrabold tracking-tight mb-2">Chào mừng trở lại</h1>
-                        <p className="text-muted-foreground">Đăng nhập để trải nghiệm công nghệ cùng TechnoHeart</p>
+                        <p className="text-muted-foreground">Đăng nhập để trải nghiệm công nghệ cùng Technoheart</p>
                     </div>
 
                     <div className="rounded-2xl border border-border/50 bg-card p-7 shadow-xl">

@@ -87,7 +87,7 @@ export default function AdminLayout({
                             <Heart className="h-6 w-6 fill-current" />
                         </div>
                         <span className="text-2xl font-black tracking-tighter text-zinc-900">
-                            TechnoHeart
+                            Technoheart
                         </span>
                     </Link>
                 </div>

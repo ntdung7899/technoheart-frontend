@@ -116,7 +116,7 @@ export default function AffiliatePage() {
                 <div>
                     <h1 className="text-2xl font-extrabold tracking-tight">Affiliate Marketing</h1>
                     <p className="text-muted-foreground text-sm mt-1">
-                        Kiếm thu nhập không giới hạn khi giới thiệu sản phẩm TechnoHeart
+                        Kiếm thu nhập không giới hạn khi giới thiệu sản phẩm Technoheart
                     </p>
                 </div>
 
@@ -311,7 +311,7 @@ export default function AffiliatePage() {
                         onClick={() => {
                             const link = `${window.location.origin}/signup?ref=${profile!.referralCode}`;
                             if (navigator.share) {
-                                navigator.share({ title: "TechnoHeart Affiliate", url: link });
+                                navigator.share({ title: "Technoheart Affiliate", url: link });
                             }
                         }}
                         className="flex items-center justify-center rounded-xl border border-border/40 bg-card px-3 py-3 text-muted-foreground hover:text-primary transition-colors"
