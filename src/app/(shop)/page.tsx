@@ -208,7 +208,7 @@ export default async function Home() {
               <div className="space-y-4">
                 <h1
                   className="font-extrabold leading-tight tracking-tight"
-                  style={{ fontSize: "clamp(2.0rem, 5vw, 3.6rem)", color: "#FFFFFF", lineHeight: "1.1" }}
+                  style={{ fontSize: "clamp(1.8rem, 5vw, 3.6rem)", color: "#FFFFFF", lineHeight: "1.1" }}
                 >
                   Khoa học vì{" "}
                   <span style={{ background: "linear-gradient(90deg, #3B82F6, #60A5FA)", WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent", backgroundClip: "text" }}>
@@ -269,7 +269,7 @@ export default async function Home() {
                 </div>
 
                 {/* float cards – ẩn trên mobile để tránh overflow */}
-                <div className="hidden sm:block absolute -left-8 top-8 animate-float th-float-card" style={{ animationDelay: "0.5s" }}>
+                <div className=" md:block absolute left-2 top-8 animate-float th-float-card" style={{ animationDelay: "0.5s" }}>
                   <div className="th-glass-card flex items-center gap-3 px-4 py-3">
                     <div className="h-9 w-9 rounded-xl flex items-center justify-center shrink-0" style={{ background: "rgba(250,204,21,0.15)" }}>
                       <TrendingUp className="h-4 w-4" style={{ color: "#FACC15" }} />
@@ -281,7 +281,7 @@ export default async function Home() {
                   </div>
                 </div>
 
-                <div className="hidden sm:block absolute -right-8 bottom-16 animate-float th-float-card" style={{ animationDelay: "1s" }}>
+                <div className=" sm:block absolute right-2 bottom-16 animate-float th-float-card" style={{ animationDelay: "1s" }}>
                   <div className="th-glass-card flex items-center gap-3 px-4 py-3">
                     <div className="h-9 w-9 rounded-xl flex items-center justify-center shrink-0" style={{ background: "rgba(59,130,246,0.2)" }}>
                       <Zap className="h-4 w-4" style={{ color: "#60A5FA" }} />
@@ -378,11 +378,13 @@ export default async function Home() {
                 Giới thiệu về Technoheart
               </div>
 
-              <h2 className="font-extrabold tracking-tight" style={{ fontSize: "clamp(1.5rem, 3.5vw, 2.6rem)", color: "#FFFFFF", lineHeight: "1.2" }}>
-                Đơn vị tiên phong chuyển giao{" "}
-                <span style={{ color: "#60A5FA" }}>Khoa học Việt Nam</span>{" "}
+              <h2 className="font-extrabold tracking-tight" style={{ fontSize: "clamp(1.2rem, 3.5vw, 2.6rem)", color: "#FFFFFF", lineHeight: "1.3" }}>
+                Đơn vị tiên phong chuyển giao
+                <br className="block sm:hidden" />
+                {" "}<span style={{ color: "#60A5FA" }}>Khoa học Việt Nam</span>{" "}
                 ra thế giới
               </h2>
+
 
               <div className="space-y-4 text-base leading-relaxed" style={{ color: "#CBD5E1" }}>
                 <p>
@@ -641,7 +643,7 @@ export default async function Home() {
                   <span style={{ color: "#60A5FA" }}>Technoheart?</span>
                 </h2>
                 <p className="text-lg leading-relaxed" style={{ color: "#93C5FD" }}>
-                  06 lý do khiến hàng nghìn khách hàng tin tưởng lựa chọn Technoheart là đối tác phát triển khoa học – công nghệ của họ.
+                  06 lý do chọn chúng tôi
                 </p>
               </div>
 
