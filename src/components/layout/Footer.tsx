@@ -52,6 +52,7 @@ export async function Footer() {
                             <span>Trụ sở: 410, Tòa nhà SBI-QTSC, P Trung Mỹ Tây, TP. Hồ Chí Minh, Việt Nam</span>
                         </div>
 
+
                         {/* Phone */}
                         <div className="flex items-center gap-2 text-sm" style={{ color: '#93C5FD' }}>
                             <Phone className="h-4 w-4 shrink-0" style={{ color: '#60A5FA' }} />
