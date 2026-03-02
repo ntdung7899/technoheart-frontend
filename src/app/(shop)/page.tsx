@@ -131,7 +131,7 @@ export default async function Home() {
   const featuredProducts = await getFeaturedProducts();
 
   return (
-    <div className="flex flex-col" style={{ background: "#0A1628" }}>
+    <div className="flex flex-col overflow-x-hidden" style={{ background: "#0A1628" }}>
 
       {/* ═══════════════════════════════════════════════════
           HERO
@@ -247,7 +247,7 @@ export default async function Home() {
             </div>
 
             {/* Right – hero image */}
-            <div className="relative flex items-center justify-center animate-fade-in" style={{ animationDelay: "0.3s" }}>
+            <div className="relative flex items-center justify-center animate-fade-in overflow-hidden" style={{ animationDelay: "0.3s" }}>
               <div className="relative w-full max-w-[520px]">
                 {/* glow */}
                 <div

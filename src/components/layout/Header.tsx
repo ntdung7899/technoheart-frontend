@@ -1,10 +1,11 @@
 import Link from 'next/link';
 import Image from 'next/image';
-import { Menu, Search, User, ChevronDown, Sparkles } from 'lucide-react';
+import { Search, User, ChevronDown, Sparkles } from 'lucide-react';
 import { SearchModal } from '@/components/ui/SearchModal';
 import prisma from '@/lib/prisma';
 import { getSession } from "@/lib/auth-utils";
 import { CartIcon } from './CartIcon';
+import { MobileMenu } from './MobileMenu';
 
 export async function Header() {
     const session = await getSession();
@@ -48,7 +49,7 @@ export async function Header() {
                                 alt="Technoheart Logo"
                                 width={400}
                                 height={128}
-                                className="h-24 lg:h-28 w-auto object-contain transition-transform duration-300 group-hover:scale-105"
+                                className="h-14 lg:h-24 w-auto object-contain transition-transform duration-300 group-hover:scale-105"
                                 priority
                             />
                         </Link>
@@ -151,9 +152,7 @@ export async function Header() {
                             <User className="h-5 w-5" />
                         </Link>
 
-                        <button className="md:hidden th-icon-btn p-2.5 rounded-xl transition-colors">
-                            <Menu className="h-5 w-5" />
-                        </button>
+                        <MobileMenu />
                     </div>
                 </div>
             </header>
