@@ -178,7 +178,7 @@ export function CartClient() {
                         </div>
                         <div className="text-xs">
                             <p className="font-bold">Giao hàng miễn phí</p>
-                            <p className="text-muted-foreground">Cho tất cả đơn hàng từ {formatPrice(500000)}</p>
+                            <p className="text-muted-foreground">Cho tất cả đơn hàng từ 1.000.000đ</p>
                         </div>
                     </div>
                     <div className="flex items-center gap-4 p-4 rounded-2xl bg-secondary/20 border border-border/40">

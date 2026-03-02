@@ -47,7 +47,7 @@ export async function Footer() {
                         </p>
 
                         {/* Address */}
-                        <div className="flex items-start gap-2 text-sm" style={{ color: '#93C5FD' }}>
+                        <div className="flex items-start gap-2 text-base sm:text-md" style={{ color: '#93C5FD' }}>
                             <MapPin className="h-4 w-4 mt-0.5 shrink-0" style={{ color: '#60A5FA' }} />
                             <span>Trụ sở: 410, Tòa nhà SBI-QTSC, P Trung Mỹ Tây, TP. Hồ Chí Minh, Việt Nam</span>
                         </div>

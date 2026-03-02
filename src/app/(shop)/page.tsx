@@ -66,8 +66,6 @@ const coreValues = [
 ];
 
 const stats = [
-  { value: "200+", label: "Sản phẩm khoa học", icon: Zap },
-  { value: "50+", label: "Chuyên gia & Đối tác", icon: Users },
   { value: "5+", label: "5 năm kinh nghiệm", icon: Award },
   { value: "98%", label: "Khách hàng hài lòng", icon: Star },
 ];
@@ -108,19 +106,19 @@ const testimonials = [
   {
     name: "Nguyễn Thị Lan",
     role: "Giám đốc điều hành, HealthTech VN",
-    text: "Technoheart đã giúp chúng tôi chuyển hóa nền tảng khoa học thành sản phẩm thực tiễn. Đội ngũ chuyên nghiệp và tận tâm, dự án hoàn thành trước tiến độ 2 tuần.",
+    text: "Technoheart G9 đã giúp chúng tôi chuyển hóa nền tảng khoa học thành sản phẩm thực tiễn. Đội ngũ chuyên nghiệp và tận tâm, dự án hoàn thành trước tiến độ 2 tuần.",
     rating: 5,
   },
   {
     name: "Trần Minh Quân",
     role: "CEO, EduSmart Platform",
-    text: "Với sự hỗ trợ của Technoheart, hệ thống giáo dục của chúng tôi đã phục vụ hơn 50.000 học viên. Công nghệ AI và blockchain tích hợp hoàn hảo với yêu cầu minh bạch.",
+    text: "Với sự hỗ trợ của Technoheart G9, hệ thống giáo dục của chúng tôi đã phục vụ hơn 50.000 học viên. Công nghệ AI và blockchain tích hợp hoàn hảo với yêu cầu minh bạch.",
     rating: 5,
   },
   {
     name: "Phạm Thu Hương",
     role: "Trưởng phòng Công nghệ, VinaBio",
-    text: "Nền tảng phân tích dựa trên khoa học mà Technoheart xây dựng đã tăng tỷ lệ chuyển đổi của chúng tôi lên 34%. Đội ngũ hiểu sâu về cả khoa học lẫn công nghệ.",
+    text: "Nền tảng phân tích dựa trên khoa học mà Technoheart G9 xây dựng đã tăng tỷ lệ chuyển đổi của chúng tôi lên 34%. Đội ngũ hiểu sâu về cả khoa học lẫn công nghệ.",
     rating: 5,
   },
 ];
@@ -217,8 +215,8 @@ export default async function Home() {
                   <br />Đổi mới bằng{" "}
                   <span style={{ color: "#FACC15" }}>Trái tim</span>
                 </h1>
-                <p className="text-lg leading-relaxed max-w-xl" style={{ color: "#93C5FD" }}>
-                  Technoheart – đơn vị trực thuộc Viện Khoa học Phát triển Tài năng Việt Nam – Bộ Khoa học & Công nghệ (ID: A‑1940). Tiên phong chuyển giao, thương mại hóa và lan tỏa các công trình khoa học Việt Nam.
+                <p className="sm:text-xl text-lg leading-relaxed max-w-xl" style={{ color: "#93C5FD" }}>
+                  Technoheart G9 – đơn vị trực thuộc Viện Khoa học Phát triển Tài năng Việt Nam – Bộ Khoa học & Công nghệ (ID: A‑1940). Tiên phong chuyển giao, thương mại hóa và lan tỏa các công trình khoa học Việt Nam.
                 </p>
               </div>
 
@@ -234,7 +232,7 @@ export default async function Home() {
               {/* USP strip */}
               <div className="flex flex-wrap items-center gap-6 pt-2">
                 {[
-                  { icon: Truck, text: "Giao hàng miễn phí từ 500k" },
+                  { icon: Truck, text: "Giao hàng miễn phí trên 1.000.000đ" },
                   { icon: ShieldCheck, text: "Hàng chính hãng 100%" },
                   { icon: RefreshCw, text: "Đổi trả trong 30 ngày" },
                 ].map((item, i) => (
@@ -264,7 +262,7 @@ export default async function Home() {
                     boxShadow: "0 0 0 1px rgba(59,130,246,0.2), 0 32px 64px rgba(0,0,0,0.5), 0 0 80px rgba(59,130,246,0.15)",
                   }}
                 >
-                  <Image src="/hero-dashboard.png" alt="Nền tảng Technoheart" width={520} height={390} className="object-cover w-full" priority />
+                  <Image src="/hero-dashboard.png" alt="Nền tảng Technoheart G9" width={520} height={390} className="object-cover w-full" priority />
                   <div className="absolute inset-0" style={{ background: "linear-gradient(to bottom, transparent 60%, rgba(10,22,40,0.45) 100%)" }} />
                 </div>
 
@@ -308,7 +306,7 @@ export default async function Home() {
       ═══════════════════════════════════════════════════ */}
       <section style={{ background: "#0D1F3C", borderTop: "1px solid rgba(59,130,246,0.1)", borderBottom: "1px solid rgba(59,130,246,0.1)" }}>
         <div className="container mx-auto px-4 md:px-6 py-10">
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
+          <div className="flex flex-wrap justify-center gap-12 md:gap-24">
             {stats.map((stat, i) => (
               <div key={i} className="text-center">
                 <stat.icon className="h-6 w-6 mx-auto mb-2" style={{ color: "#FACC15" }} />
@@ -337,7 +335,7 @@ export default async function Home() {
               style={{ background: "rgba(59,130,246,0.1)", border: "1px solid rgba(59,130,246,0.25)", color: "#60A5FA" }}
             >
               <FlaskConical className="h-4 w-4" style={{ color: "#FACC15" }} />
-              Giới thiệu về Technoheart
+              Giới thiệu về Technoheart G9
             </div>
           </div>
 
@@ -391,10 +389,10 @@ export default async function Home() {
 
               <div className="space-y-4 text-base leading-relaxed" style={{ color: "#CBD5E1" }}>
                 <p>
-                  <strong className="text-white">Technoheart</strong> – đơn vị trực thuộc Viện Khoa học Phát triển Tài năng Việt Nam – Bộ Khoa học & Công nghệ (ID: A‑1940). Văn phòng: Phòng 410, Tòa nhà SBI, Đường số 3, Lô 6B, Khu Công viên Phần mềm Quang Trung, TP. Hồ Chí Minh.
+                  <strong className="text-white">Technoheart G9</strong> – đơn vị trực thuộc Viện Khoa học Phát triển Tài năng Việt Nam – Bộ Khoa học & Công nghệ (ID: A‑1940). Văn phòng: Phòng 410, Tòa nhà SBI, Đường số 3, Lô 6B, Khu Công viên Phần mềm Quang Trung, TP. Hồ Chí Minh.
                 </p>
                 <p>
-                  Technoheart đã tiên phong trong việc chuyển giao, thương mại hóa và lan tỏa các công trình khoa học Việt Nam, kết nối tri thức đến cộng đồng, biến khoa học thành giá trị sống phục vụ sức khỏe và hạnh phúc con người.
+                  Technoheart G9 đã tiên phong trong việc chuyển giao, thương mại hóa và lan tỏa các công trình khoa học Việt Nam, kết nối tri thức đến cộng đồng, biến khoa học thành giá trị sống phục vụ sức khỏe và hạnh phúc con người.
                 </p>
               </div>
 
@@ -439,7 +437,7 @@ export default async function Home() {
               Giá Trị <span style={{ color: "#60A5FA" }}>Cốt Lõi</span>
             </h2>
             <p className="text-lg max-w-2xl mx-auto" style={{ color: "#93C5FD" }}>
-              5 nguyên tắc định hướng mọi hoạt động của Technoheart – từ nghiên cứu đến sản phẩm và phụng sự cộng đồng.
+              5 nguyên tắc định hướng mọi hoạt động của Technoheart G9 – từ nghiên cứu đến sản phẩm và phụng sự cộng đồng.
             </p>
           </div>
 
@@ -489,7 +487,7 @@ export default async function Home() {
             </div>
             <h2 className="font-extrabold tracking-tight mb-3" style={{ fontSize: "clamp(1.8rem, 3.5vw, 2.8rem)", color: "#FFFFFF" }}>
               Triết Lý Vận Hành{" "}
-              <span style={{ color: "#60A5FA" }}>Technoheart</span>
+              <span style={{ color: "#60A5FA" }}>Technoheart G9</span>
             </h2>
             <p className="italic text-lg mb-2" style={{ color: "#93C5FD" }}>
               "Khoa học là nền tảng – Phụng sự là động lực – Con người là trung tâm."
@@ -527,7 +525,7 @@ export default async function Home() {
             <Quote className="h-10 w-10 mx-auto mb-4" style={{ color: "#FACC15" }} />
             <h3 className="text-lg font-bold text-white mb-4 uppercase tracking-wide">Thông điệp lãnh đạo</h3>
             <blockquote className="text-base italic leading-relaxed max-w-3xl mx-auto mb-6" style={{ color: "#CBD5E1" }}>
-              "Chúng tôi không chỉ tạo ra công nghệ – chúng tôi kiến tạo tương lai nhân văn. Mỗi bước tiến của Technoheart là hành trình đưa khoa học phục vụ con người, để tri thức không còn nằm trong phòng thí nghiệm mà tỏa sáng trong cuộc sống."
+              "Chúng tôi không chỉ tạo ra công nghệ – chúng tôi kiến tạo tương lai nhân văn. Mỗi bước tiến của Technoheart G9 là hành trình đưa khoa học phục vụ con người, để tri thức không còn nằm trong phòng thí nghiệm mà tỏa sáng trong cuộc sống."
             </blockquote>
 
             {/* Brand spirit */}
@@ -547,7 +545,7 @@ export default async function Home() {
       </section>
 
       {/* ═══════════════════════════════════════════════════
-          TẠI SAO CHỌN Technoheart
+          TẠI SAO CHỌN Technoheart G9
       ═══════════════════════════════════════════════════ */}
       <section
         id="why"
@@ -568,7 +566,7 @@ export default async function Home() {
                 </div>
                 <h2 className="font-extrabold tracking-tight mb-4" style={{ fontSize: "clamp(1.8rem, 3.5vw, 2.8rem)", color: "#FFFFFF", lineHeight: "1.2" }}>
                   Tại Sao Chọn{" "}
-                  <span style={{ color: "#60A5FA" }}>Technoheart?</span>
+                  <span style={{ color: "#60A5FA" }}>Technoheart G9?</span>
                 </h2>
                 <p className="text-lg leading-relaxed" style={{ color: "#93C5FD" }}>
                   06 lý do chọn chúng tôi
@@ -667,7 +665,7 @@ export default async function Home() {
                 <iframe
                   className="absolute inset-0 w-full h-full"
                   src={`https://www.youtube.com/embed/${videoId}`}
-                  title={`Technoheart Reputation Video ${index + 1}`}
+                  title={`Technoheart G9 Reputation Video ${index + 1}`}
                   allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
                   allowFullScreen
                 ></iframe>
