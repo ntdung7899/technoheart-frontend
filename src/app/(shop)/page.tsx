@@ -234,7 +234,7 @@ export default async function Home() {
                 {[
                   { icon: Truck, text: "Giao hàng miễn phí trên 1.000.000đ" },
                   { icon: ShieldCheck, text: "Hàng chính hãng 100%" },
-                  { icon: RefreshCw, text: "Đổi trả trong 30 ngày" },
+                  { icon: RefreshCw, text: "Đổi trong 30 ngày" },
                 ].map((item, i) => (
                   <div key={i} className="flex items-center gap-2 text-sm" style={{ color: "#93C5FD" }}>
                     <item.icon className="h-4 w-4" style={{ color: "#FACC15" }} />
@@ -603,7 +603,7 @@ export default async function Home() {
               {[
                 { icon: Truck, title: "Giao Hàng Nhanh", desc: "Miễn phí toàn quốc cho đơn từ 1.000.000đ. Nhận hàng trong 1–3 ngày làm việc.", color: "#3B82F6" },
                 { icon: ShieldCheck, title: "Bảo Hành Uy Tín", desc: "Cam kết 100% sản phẩm chính hãng. Bảo hành lên đến 24 tháng toàn quốc.", color: "#60A5FA" },
-                { icon: RefreshCw, title: "Đổi Trả Dễ Dàng", desc: "Hoàn tiền 100% trong 30 ngày nếu sản phẩm không đúng mô tả hoặc lỗi kỹ thuật.", color: "#FACC15" },
+                { icon: RefreshCw, title: "Đổi Dễ Dàng", desc: "Hoàn tiền 100% trong 30 ngày nếu sản phẩm không đúng mô tả hoặc lỗi kỹ thuật.", color: "#FACC15" },
                 { icon: Award, title: "Chứng Nhận Khoa Học", desc: "Tất cả sản phẩm được kiểm định bởi Viện Khoa học Phát triển Tài năng Việt Nam.", color: "#FACC15" },
               ].map((item, idx) => (
                 <div

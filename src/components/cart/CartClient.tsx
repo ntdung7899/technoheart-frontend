@@ -195,7 +195,7 @@ export function CartClient() {
                             <RefreshCcw className="h-5 w-5" />
                         </div>
                         <div className="text-xs">
-                            <p className="font-bold">Đổi trả 30 ngày</p>
+                            <p className="font-bold">Đổi 30 ngày</p>
                             <p className="text-muted-foreground">Hoàn tiền 100% nếu không hài lòng</p>
                         </div>
                     </div>

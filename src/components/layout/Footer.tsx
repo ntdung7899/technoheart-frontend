@@ -7,7 +7,7 @@ const policyLinks = [
     { name: 'Chính sách bảo mật thông tin', href: '/chinh-sach-bao-mat' },
     { name: 'Chính sách thanh toán', href: '/chinh-sach-thanh-toan' },
     { name: 'Chính sách giao hàng', href: '/chinh-sach-giao-hang' },
-    { name: 'Chính sách đổi trả hàng', href: '/chinh-sach-doi-tra' },
+    { name: 'Chính sách đổi hàng', href: '/chinh-sach-doi-tra' },
 ];
 
 export async function Footer() {

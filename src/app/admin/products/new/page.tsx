@@ -19,7 +19,7 @@ export default function NewProductPage() {
         imageUrl: "https://ik.imagekit.io/demo/img/default-product.jpg",
         warranty: "Bảo hành 12 tháng chính hãng",
         shippingInfo: "Giao hàng nhanh 1-2 ngày",
-        returnPolicy: "Hỗ trợ đổi trả trong 7 ngày",
+        returnPolicy: "Hỗ trợ đổi trong 7 ngày",
         origin: "",
     });
 
@@ -200,11 +200,11 @@ export default function NewProductPage() {
                                 />
                             </div>
                             <div className="space-y-1.5">
-                                <label className="text-[10px] font-black uppercase tracking-[0.2em] text-zinc-400 ml-1">Chính sách đổi trả</label>
+                                <label className="text-[10px] font-black uppercase tracking-[0.2em] text-zinc-400 ml-1">Chính sách đổi</label>
                                 <input
                                     type="text"
                                     name="returnPolicy"
-                                    placeholder="VD: Hỗ trợ đổi trả trong 7 ngày"
+                                    placeholder="VD: Hỗ trợ đổi trong 7 ngày"
                                     className="h-14 w-full rounded-2xl border border-zinc-200 bg-zinc-50 px-5 text-sm font-medium focus:outline-none focus:ring-4 focus:ring-primary/10 transition-all focus:border-primary/30"
                                     value={formData.returnPolicy}
                                     onChange={handleChange}

@@ -54,7 +54,7 @@ async function main() {
                 images: ['https://images.unsplash.com/photo-1696446701796-da61225697cc?q=80&w=800&auto=format&fit=crop'],
                 warranty: 'Bảo hành 12 tháng chính hãng',
                 shippingInfo: 'Giao hàng nhanh 1-2 ngày',
-                returnPolicy: 'Hỗ trợ đổi trả trong 7 ngày',
+                returnPolicy: 'Hỗ trợ đổi trong 7 ngày',
                 origin: 'Apple VN',
             },
             {
@@ -66,7 +66,7 @@ async function main() {
                 images: ['https://images.unsplash.com/photo-1517336714731-489689fd1ca4?q=80&w=800&auto=format&fit=crop'],
                 warranty: 'Bảo hành 12 tháng chính hãng',
                 shippingInfo: 'Giao hàng nhanh 1-2 ngày',
-                returnPolicy: 'Hỗ trợ đổi trả trong 7 ngày',
+                returnPolicy: 'Hỗ trợ đổi trong 7 ngày',
                 origin: 'Apple VN',
             },
             {
@@ -78,7 +78,7 @@ async function main() {
                 images: ['https://images.unsplash.com/photo-1613040809024-b4ef7ba99bc3?q=80&w=800&auto=format&fit=crop'],
                 warranty: 'Bảo hành 12 tháng chính hãng',
                 shippingInfo: 'Giao hàng nhanh 1-2 ngày',
-                returnPolicy: 'Hỗ trợ đổi trả trong 7 ngày',
+                returnPolicy: 'Hỗ trợ đổi trong 7 ngày',
                 origin: 'Apple VN',
             },
             {
@@ -90,7 +90,7 @@ async function main() {
                 images: ['https://images.unsplash.com/photo-1610945415295-d9bbf067e59c?q=80&w=800&auto=format&fit=crop'],
                 warranty: 'Bảo hành 12 tháng chính hãng',
                 shippingInfo: 'Giao hàng nhanh 2-3 ngày',
-                returnPolicy: 'Hỗ trợ đổi trả trong 7 ngày',
+                returnPolicy: 'Hỗ trợ đổi trong 7 ngày',
                 origin: 'Samsung Việt Nam',
             },
         ],
