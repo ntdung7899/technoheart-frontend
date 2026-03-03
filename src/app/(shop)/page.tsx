@@ -415,7 +415,91 @@ export default async function Home() {
           </div>
         </div>
       </section>
+      {/* ═══════════════════════════════════════════════════
+          TẠI SAO CHỌN Technoheart G9
+      ═══════════════════════════════════════════════════ */}
+      <section
+        id="why"
+        className="w-full"
+        style={{ background: "linear-gradient(180deg, #0A1628 0%, #0D1F3C 100%)", paddingTop: '30px', paddingBottom: "12px" }}
+      >
+        <div className="container mx-auto px-4 md:px-6">
+          <div className="grid lg:grid-cols-2 gap-16 items-center">
+            {/* Left text */}
+            <div className="space-y-8">
+              <div>
+                <div
+                  className="inline-flex items-center gap-2 rounded-full px-4 py-2 text-sm font-semibold mb-6"
+                  style={{ background: "rgba(59,130,246,0.1)", border: "1px solid rgba(59,130,246,0.25)", color: "#60A5FA" }}
+                >
+                  <Award className="h-4 w-4" style={{ color: "#FACC15" }} />
+                  Lý do lựa chọn
+                </div>
+                <h2 className="font-extrabold tracking-tight mb-4" style={{ fontSize: "clamp(1.8rem, 3.5vw, 2.8rem)", color: "#FFFFFF", lineHeight: "1.2" }}>
+                  Tại Sao Chọn{" "}
+                  <span style={{ color: "#60A5FA" }}>Technoheart G9?</span>
+                </h2>
+                <p className="text-lg leading-relaxed" style={{ color: "#93C5FD" }}>
+                  06 lý do chọn chúng tôi
+                </p>
+              </div>
 
+              <ul className="space-y-4">
+                {whyChoose.map((item, i) => (
+                  <li key={i} className="flex items-start gap-3">
+                    <div
+                      className="h-6 w-6 rounded-full shrink-0 flex items-center justify-center text-xs font-bold mt-0.5"
+                      style={{ background: "rgba(250,204,21,0.15)", border: "1px solid rgba(250,204,21,0.3)", color: "#FACC15" }}
+                    >
+                      {i + 1}
+                    </div>
+                    <span className="text-sm leading-relaxed" style={{ color: "#CBD5E1" }}>{item}</span>
+                  </li>
+                ))}
+              </ul>
+
+              <div
+                className="rounded-2xl p-5"
+                style={{ background: "rgba(59,130,246,0.06)", border: "1px solid rgba(59,130,246,0.15)" }}
+              >
+                <p className="text-sm font-semibold mb-1" style={{ color: "#FACC15" }}>🏢 Văn phòng:</p>
+                <p className="text-sm" style={{ color: "#93C5FD" }}>
+                  Phòng 410, Tòa nhà SBI, Đường số 3, Lô 6B, Khu Công viên Phần mềm Quang Trung, TP. Hồ Chí Minh, Việt Nam.
+                </p>
+              </div>
+            </div>
+
+            {/* Right – USP cards */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
+              {[
+                { icon: Truck, title: "Giao Hàng Nhanh", desc: "Miễn phí toàn quốc cho đơn từ 1.000.000đ. Nhận hàng trong 1–3 ngày làm việc.", color: "#3B82F6" },
+                { icon: ShieldCheck, title: "Bảo Hành Uy Tín", desc: "Cam kết 100% sản phẩm chính hãng. Bảo hành lên đến 24 tháng toàn quốc.", color: "#60A5FA" },
+                { icon: RefreshCw, title: "Đổi Dễ Dàng", desc: "Hoàn tiền 100% trong 30 ngày nếu sản phẩm không đúng mô tả hoặc lỗi kỹ thuật.", color: "#FACC15" },
+                { icon: Award, title: "Chứng Nhận Khoa Học", desc: "Tất cả sản phẩm được kiểm định bởi Viện Khoa học Phát triển Tài năng Việt Nam.", color: "#FACC15" },
+              ].map((item, idx) => (
+                <div
+                  key={idx}
+                  className="rounded-2xl p-6 transition-all duration-300 hover:-translate-y-1"
+                  style={{
+                    background: "rgba(255,255,255,0.025)",
+                    border: "1px solid rgba(59,130,246,0.15)",
+                    boxShadow: "0 4px 20px rgba(0,0,0,0.2)",
+                  }}
+                >
+                  <div
+                    className="h-12 w-12 rounded-xl flex items-center justify-center mb-4"
+                    style={{ background: `rgba(${item.color === "#FACC15" ? "250,204,21" : "59,130,246"},0.12)`, border: `1px solid rgba(${item.color === "#FACC15" ? "250,204,21" : "59,130,246"},0.25)` }}
+                  >
+                    <item.icon className="h-5 w-5" style={{ color: item.color }} />
+                  </div>
+                  <h3 className="font-bold text-white mb-2">{item.title}</h3>
+                  <p className="text-sm leading-relaxed" style={{ color: "#93C5FD" }}>{item.desc}</p>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+      </section>
       {/* ═══════════════════════════════════════════════════
           GIÁ TRỊ CỐT LÕI
       ═══════════════════════════════════════════════════ */}
@@ -539,92 +623,6 @@ export default async function Home() {
               <p className="text-sm mt-2" style={{ color: "#93C5FD" }}>
                 Khoa học vì Con người – Đổi mới bằng Trái tim – Hướng đến Cuộc sống Thịnh vượng và Có ý nghĩa.
               </p>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* ═══════════════════════════════════════════════════
-          TẠI SAO CHỌN Technoheart G9
-      ═══════════════════════════════════════════════════ */}
-      <section
-        id="why"
-        className="w-full"
-        style={{ background: "linear-gradient(180deg, #0A1628 0%, #0D1F3C 100%)", paddingTop: '30px', paddingBottom: "12px" }}
-      >
-        <div className="container mx-auto px-4 md:px-6">
-          <div className="grid lg:grid-cols-2 gap-16 items-center">
-            {/* Left text */}
-            <div className="space-y-8">
-              <div>
-                <div
-                  className="inline-flex items-center gap-2 rounded-full px-4 py-2 text-sm font-semibold mb-6"
-                  style={{ background: "rgba(59,130,246,0.1)", border: "1px solid rgba(59,130,246,0.25)", color: "#60A5FA" }}
-                >
-                  <Award className="h-4 w-4" style={{ color: "#FACC15" }} />
-                  Lý do lựa chọn
-                </div>
-                <h2 className="font-extrabold tracking-tight mb-4" style={{ fontSize: "clamp(1.8rem, 3.5vw, 2.8rem)", color: "#FFFFFF", lineHeight: "1.2" }}>
-                  Tại Sao Chọn{" "}
-                  <span style={{ color: "#60A5FA" }}>Technoheart G9?</span>
-                </h2>
-                <p className="text-lg leading-relaxed" style={{ color: "#93C5FD" }}>
-                  06 lý do chọn chúng tôi
-                </p>
-              </div>
-
-              <ul className="space-y-4">
-                {whyChoose.map((item, i) => (
-                  <li key={i} className="flex items-start gap-3">
-                    <div
-                      className="h-6 w-6 rounded-full shrink-0 flex items-center justify-center text-xs font-bold mt-0.5"
-                      style={{ background: "rgba(250,204,21,0.15)", border: "1px solid rgba(250,204,21,0.3)", color: "#FACC15" }}
-                    >
-                      {i + 1}
-                    </div>
-                    <span className="text-sm leading-relaxed" style={{ color: "#CBD5E1" }}>{item}</span>
-                  </li>
-                ))}
-              </ul>
-
-              <div
-                className="rounded-2xl p-5"
-                style={{ background: "rgba(59,130,246,0.06)", border: "1px solid rgba(59,130,246,0.15)" }}
-              >
-                <p className="text-sm font-semibold mb-1" style={{ color: "#FACC15" }}>🏢 Văn phòng:</p>
-                <p className="text-sm" style={{ color: "#93C5FD" }}>
-                  Phòng 410, Tòa nhà SBI, Đường số 3, Lô 6B, Khu Công viên Phần mềm Quang Trung, TP. Hồ Chí Minh, Việt Nam.
-                </p>
-              </div>
-            </div>
-
-            {/* Right – USP cards */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
-              {[
-                { icon: Truck, title: "Giao Hàng Nhanh", desc: "Miễn phí toàn quốc cho đơn từ 1.000.000đ. Nhận hàng trong 1–3 ngày làm việc.", color: "#3B82F6" },
-                { icon: ShieldCheck, title: "Bảo Hành Uy Tín", desc: "Cam kết 100% sản phẩm chính hãng. Bảo hành lên đến 24 tháng toàn quốc.", color: "#60A5FA" },
-                { icon: RefreshCw, title: "Đổi Dễ Dàng", desc: "Hoàn tiền 100% trong 30 ngày nếu sản phẩm không đúng mô tả hoặc lỗi kỹ thuật.", color: "#FACC15" },
-                { icon: Award, title: "Chứng Nhận Khoa Học", desc: "Tất cả sản phẩm được kiểm định bởi Viện Khoa học Phát triển Tài năng Việt Nam.", color: "#FACC15" },
-              ].map((item, idx) => (
-                <div
-                  key={idx}
-                  className="rounded-2xl p-6 transition-all duration-300 hover:-translate-y-1"
-                  style={{
-                    background: "rgba(255,255,255,0.025)",
-                    border: "1px solid rgba(59,130,246,0.15)",
-                    boxShadow: "0 4px 20px rgba(0,0,0,0.2)",
-                  }}
-                >
-                  <div
-                    className="h-12 w-12 rounded-xl flex items-center justify-center mb-4"
-                    style={{ background: `rgba(${item.color === "#FACC15" ? "250,204,21" : "59,130,246"},0.12)`, border: `1px solid rgba(${item.color === "#FACC15" ? "250,204,21" : "59,130,246"},0.25)` }}
-                  >
-                    <item.icon className="h-5 w-5" style={{ color: item.color }} />
-                  </div>
-                  <h3 className="font-bold text-white mb-2">{item.title}</h3>
-                  <p className="text-sm leading-relaxed" style={{ color: "#93C5FD" }}>{item.desc}</p>
-                </div>
-              ))}
             </div>
           </div>
         </div>
