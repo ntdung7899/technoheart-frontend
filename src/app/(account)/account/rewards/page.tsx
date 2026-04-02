@@ -49,7 +49,7 @@ export default function RewardsPage() {
 
     return (
         <div className="space-y-8">
-            <h1 className="text-2xl font-extrabold tracking-tight">Ưu đãi</h1>
+            <h1 className="text-2xl font-bold tracking-tight">Ưu đãi</h1>
 
             {/* Points Card */}
             <div className="rounded-2xl border border-primary/20 bg-gradient-to-br from-primary/5 to-primary/10 p-6 flex items-center gap-5">
@@ -57,10 +57,10 @@ export default function RewardsPage() {
                     <Star className="h-7 w-7 text-primary" />
                 </div>
                 <div>
-                    <p className="text-xs font-bold uppercase tracking-widest text-muted-foreground">
+                    <p className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
                         Điểm thưởng
                     </p>
-                    <p className="text-3xl font-extrabold tracking-tight">{points}</p>
+                    <p className="text-3xl font-bold tracking-tight">{points}</p>
                 </div>
             </div>
 
@@ -92,14 +92,14 @@ export default function RewardsPage() {
                                     </span>
                                 </div>
                                 <p className="text-sm font-medium mb-1">{v.description}</p>
-                                <p className="text-lg font-extrabold text-primary">
+                                <p className="text-lg font-bold text-primary">
                                     -{Number(v.discount).toLocaleString("vi-VN")}₫
                                 </p>
                                 <div className="flex items-center justify-between mt-3">
-                                    <p className="text-[10px] text-muted-foreground">
+                                    <p className="text-xs text-muted-foreground">
                                         Đơn tối thiểu: {Number(v.minSpend).toLocaleString("vi-VN")}₫
                                     </p>
-                                    <p className="text-[10px] text-muted-foreground">
+                                    <p className="text-xs text-muted-foreground">
                                         HSD: {new Date(v.expiresAt).toLocaleDateString("vi-VN")}
                                     </p>
                                 </div>
@@ -133,7 +133,7 @@ export default function RewardsPage() {
                                     </p>
                                 </div>
                                 <span
-                                    className={`text-[11px] font-bold px-2.5 py-0.5 rounded-full ${h.usedAt
+                                    className={`text-xs font-semibold px-2.5 py-0.5 rounded-full ${h.usedAt
                                             ? "bg-green-500/10 text-green-600"
                                             : "bg-yellow-500/10 text-yellow-600"
                                         }`}

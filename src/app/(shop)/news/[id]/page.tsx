@@ -38,11 +38,11 @@ export default async function NewsDetailPage({ params }: { params: Promise<{ id:
                 {/* Article Header */}
                 <div className="mb-10 text-center">
                     <div className="flex items-center justify-center gap-3 mb-6">
-                        <span className="bg-primary/10 text-primary px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider">
+                        <span className="bg-primary/10 text-primary px-3 py-1 rounded-full text-xs font-semibold uppercase tracking-wider">
                             {article.category}
                         </span>
                     </div>
-                    <h1 className="text-3xl md:text-5xl font-extrabold tracking-tight mb-8 leading-tight">
+                    <h1 className="text-3xl md:text-5xl font-bold tracking-tight mb-8 leading-tight">
                         {article.title}
                     </h1>
                     <div className="flex flex-wrap items-center justify-center gap-6 text-sm text-muted-foreground border-y border-border/40 py-4 font-medium">
@@ -63,7 +63,7 @@ export default async function NewsDetailPage({ params }: { params: Promise<{ id:
 
                 {/* Feature Image */}
                 {article.image && (
-                    <div className="relative aspect-[16/9] mb-12 rounded-3xl overflow-hidden shadow-2xl">
+                    <div className="relative aspect-[16/9] mb-12 rounded-2xl overflow-hidden shadow-xl">
                         <Image
                             src={article.image}
                             alt={article.title}
@@ -83,7 +83,7 @@ export default async function NewsDetailPage({ params }: { params: Promise<{ id:
                     </div>
 
                     {/* Main Content */}
-                    <article className="flex-1 prose prose-slate prose-lg dark:prose-invert max-w-none prose-headings:font-bold prose-headings:tracking-tight prose-p:text-muted-foreground prose-p:leading-relaxed prose-a:text-primary prose-img:rounded-3xl">
+                    <article className="flex-1 prose prose-slate prose-lg dark:prose-invert max-w-none prose-headings:font-bold prose-headings:tracking-tight prose-p:text-muted-foreground prose-p:leading-relaxed prose-a:text-primary prose-img:rounded-2xl">
                         <div dangerouslySetInnerHTML={{ __html: article.content.replace(/\n/g, '<br/>') }} />
                     </article>
                 </div>
@@ -94,10 +94,10 @@ export default async function NewsDetailPage({ params }: { params: Promise<{ id:
                     {related.length > 0 ? (
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                             {related.map(r => (
-                                <Link key={r.id} href={`/news/${r.id}`} className="p-6 rounded-2xl bg-secondary/20 border border-border/40 hover:bg-secondary/30 hover:border-primary/30 transition-all group">
-                                    <span className="text-[10px] font-bold text-primary uppercase tracking-widest mb-2 block">{r.category}</span>
-                                    <h3 className="font-bold mb-2 group-hover:text-primary transition-colors line-clamp-2">{r.title}</h3>
-                                    <span className="text-xs font-bold text-muted-foreground">Xem thêm →</span>
+                                <Link key={r.id} href={`/news/${r.id}`} className="p-6 rounded-xl bg-secondary/20 border border-border/40 hover:bg-secondary/30 hover:border-primary/30 transition-all group">
+                                    <span className="text-xs font-semibold text-primary uppercase tracking-wider mb-2 block">{r.category}</span>
+                                    <h3 className="font-semibold mb-2 group-hover:text-primary transition-colors line-clamp-2">{r.title}</h3>
+                                    <span className="text-xs font-semibold text-muted-foreground">Xem thêm →</span>
                                 </Link>
                             ))}
                         </div>

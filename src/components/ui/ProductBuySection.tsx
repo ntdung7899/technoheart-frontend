@@ -56,7 +56,7 @@ export function ProductBuySection({ product }: ProductBuySectionProps) {
         <div className="space-y-4">
             {/* Quantity Selector */}
             <div className="flex items-center gap-4">
-                <span className="text-xs font-bold uppercase tracking-widest text-zinc-400">Số lượng</span>
+                <span className="text-xs font-semibold uppercase tracking-wider text-zinc-400">Số lượng</span>
                 <div className="flex items-center h-10 rounded-lg border border-zinc-200 bg-white overflow-hidden">
                     <button
                         onClick={decrease}
@@ -84,7 +84,7 @@ export function ProductBuySection({ product }: ProductBuySectionProps) {
                 <button
                     onClick={handleBuyNow}
                     disabled={buyingNow}
-                    className="flex items-center justify-center gap-2 rounded-xl bg-primary text-white font-bold text-sm py-3.5 px-6 shadow-lg shadow-primary/25 hover:shadow-xl hover:shadow-primary/35 hover:bg-blue-600 transition-all active:scale-[0.98] disabled:opacity-70 disabled:cursor-not-allowed"
+                    className="flex items-center justify-center gap-2 rounded-lg bg-primary text-white font-semibold text-sm py-3.5 px-6 shadow-lg shadow-primary/20 hover:shadow-xl hover:shadow-primary/30 hover:bg-blue-600 transition-all active:scale-[0.98] disabled:opacity-70 disabled:cursor-not-allowed"
                 >
                     {buyingNow ? (
                         <>
@@ -104,7 +104,7 @@ export function ProductBuySection({ product }: ProductBuySectionProps) {
                     onClick={handleAdd}
                     disabled={isAdded}
                     className={`
-                        flex items-center justify-center gap-2 rounded-xl font-bold text-sm py-3.5 px-6 transition-all active:scale-[0.98] border-2
+                        flex items-center justify-center gap-2 rounded-lg font-semibold text-sm py-3.5 px-6 transition-all active:scale-[0.98] border-2
                         ${isAdded
                             ? "bg-emerald-50 text-emerald-600 border-emerald-200"
                             : "bg-white text-primary border-primary hover:bg-primary/5"

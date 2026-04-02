@@ -64,51 +64,51 @@ export default function NewNewsPage() {
     };
 
     return (
-        <div className="space-y-8 pb-20 max-w-5xl">
+        <div className="space-y-6 pb-12 max-w-5xl">
             {/* Header */}
-            <div className="flex items-center gap-4">
-                <Link href="/admin/news" className="h-11 w-11 flex items-center justify-center rounded-2xl border border-zinc-200 hover:bg-zinc-100 transition-all text-zinc-500">
-                    <ArrowLeft className="h-5 w-5" />
+            <div className="flex items-center gap-3">
+                <Link href="/admin/news" className="h-8 w-8 flex items-center justify-center rounded-md border border-slate-200 hover:bg-slate-100 transition-colors text-slate-500">
+                    <ArrowLeft className="h-4 w-4" />
                 </Link>
                 <div>
-                    <p className="text-[10px] font-black uppercase tracking-[0.2em] text-zinc-400 mb-0.5">Tin tức</p>
-                    <h1 className="text-3xl font-black tracking-tight text-zinc-900">Viết bài mới</h1>
+                    <p className="text-xs font-medium text-slate-400 mb-0.5">Tin tức</p>
+                    <h1 className="text-xl font-bold text-slate-900">Viết bài mới</h1>
                 </div>
             </div>
 
-            <form onSubmit={handleSubmit} className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+            <form onSubmit={handleSubmit} className="grid grid-cols-1 lg:grid-cols-3 gap-6">
                 {/* Main content */}
-                <div className="lg:col-span-2 space-y-6">
+                <div className="lg:col-span-2 space-y-4">
                     {/* Title */}
-                    <div className="rounded-[2rem] border border-zinc-200 bg-white shadow-sm p-6 space-y-2">
-                        <label className="text-[10px] font-black uppercase tracking-[0.2em] text-zinc-400">Tiêu đề bài viết *</label>
+                    <div className="rounded-xl border border-slate-200 bg-white shadow-sm p-5 space-y-2">
+                        <label className="text-xs font-medium text-slate-500">Tiêu đề bài viết *</label>
                         <input
                             type="text"
                             value={form.title}
                             onChange={e => set("title", e.target.value)}
                             placeholder="Nhập tiêu đề hấp dẫn..."
-                            className="w-full text-2xl font-black text-zinc-900 bg-transparent border-none outline-none placeholder:text-zinc-200 focus:ring-0"
+                            className="w-full text-xl font-bold text-slate-900 bg-transparent border-none outline-none placeholder:text-slate-200 focus:ring-0"
                             required
                         />
                     </div>
 
                     {/* Excerpt */}
-                    <div className="rounded-[2rem] border border-zinc-200 bg-white shadow-sm p-6 space-y-2">
-                        <label className="text-[10px] font-black uppercase tracking-[0.2em] text-zinc-400">Tóm tắt *</label>
+                    <div className="rounded-xl border border-slate-200 bg-white shadow-sm p-5 space-y-2">
+                        <label className="text-xs font-medium text-slate-500">Tóm tắt *</label>
                         <textarea
                             value={form.excerpt}
                             onChange={e => set("excerpt", e.target.value)}
-                            placeholder="Mô tả ngắn gọn nội dung bài viết (hiển thị trên trang danh sách)..."
+                            placeholder="Mô tả ngắn gọn nội dung bài viết..."
                             rows={3}
-                            className="w-full text-sm font-medium text-zinc-700 bg-transparent border-none outline-none resize-none placeholder:text-zinc-300 focus:ring-0 leading-relaxed"
+                            className="w-full text-sm text-slate-700 bg-transparent border-none outline-none resize-none placeholder:text-slate-300 focus:ring-0 leading-relaxed"
                             required
                         />
                     </div>
 
                     {/* Content */}
-                    <div className="rounded-[2rem] border border-zinc-200 bg-white shadow-sm overflow-hidden">
-                        <div className="px-6 pt-6 pb-4 border-b border-zinc-100">
-                            <label className="text-[10px] font-black uppercase tracking-[0.2em] text-zinc-400">Nội dung bài viết *</label>
+                    <div className="rounded-xl border border-slate-200 bg-white shadow-sm overflow-hidden">
+                        <div className="px-5 pt-4 pb-3 border-b border-slate-100">
+                            <label className="text-xs font-medium text-slate-500">Nội dung bài viết *</label>
                         </div>
                         <RichTextEditor
                             value={form.content}
@@ -118,26 +118,26 @@ export default function NewNewsPage() {
                     </div>
 
                     {error && (
-                        <div className="p-4 rounded-2xl bg-red-50 border border-red-200 text-red-600 text-sm font-bold">
+                        <div className="p-3 rounded-lg bg-red-50 border border-red-200 text-red-600 text-sm font-medium">
                             {error}
                         </div>
                     )}
                 </div>
 
                 {/* Sidebar settings */}
-                <div className="space-y-5">
+                <div className="space-y-4">
                     {/* Publish */}
-                    <div className="rounded-[2rem] border border-zinc-200 bg-white shadow-sm p-6 space-y-4">
-                        <p className="text-[10px] font-black uppercase tracking-[0.2em] text-zinc-400">Xuất bản</p>
+                    <div className="rounded-xl border border-slate-200 bg-white shadow-sm p-5 space-y-3">
+                        <p className="text-xs font-medium text-slate-500">Xuất bản</p>
 
                         <label className="flex items-center justify-between gap-3 cursor-pointer">
                             <div className="flex items-center gap-2.5">
-                                {form.published ? <Eye className="h-4 w-4 text-emerald-500" /> : <EyeOff className="h-4 w-4 text-zinc-300" />}
-                                <span className="text-sm font-bold text-zinc-700">Xuất bản ngay</span>
+                                {form.published ? <Eye className="h-4 w-4 text-emerald-500" /> : <EyeOff className="h-4 w-4 text-slate-300" />}
+                                <span className="text-sm font-medium text-slate-700">Xuất bản ngay</span>
                             </div>
                             <div
                                 onClick={() => set("published", !form.published)}
-                                className={`relative h-6 w-11 rounded-full transition-colors cursor-pointer ${form.published ? "bg-emerald-500" : "bg-zinc-200"}`}
+                                className={`relative h-6 w-11 rounded-full transition-colors cursor-pointer ${form.published ? "bg-emerald-500" : "bg-slate-200"}`}
                             >
                                 <div className={`absolute top-1 h-4 w-4 rounded-full bg-white shadow transition-transform ${form.published ? "translate-x-5" : "translate-x-1"}`} />
                             </div>
@@ -145,12 +145,12 @@ export default function NewNewsPage() {
 
                         <label className="flex items-center justify-between gap-3 cursor-pointer">
                             <div className="flex items-center gap-2.5">
-                                <Star className={`h-4 w-4 ${form.featured ? "text-yellow-500 fill-yellow-500" : "text-zinc-300"}`} />
-                                <span className="text-sm font-bold text-zinc-700">Bài nổi bật</span>
+                                <Star className={`h-4 w-4 ${form.featured ? "text-yellow-500 fill-yellow-500" : "text-slate-300"}`} />
+                                <span className="text-sm font-medium text-slate-700">Bài nổi bật</span>
                             </div>
                             <div
                                 onClick={() => set("featured", !form.featured)}
-                                className={`relative h-6 w-11 rounded-full transition-colors cursor-pointer ${form.featured ? "bg-yellow-400" : "bg-zinc-200"}`}
+                                className={`relative h-6 w-11 rounded-full transition-colors cursor-pointer ${form.featured ? "bg-yellow-400" : "bg-slate-200"}`}
                             >
                                 <div className={`absolute top-1 h-4 w-4 rounded-full bg-white shadow transition-transform ${form.featured ? "translate-x-5" : "translate-x-1"}`} />
                             </div>
@@ -158,19 +158,19 @@ export default function NewNewsPage() {
                     </div>
 
                     {/* Category */}
-                    <div className="rounded-[2rem] border border-zinc-200 bg-white shadow-sm p-6 space-y-3">
-                        <p className="text-[10px] font-black uppercase tracking-[0.2em] text-zinc-400">Danh mục</p>
+                    <div className="rounded-xl border border-slate-200 bg-white shadow-sm p-5 space-y-3">
+                        <p className="text-xs font-medium text-slate-500">Danh mục</p>
                         {categories.length === 0 ? (
                             <div className="space-y-2">
-                                <p className="text-xs text-zinc-400 font-medium">
-                                    Chưa có danh mục nào. <Link href="/admin/news/categories" className="text-primary font-bold hover:underline">Tạo danh mục</Link>
+                                <p className="text-xs text-slate-400 font-medium">
+                                    Chưa có danh mục nào. <Link href="/admin/news/categories" className="text-primary font-semibold hover:underline">Tạo danh mục</Link>
                                 </p>
                                 <input
                                     type="text"
                                     value={form.category}
                                     onChange={e => set("category", e.target.value)}
                                     placeholder="Hoặc nhập danh mục thủ công..."
-                                    className="w-full h-10 rounded-xl border border-zinc-200 bg-zinc-50 px-4 text-sm font-medium focus:outline-none focus:ring-2 focus:ring-primary/20"
+                                    className="w-full h-9 rounded-lg border border-slate-200 bg-white px-3 text-sm focus:outline-none focus:ring-2 focus:ring-primary/20"
                                 />
                             </div>
                         ) : (
@@ -180,9 +180,9 @@ export default function NewNewsPage() {
                                         key={cat.id}
                                         type="button"
                                         onClick={() => set("category", cat.name)}
-                                        className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all border-2 ${form.category === cat.name
+                                        className={`px-3 py-1.5 rounded-md text-xs font-medium transition-all border-2 ${form.category === cat.name
                                             ? "text-white shadow-md"
-                                            : "bg-zinc-100 text-zinc-600 hover:bg-zinc-200 border-transparent"
+                                            : "bg-slate-100 text-slate-600 hover:bg-slate-200 border-transparent"
                                             }`}
                                         style={form.category === cat.name ? {
                                             backgroundColor: cat.color,
@@ -197,20 +197,20 @@ export default function NewNewsPage() {
                     </div>
 
                     {/* Read time */}
-                    <div className="rounded-[2rem] border border-zinc-200 bg-white shadow-sm p-6 space-y-3">
-                        <label className="text-[10px] font-black uppercase tracking-[0.2em] text-zinc-400">Thời gian đọc</label>
+                    <div className="rounded-xl border border-slate-200 bg-white shadow-sm p-5 space-y-3">
+                        <label className="text-xs font-medium text-slate-500">Thời gian đọc</label>
                         <input
                             type="text"
                             value={form.readTime}
                             onChange={e => set("readTime", e.target.value)}
                             placeholder="VD: 5 phút"
-                            className="w-full h-10 rounded-xl border border-zinc-200 bg-zinc-50 px-4 text-sm font-medium focus:outline-none focus:ring-2 focus:ring-primary/20"
+                            className="w-full h-9 rounded-lg border border-slate-200 bg-white px-3 text-sm focus:outline-none focus:ring-2 focus:ring-primary/20"
                         />
                     </div>
 
                     {/* Thumbnail */}
-                    <div className="rounded-[2rem] border border-zinc-200 bg-white shadow-sm p-6 space-y-3">
-                        <label className="text-[10px] font-black uppercase tracking-[0.2em] text-zinc-400">
+                    <div className="rounded-xl border border-slate-200 bg-white shadow-sm p-5 space-y-3">
+                        <label className="text-xs font-medium text-slate-500">
                             <span className="flex items-center gap-2">
                                 <ImageIcon className="h-3.5 w-3.5" />
                                 URL ảnh bìa
@@ -221,10 +221,10 @@ export default function NewNewsPage() {
                             value={form.image}
                             onChange={e => set("image", e.target.value)}
                             placeholder="https://..."
-                            className="w-full h-10 rounded-xl border border-zinc-200 bg-zinc-50 px-4 text-sm font-medium focus:outline-none focus:ring-2 focus:ring-primary/20"
+                            className="w-full h-9 rounded-lg border border-slate-200 bg-white px-3 text-sm focus:outline-none focus:ring-2 focus:ring-primary/20"
                         />
                         {form.image && (
-                            <div className="aspect-video rounded-xl overflow-hidden border border-zinc-100 bg-zinc-50 relative">
+                            <div className="aspect-video rounded-lg overflow-hidden border border-slate-100 bg-slate-50 relative">
                                 <Image src={form.image} alt="preview" fill className="object-cover" unoptimized onError={e => { (e.target as HTMLImageElement).style.display = "none" }} />
                             </div>
                         )}
@@ -234,9 +234,9 @@ export default function NewNewsPage() {
                     <button
                         type="submit"
                         disabled={loading}
-                        className="w-full h-14 rounded-2xl bg-primary text-primary-foreground font-black text-sm uppercase tracking-widest shadow-xl shadow-primary/20 hover:scale-[1.01] active:scale-95 transition-all disabled:opacity-60 flex items-center justify-center gap-3"
+                        className="w-full h-10 rounded-lg bg-primary text-primary-foreground font-medium text-sm hover:opacity-90 active:scale-[0.98] transition-all disabled:opacity-60 flex items-center justify-center gap-2"
                     >
-                        {loading ? <Loader2 className="h-5 w-5 animate-spin" /> : <Send className="h-5 w-5" />}
+                        {loading ? <Loader2 className="h-4 w-4 animate-spin" /> : <Send className="h-4 w-4" />}
                         {loading ? "Đang lưu..." : form.published ? "Xuất bản bài viết" : "Lưu bản nháp"}
                     </button>
                 </div>

@@ -138,7 +138,7 @@ export default function ContactPage() {
                         <Sparkles className="h-3.5 w-3.5" />
                         Luôn sẵn sàng hỗ trợ bạn 24/7
                     </div>
-                    <h1 className="text-4xl md:text-6xl font-extrabold tracking-tight mb-5 bg-gradient-to-b from-foreground to-foreground/70 bg-clip-text text-transparent">
+                    <h1 className="text-4xl md:text-6xl font-bold tracking-tight mb-5 bg-gradient-to-b from-foreground to-foreground/70 bg-clip-text text-transparent">
                         Liên hệ với chúng tôi
                     </h1>
                     <p className="text-muted-foreground text-lg md:text-xl max-w-2xl mx-auto leading-relaxed">
@@ -153,11 +153,11 @@ export default function ContactPage() {
                     {contactCards.map((item) => (
                         <div
                             key={item.title}
-                            className={`group relative p-6 rounded-2xl bg-card border border-border/50 shadow-lg shadow-black/[0.03] hover:shadow-xl hover:shadow-black/[0.06] hover:-translate-y-1 transition-all duration-300`}
+                            className={`group relative p-6 rounded-xl bg-card border border-border/50 shadow-lg shadow-black/[0.03] hover:shadow-xl hover:shadow-black/[0.06] hover:-translate-y-1 transition-all duration-300`}
                         >
-                            <div className={`absolute inset-0 rounded-2xl bg-gradient-to-br ${item.gradient} opacity-0 group-hover:opacity-100 transition-opacity duration-300`} />
+                            <div className={`absolute inset-0 rounded-xl bg-gradient-to-br ${item.gradient} opacity-0 group-hover:opacity-100 transition-opacity duration-300`} />
                             <div className="relative">
-                                <div className={`h-12 w-12 rounded-2xl ${item.iconBg} flex items-center justify-center ${item.iconColor} mb-4 group-hover:scale-110 transition-transform duration-300`}>
+                                <div className={`h-12 w-12 rounded-xl ${item.iconBg} flex items-center justify-center ${item.iconColor} mb-4 group-hover:scale-110 transition-transform duration-300`}>
                                     <item.icon className="h-5 w-5" />
                                 </div>
                                 <h3 className="font-bold text-foreground mb-0.5">{item.title}</h3>
@@ -179,7 +179,7 @@ export default function ContactPage() {
                 <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 items-start mb-20">
                     {/* Form */}
                     <div className="lg:col-span-7">
-                        <div className="rounded-3xl border border-border/50 bg-card shadow-xl shadow-black/[0.04] overflow-hidden">
+                        <div className="rounded-xl border border-border/50 bg-card shadow-xl shadow-black/[0.04] overflow-hidden">
                             {/* Form header */}
                             <div className="relative px-8 pt-8 pb-6 border-b border-border/50 bg-gradient-to-r from-primary/[0.03] to-transparent">
                                 <div className="flex items-center gap-3">
@@ -299,7 +299,7 @@ export default function ContactPage() {
                             {features.map((item, idx) => (
                                 <div
                                     key={idx}
-                                    className="group flex gap-4 p-5 rounded-2xl bg-card border border-border/50 hover:shadow-lg hover:shadow-black/[0.04] hover:-translate-y-0.5 transition-all duration-300"
+                                    className="group flex gap-4 p-5 rounded-xl bg-card border border-border/50 hover:shadow-lg hover:shadow-black/[0.04] hover:-translate-y-0.5 transition-all duration-300"
                                 >
                                     <div className={`h-11 w-11 rounded-xl ${item.accent} flex items-center justify-center shrink-0 group-hover:scale-110 transition-transform`}>
                                         <item.icon className="h-5 w-5" />
@@ -313,8 +313,8 @@ export default function ContactPage() {
                         </div>
 
                         {/* Social Links */}
-                        <div className="p-6 rounded-2xl bg-card border border-border/50">
-                            <h3 className="font-bold text-foreground mb-4">Kết nối với chúng tôi</h3>
+                        <div className="p-6 rounded-xl bg-card border border-border/50">
+                            <h3 className="font-semibold text-foreground mb-4">Kết nối với chúng tôi</h3>
                             <div className="grid grid-cols-4 gap-3">
                                 {socials.map((social) => (
                                     <a
@@ -326,17 +326,17 @@ export default function ContactPage() {
                                         aria-label={social.label}
                                     >
                                         <social.icon className="h-5 w-5" />
-                                        <span className="text-[10px] font-medium">{social.label}</span>
+                                        <span className="text-xs font-medium">{social.label}</span>
                                     </a>
                                 ))}
                             </div>
                         </div>
 
                         {/* Working hours */}
-                        <div className="p-6 rounded-2xl bg-gradient-to-br from-primary/5 to-primary/[0.02] border border-primary/10">
+                        <div className="p-6 rounded-xl bg-gradient-to-br from-primary/5 to-primary/[0.02] border border-primary/10">
                             <div className="flex items-center gap-2 mb-3">
                                 <Clock className="h-4 w-4 text-primary" />
-                                <h3 className="font-bold text-foreground text-sm">Giờ làm việc</h3>
+                                <h3 className="font-semibold text-foreground text-sm">Giờ làm việc</h3>
                             </div>
                             <div className="space-y-2 text-sm">
                                 <div className="flex items-center justify-between">
@@ -360,7 +360,7 @@ export default function ContactPage() {
                             <MapPin className="h-5 w-5 text-primary" />
                             <h2 className="text-xl font-bold">Vị trí của chúng tôi</h2>
                         </div>
-                        <div className="rounded-2xl overflow-hidden border border-border/40 h-[380px] relative grayscale hover:grayscale-0 transition-all duration-700 shadow-lg group">
+                        <div className="rounded-xl overflow-hidden border border-border/40 h-[380px] relative grayscale hover:grayscale-0 transition-all duration-700 shadow-lg group">
                             <iframe
                                 src={info.mapEmbed}
                                 className="w-full h-full border-0"

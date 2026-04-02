@@ -19,13 +19,13 @@ export default async function AccountDashboard() {
     ]);
 
     return (
-        <div className="space-y-8">
+        <div className="space-y-8 max-w-6xl">
             {/* Greeting */}
             <div>
-                <h1 className="text-2xl font-extrabold tracking-tight">
+                <h1 className="text-2xl font-bold tracking-tight text-slate-900">
                     Xin chào, {user?.name || "bạn"} 👋
                 </h1>
-                <p className="text-muted-foreground text-sm mt-1">
+                <p className="text-slate-500 text-sm mt-1">
                     Chào mừng bạn trở lại với Technoheart
                 </p>
             </div>
@@ -37,32 +37,36 @@ export default async function AccountDashboard() {
                     label="Tổng đơn hàng"
                     value={totalOrders}
                     subtitle="Tất cả đơn hàng của bạn"
+                    color="blue"
                 />
                 <SummaryCard
                     icon={<Clock className="h-5 w-5" />}
                     label="Đang chờ"
                     value={pendingOrders}
                     subtitle="Đơn hàng chờ xử lý"
+                    color="amber"
                 />
                 <SummaryCard
                     icon={<Heart className="h-5 w-5" />}
                     label="Yêu thích"
                     value={wishlistCount}
                     subtitle="Sản phẩm đã lưu"
+                    color="rose"
                 />
                 <SummaryCard
                     icon={<Star className="h-5 w-5" />}
                     label="Điểm thưởng"
                     value={user?.points || 0}
                     subtitle="Điểm tích luỹ của bạn"
+                    color="emerald"
                 />
             </div>
 
             {/* Recently Viewed */}
             <div>
-                <h2 className="text-lg font-bold mb-4">Sản phẩm đã xem gần đây</h2>
-                <div className="rounded-2xl border border-border/40 bg-card/50 p-8 text-center">
-                    <p className="text-sm text-muted-foreground">
+                <h2 className="text-base font-semibold text-slate-900 mb-4">Sản phẩm đã xem gần đây</h2>
+                <div className="rounded-xl border border-slate-200 bg-white p-10 text-center">
+                    <p className="text-sm text-slate-400">
                         Tính năng đang được phát triển
                     </p>
                 </div>

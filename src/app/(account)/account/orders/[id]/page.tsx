@@ -71,8 +71,8 @@ export default function OrderDetailPage() {
     if (error || !order) {
         return (
             <div className="text-center py-20">
-                <p className="text-muted-foreground">{error || "Không tìm thấy đơn hàng"}</p>
-                <Link href="/account/orders" className="text-primary text-sm font-bold mt-2 inline-block hover:underline">
+                <p className="text-slate-400">{error || "Không tìm thấy đơn hàng"}</p>
+                <Link href="/account/orders" className="text-blue-600 text-sm font-semibold mt-2 inline-block hover:underline">
                     ← Quay lại
                 </Link>
             </div>
@@ -88,15 +88,15 @@ export default function OrderDetailPage() {
             <div className="flex items-center gap-3">
                 <Link
                     href="/account/orders"
-                    className="p-2 rounded-xl hover:bg-secondary transition-colors"
+                    className="p-2 rounded-xl hover:bg-slate-100 transition-colors"
                 >
-                    <ArrowLeft className="h-4 w-4" />
+                    <ArrowLeft className="h-4 w-4 text-slate-600" />
                 </Link>
                 <div>
-                    <h1 className="text-xl font-extrabold tracking-tight">
+                    <h1 className="text-xl font-bold tracking-tight text-slate-800">
                         Đơn hàng #{order.id.slice(-8).toUpperCase()}
                     </h1>
-                    <p className="text-xs text-muted-foreground">
+                    <p className="text-xs text-slate-400">
                         {new Date(order.createdAt).toLocaleDateString("vi-VN", {
                             day: "2-digit",
                             month: "2-digit",
@@ -113,7 +113,7 @@ export default function OrderDetailPage() {
 
             {/* Status Tracking */}
             {order.status !== "CANCELLED" ? (
-                <div className="rounded-2xl border border-border/40 bg-card/50 p-6">
+                <div className="rounded-xl border border-slate-200 bg-white p-6">
                     <div className="flex items-center justify-between">
                         {trackingSteps.map((step, i) => {
                             const Icon = step.icon;
@@ -124,16 +124,16 @@ export default function OrderDetailPage() {
                                     <div className="flex flex-col items-center gap-1.5">
                                         <div
                                             className={`h-10 w-10 rounded-full flex items-center justify-center transition-all ${isActive
-                                                ? "bg-primary text-primary-foreground shadow-lg"
+                                                ? "bg-blue-600 text-white shadow-lg shadow-blue-200"
                                                 : isCompleted
-                                                    ? "bg-primary/20 text-primary"
-                                                    : "bg-secondary text-muted-foreground"
+                                                    ? "bg-blue-100 text-blue-600"
+                                                    : "bg-slate-100 text-slate-400"
                                                 }`}
                                         >
                                             <Icon className="h-4 w-4" />
                                         </div>
                                         <span
-                                            className={`text-[10px] font-bold ${isCompleted ? "text-foreground" : "text-muted-foreground"
+                                            className={`text-xs font-semibold ${isCompleted ? "text-slate-700" : "text-slate-400"
                                                 }`}
                                         >
                                             {step.label}
@@ -141,7 +141,7 @@ export default function OrderDetailPage() {
                                     </div>
                                     {i < trackingSteps.length - 1 && (
                                         <div
-                                            className={`flex-1 h-0.5 mx-2 rounded-full ${i < currentStep ? "bg-primary/30" : "bg-border"
+                                            className={`flex-1 h-0.5 mx-2 rounded-full ${i < currentStep ? "bg-blue-300" : "bg-slate-200"
                                                 }`}
                                         />
                                     )}
@@ -151,21 +151,21 @@ export default function OrderDetailPage() {
                     </div>
                 </div>
             ) : (
-                <div className="rounded-2xl border border-red-500/20 bg-red-500/5 p-5 flex items-center gap-3">
+                <div className="rounded-xl border border-red-200 bg-red-50 p-5 flex items-center gap-3">
                     <XCircle className="h-5 w-5 text-red-500" />
                     <p className="text-sm font-medium text-red-600">Đơn hàng đã bị huỷ</p>
                 </div>
             )}
 
             {/* Products */}
-            <div className="rounded-2xl border border-border/40 bg-card/50 overflow-hidden">
-                <div className="px-5 py-3 border-b border-border/40">
-                    <h2 className="text-sm font-bold">Sản phẩm</h2>
+            <div className="rounded-xl border border-slate-200 bg-white overflow-hidden">
+                <div className="px-5 py-3 border-b border-slate-100">
+                    <h2 className="text-sm font-semibold text-slate-700">Sản phẩm</h2>
                 </div>
-                <div className="divide-y divide-border/40">
+                <div className="divide-y divide-slate-100">
                     {order.items.map((item) => (
                         <div key={item.id} className="flex items-center gap-4 px-5 py-4">
-                            <div className="h-14 w-14 rounded-xl bg-secondary/50 flex items-center justify-center shrink-0 overflow-hidden">
+                            <div className="h-14 w-14 rounded-xl bg-slate-100 flex items-center justify-center shrink-0 overflow-hidden">
                                 {item.product.images?.[0] ? (
                                     <Image
                                         src={item.product.images[0]}
@@ -176,16 +176,16 @@ export default function OrderDetailPage() {
                                         unoptimized
                                     />
                                 ) : (
-                                    <Package className="h-5 w-5 text-muted-foreground" />
+                                    <Package className="h-5 w-5 text-slate-400" />
                                 )}
                             </div>
                             <div className="flex-1 min-w-0">
-                                <p className="text-sm font-medium truncate">{item.product.name}</p>
-                                <p className="text-xs text-muted-foreground">
+                                <p className="text-sm font-medium text-slate-700 truncate">{item.product.name}</p>
+                                <p className="text-xs text-slate-400">
                                     x{item.quantity}
                                 </p>
                             </div>
-                            <p className="text-sm font-bold whitespace-nowrap">
+                            <p className="text-sm font-bold text-slate-800 whitespace-nowrap">
                                 {formatPrice(item.price)}
                             </p>
                         </div>
@@ -194,30 +194,30 @@ export default function OrderDetailPage() {
             </div>
 
             {/* Shipping Address */}
-            <div className="rounded-2xl border border-border/40 bg-card/50 p-5">
+            <div className="rounded-xl border border-slate-200 bg-white p-5">
                 <div className="flex items-center gap-2 mb-3">
-                    <MapPin className="h-4 w-4 text-muted-foreground" />
-                    <h2 className="text-sm font-bold">Địa chỉ giao hàng</h2>
+                    <MapPin className="h-4 w-4 text-slate-400" />
+                    <h2 className="text-sm font-semibold text-slate-700">Địa chỉ giao hàng</h2>
                 </div>
-                <p className="text-sm">{order.address.street}</p>
-                <p className="text-xs text-muted-foreground mt-0.5">
+                <p className="text-sm text-slate-700">{order.address.street}</p>
+                <p className="text-xs text-slate-400 mt-0.5">
                     {order.address.city}, {order.address.state} {order.address.zip}
                 </p>
             </div>
 
             {/* Price Summary */}
-            <div className="rounded-2xl border border-border/40 bg-card/50 p-5 space-y-3">
+            <div className="rounded-xl border border-slate-200 bg-white p-5 space-y-3">
                 <div className="flex justify-between text-sm">
-                    <span className="text-muted-foreground">Tạm tính</span>
-                    <span>{formatPrice(subtotal)}</span>
+                    <span className="text-slate-400">Tạm tính</span>
+                    <span className="text-slate-700">{formatPrice(subtotal)}</span>
                 </div>
                 <div className="flex justify-between text-sm">
-                    <span className="text-muted-foreground">Phí vận chuyển</span>
-                    <span>{formatPrice(order.shippingFee)}</span>
+                    <span className="text-slate-400">Phí vận chuyển</span>
+                    <span className="text-slate-700">{formatPrice(order.shippingFee)}</span>
                 </div>
-                <div className="border-t border-border/40 pt-3 flex justify-between">
-                    <span className="font-bold">Tổng cộng</span>
-                    <span className="text-lg font-extrabold">
+                <div className="border-t border-slate-100 pt-3 flex justify-between">
+                    <span className="font-bold text-slate-800">Tổng cộng</span>
+                    <span className="text-lg font-bold text-slate-800">
                         {formatPrice(order.total)}
                     </span>
                 </div>

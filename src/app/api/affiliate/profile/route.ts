@@ -37,7 +37,7 @@ export async function GET() {
 
         const rates = getCommissionRates(profile.rank);
         const achievement = getAchievementBonus(profile.rank);
-        const progression = getPVForNextRank(profile.rank, profile.personalPV);
+        const progression = getPVForNextRank(profile.rank, profile.personalPV, profile.teamPV);
         const rankInfo = RANK_INFO[profile.rank];
 
         return NextResponse.json({
@@ -45,6 +45,8 @@ export async function GET() {
             profile: {
                 ...profile,
                 totalEarnings: Number(profile.totalEarnings),
+                paidEarnings: Number(profile.paidEarnings),
+                availableBalance: Number(profile.totalEarnings) - Number(profile.paidEarnings),
             },
             stats: {
                 f1Count,

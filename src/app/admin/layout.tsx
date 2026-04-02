@@ -14,12 +14,17 @@ import {
     LayoutDashboard,
     Bell,
     Search,
-    ChevronRight,
     LayoutGrid,
     Loader2,
     ShieldAlert,
     Newspaper,
-    MessageSquare
+    MessageSquare,
+    TrendingUp,
+    Menu,
+    X,
+    ChevronsLeft,
+    ChevronsRight,
+    LogOut
 } from 'lucide-react';
 
 export default function AdminLayout({
@@ -30,6 +35,20 @@ export default function AdminLayout({
     const pathname = usePathname();
     const router = useRouter();
     const [authState, setAuthState] = useState<'loading' | 'authorized' | 'unauthorized'>('loading');
+    const [sidebarOpen, setSidebarOpen] = useState(false);
+    const [collapsed, setCollapsed] = useState(false);
+
+    useEffect(() => {
+        const saved = localStorage.getItem('admin-sidebar-collapsed');
+        if (saved === 'true') setCollapsed(true);
+    }, []);
+
+    const toggleCollapsed = () => {
+        setCollapsed(prev => {
+            localStorage.setItem('admin-sidebar-collapsed', String(!prev));
+            return !prev;
+        });
+    };
 
     useEffect(() => {
         fetch('/api/auth/me')
@@ -48,20 +67,29 @@ export default function AdminLayout({
             });
     }, [router]);
 
+    const handleLogout = async () => {
+        await fetch('/api/auth/logout', { method: 'POST' });
+        router.replace('/login');
+    };
+
+    useEffect(() => {
+        setSidebarOpen(false);
+    }, [pathname]);
+
     if (authState === 'loading') {
         return (
-            <div className="min-h-screen flex flex-col items-center justify-center bg-zinc-50 gap-4">
-                <Loader2 className="h-10 w-10 animate-spin text-primary" />
-                <p className="text-sm font-bold text-zinc-400 uppercase tracking-widest">Đang xác thực...</p>
+            <div className="min-h-screen flex flex-col items-center justify-center bg-slate-50 gap-3">
+                <Loader2 className="h-8 w-8 animate-spin text-primary" />
+                <p className="text-sm font-medium text-slate-400">Đang xác thực...</p>
             </div>
         );
     }
 
     if (authState === 'unauthorized') {
         return (
-            <div className="min-h-screen flex flex-col items-center justify-center bg-zinc-50 gap-4">
-                <ShieldAlert className="h-12 w-12 text-red-400" />
-                <p className="text-sm font-bold text-zinc-500">Bạn không có quyền truy cập trang này</p>
+            <div className="min-h-screen flex flex-col items-center justify-center bg-slate-50 gap-3">
+                <ShieldAlert className="h-10 w-10 text-red-400" />
+                <p className="text-sm font-medium text-slate-500">Bạn không có quyền truy cập trang này</p>
             </div>
         );
     }
@@ -72,111 +100,167 @@ export default function AdminLayout({
         { label: 'Danh mục', href: '/admin/categories', icon: LayoutGrid },
         { label: 'Đơn hàng', href: '/admin/orders', icon: ShoppingBag },
         { label: 'Tin tức', href: '/admin/news', icon: Newspaper },
+        { label: 'Affiliate', href: '/admin/affiliate', icon: TrendingUp },
         { label: 'Khách hàng', href: '/admin/users', icon: Users },
         { label: 'Báo cáo', href: '/admin/analytics', icon: BarChart3 },
         { label: 'Liên hệ', href: '/admin/contact', icon: MessageSquare },
     ];
 
-    return (
-        <div className="flex min-h-screen bg-zinc-50 text-zinc-900">
-            {/* Sidebar */}
-            <aside className="w-72 bg-white border-r border-zinc-200 hidden lg:flex flex-col sticky top-0 h-screen z-40">
-                <div className="p-8">
-                    <Link href="/" className="group flex items-center space-x-3">
-                        <div className="flex h-11 w-11 items-center justify-center rounded-[14px] bg-primary text-primary-foreground group-hover:rotate-12 transition-all duration-500 shadow-xl shadow-primary/20">
-                            <Heart className="h-6 w-6 fill-current" />
-                        </div>
-                        <span className="text-2xl font-black tracking-tighter text-zinc-900">
+    const SidebarContent = ({ isCollapsed = false }: { isCollapsed?: boolean }) => (
+        <>
+            <div className={`${isCollapsed ? 'p-3 pb-4' : 'p-5 pb-6'}`}>
+                <Link href="/" className="group flex items-center gap-2.5 justify-center lg:justify-start">
+                    <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-primary text-primary-foreground transition-transform duration-300 group-hover:scale-105 flex-shrink-0">
+                        <Heart className="h-5 w-5 fill-current" />
+                    </div>
+                    {!isCollapsed && (
+                        <span className="text-lg font-bold text-white">
                             Technoheart
                         </span>
-                    </Link>
+                    )}
+                </Link>
+            </div>
+
+            <div className={`${isCollapsed ? 'px-2' : 'px-3'} flex-1 space-y-6 overflow-y-auto`}>
+                <div>
+                    {!isCollapsed && (
+                        <p className="px-3 text-[10px] font-semibold uppercase tracking-widest text-slate-400 mb-2">Hệ thống</p>
+                    )}
+                    <nav className="space-y-0.5">
+                        {navItems.map((item) => {
+                            const isActive = pathname === item.href || (item.href !== '/admin' && pathname.startsWith(item.href));
+                            return (
+                                <Link
+                                    key={item.href}
+                                    href={item.href}
+                                    title={isCollapsed ? item.label : undefined}
+                                    className={`flex items-center ${isCollapsed ? 'justify-center' : 'gap-3'} px-3 py-2.5 rounded-lg text-[13px] font-medium transition-all ${isActive
+                                        ? 'bg-white/10 text-white'
+                                        : 'text-slate-400 hover:text-white hover:bg-white/5'
+                                        }`}
+                                >
+                                    <item.icon className={`h-[18px] w-[18px] flex-shrink-0 ${isActive ? 'text-primary' : ''}`} />
+                                    {!isCollapsed && item.label}
+                                </Link>
+                            );
+                        })}
+                    </nav>
                 </div>
 
-                <div className="px-6 py-4 flex-1 space-y-8">
-                    <div>
-                        <p className="px-4 text-[10px] font-black uppercase tracking-[0.2em] text-zinc-400 mb-5">Hệ thống</p>
-                        <nav className="space-y-2">
-                            {navItems.map((item) => {
-                                const isActive = pathname === item.href;
-                                return (
-                                    <Link
-                                        key={item.href}
-                                        href={item.href}
-                                        className={`flex items-center justify-between px-4 py-3.5 rounded-2xl text-sm font-bold transition-all group ${isActive
-                                            ? 'bg-primary text-primary-foreground shadow-lg shadow-primary/20'
-                                            : 'text-zinc-500 hover:text-zinc-900 hover:bg-zinc-100'
-                                            }`}
-                                    >
-                                        <div className="flex items-center gap-3.5">
-                                            <item.icon className={`h-5 w-5 transition-transform ${isActive ? 'scale-110' : 'group-hover:scale-110 opacity-70 group-hover:opacity-100'}`} />
-                                            {item.label}
-                                        </div>
-                                        {isActive && <ChevronRight className="h-4 w-4 opacity-70" />}
-                                    </Link>
-                                );
-                            })}
-                        </nav>
-                    </div>
+                {/* <div>
+                    <p className="px-3 text-[10px] font-semibold uppercase tracking-widest text-slate-400 mb-2">Cấu hình</p>
+                    <nav className="space-y-0.5">
+                        <Link
+                            href="/admin/settings"
+                            className={`flex items-center gap-3 px-3 py-2.5 rounded-lg text-[13px] font-medium transition-all ${pathname === '/admin/settings'
+                                ? 'bg-white/10 text-white'
+                                : 'text-slate-400 hover:text-white hover:bg-white/5'
+                                }`}
+                        >
+                            <Settings className="h-[18px] w-[18px]" />
+                            Cài đặt
+                        </Link>
+                    </nav>
+                </div> */}
+            </div>
 
-                    <div>
-                        <p className="px-4 text-[10px] font-black uppercase tracking-[0.2em] text-zinc-400 mb-5">Cấu hình</p>
-                        <nav className="space-y-2">
-                            <Link
-                                href="/admin/settings"
-                                className={`flex items-center gap-3.5 px-4 py-3.5 rounded-2xl text-sm font-bold transition-all group ${pathname === '/admin/settings'
-                                    ? 'bg-primary text-primary-foreground shadow-lg shadow-primary/20'
-                                    : 'text-zinc-500 hover:text-zinc-900 hover:bg-zinc-100'
-                                    }`}
-                            >
-                                <Settings className="h-5 w-5 transition-transform group-hover:scale-110 opacity-70 group-hover:opacity-100" />
-                                Cài đặt
-                            </Link>
-                        </nav>
-                    </div>
+            <div className={`${isCollapsed ? 'p-2' : 'p-3'} mt-auto border-t border-white/10 space-y-0.5`}>
+                {!isCollapsed ? (
+                    <>
+                        <Link href="/" className="flex items-center gap-2.5 px-3 py-2.5 rounded-lg text-[13px] font-medium text-slate-400 hover:text-white hover:bg-white/5 transition-all group">
+                            <ArrowLeft className="h-[18px] w-[18px] transition-transform group-hover:-translate-x-0.5" />
+                            Trang chủ cửa hàng
+                        </Link>
+                        <button
+                            onClick={handleLogout}
+                            className="flex items-center gap-2.5 w-full px-3 py-2.5 rounded-lg text-[13px] font-medium text-slate-400 hover:text-red-400 hover:bg-red-500/10 transition-all"
+                        >
+                            <LogOut className="h-[18px] w-[18px]" />
+                            Đăng xuất
+                        </button>
+                    </>
+                ) : (
+                    <>
+                        <Link href="/" title="Trang chủ cửa hàng" className="flex items-center justify-center px-3 py-2.5 rounded-lg text-slate-400 hover:text-white hover:bg-white/5 transition-all">
+                            <ArrowLeft className="h-[18px] w-[18px]" />
+                        </Link>
+                        <button
+                            onClick={handleLogout}
+                            title="Đăng xuất"
+                            className="flex items-center justify-center w-full px-3 py-2.5 rounded-lg text-slate-400 hover:text-red-400 hover:bg-red-500/10 transition-all"
+                        >
+                            <LogOut className="h-[18px] w-[18px]" />
+                        </button>
+                    </>
+                )}
+            </div>
+        </>
+    );
+
+    return (
+        <div className="flex min-h-screen bg-slate-50">
+            {/* Mobile sidebar overlay */}
+            {sidebarOpen && (
+                <div className="fixed inset-0 z-50 lg:hidden">
+                    <div className="absolute inset-0 bg-black/50" onClick={() => setSidebarOpen(false)} />
+                    <aside className="relative w-64 h-full bg-slate-900 flex flex-col">
+                        <button onClick={() => setSidebarOpen(false)} className="absolute top-4 right-4 text-slate-400 hover:text-white">
+                            <X className="h-5 w-5" />
+                        </button>
+                        <SidebarContent />
+                    </aside>
                 </div>
+            )}
 
-                <div className="p-6 mt-auto">
-                    <Link href="/" className="flex items-center gap-3 px-6 py-4 rounded-2xl text-sm font-bold text-zinc-500 bg-zinc-50 hover:text-primary hover:bg-primary/5 transition-all group border border-zinc-200">
-                        <ArrowLeft className="h-5 w-5 transition-transform group-hover:-translate-x-1" />
-                        Trang chủ cửa hàng
-                    </Link>
+            {/* Desktop sidebar */}
+            <aside className={`${collapsed ? 'w-[68px]' : 'w-64'} bg-slate-900 hidden lg:flex flex-col sticky top-0 h-screen z-40 transition-all duration-300`}>
+                <SidebarContent isCollapsed={collapsed} />
+                <div className={`${collapsed ? 'px-2 pb-2' : 'px-3 pb-3'}`}>
+                    <button
+                        onClick={toggleCollapsed}
+                        title={collapsed ? 'Mở rộng sidebar' : 'Thu gọn sidebar'}
+                        className={`flex items-center ${collapsed ? 'justify-center' : 'gap-2.5'} w-full px-3 py-2 rounded-lg text-[13px] font-medium text-slate-500 hover:text-white hover:bg-white/5 transition-all`}
+                    >
+                        {collapsed ? <ChevronsRight className="h-[18px] w-[18px]" /> : <ChevronsLeft className="h-[18px] w-[18px]" />}
+                        {!collapsed && 'Thu gọn'}
+                    </button>
                 </div>
             </aside>
 
             {/* Main Content Area */}
             <div className="flex-1 flex flex-col min-w-0">
                 {/* Top Header */}
-                <header className="h-24 bg-white/80 backdrop-blur-xl border-b border-zinc-200 flex items-center justify-between px-10 sticky top-0 z-30">
-                    <div className="flex items-center gap-6 flex-1">
-                        <div className="relative w-full max-w-lg hidden md:block group">
-                            <Search className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-zinc-400 transition-colors group-focus-within:text-primary" />
+                <header className="h-16 bg-white border-b border-slate-200 flex items-center justify-between px-4 lg:px-8 sticky top-0 z-30">
+                    <div className="flex items-center gap-4 flex-1">
+                        <button onClick={() => setSidebarOpen(true)} className="lg:hidden h-9 w-9 flex items-center justify-center rounded-lg hover:bg-slate-100 text-slate-500">
+                            <Menu className="h-5 w-5" />
+                        </button>
+                        <div className="relative w-full max-w-md hidden md:block group">
+                            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400 transition-colors group-focus-within:text-primary" />
                             <input
                                 type="text"
-                                placeholder="Tìm kiếm nhanh mọi thứ..."
-                                className="h-12 w-full rounded-2xl border border-zinc-200 bg-zinc-50 pl-12 pr-4 text-sm focus:outline-none focus:ring-4 focus:ring-primary/10 transition-all font-medium focus:border-primary/20"
+                                placeholder="Tìm kiếm..."
+                                className="h-9 w-full rounded-lg border border-slate-200 bg-slate-50 pl-9 pr-3 text-sm focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary/30 transition-all"
                             />
                         </div>
                     </div>
 
-                    <div className="flex items-center gap-4">
-                        <button className="h-12 w-12 flex items-center justify-center rounded-2xl bg-white border border-zinc-200 hover:scale-105 active:scale-95 transition-all relative shadow-sm text-zinc-500">
-                            <Bell className="h-5 w-5" />
-                            <span className="absolute top-3.5 right-3.5 h-2.5 w-2.5 rounded-full bg-red-500 ring-4 ring-white"></span>
+                    <div className="flex items-center gap-2">
+                        <button className="h-9 w-9 flex items-center justify-center rounded-lg hover:bg-slate-100 transition-colors relative text-slate-500">
+                            <Bell className="h-[18px] w-[18px]" />
+                            <span className="absolute top-2 right-2 h-2 w-2 rounded-full bg-red-500 ring-2 ring-white"></span>
                         </button>
 
-                        <div className="h-12 flex items-center gap-3 pl-2 pr-4 py-1 rounded-2xl bg-white border border-zinc-200 shadow-sm">
-                            <div className="h-9 w-9 rounded-xl bg-gradient-to-br from-primary to-primary/60 text-primary-foreground flex items-center justify-center font-black text-xs shadow-inner">
+                        <div className="h-9 flex items-center gap-2 pl-1.5 pr-3 rounded-lg hover:bg-slate-50 transition-colors cursor-pointer">
+                            <div className="h-7 w-7 rounded-md bg-primary text-primary-foreground flex items-center justify-center font-semibold text-[11px]">
                                 AD
                             </div>
-                            <div className="flex flex-col mr-1">
-                                <span className="text-[11px] font-black uppercase tracking-wider text-zinc-400 leading-none mb-0.5">Admin</span>
-                                <span className="text-sm font-bold leading-none text-zinc-900">Quản trị viên</span>
-                            </div>
+                            <span className="text-sm font-medium text-slate-700 hidden sm:block">Admin</span>
                         </div>
                     </div>
                 </header>
 
-                <main className="flex-1 p-10 lg:p-12">
+                <main className="flex-1 p-4 lg:p-8">
                     <div className="max-w-7xl mx-auto">
                         {children}
                     </div>

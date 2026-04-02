@@ -21,15 +21,13 @@ export function ProductCard({ product, featured = false }: ProductCardProps) {
 
     return (
         <Link href={`/products/${product.id}`} className="group block h-full">
-            <div className="product-card relative flex h-full flex-col overflow-hidden rounded-2xl bg-card border border-border/40">
+            <div className="product-card relative flex h-full flex-col overflow-hidden rounded-xl bg-card border border-border/40">
 
                 {/* Image Area */}
-                <div className="product-card-image relative overflow-hidden bg-gradient-to-br from-secondary/40 to-secondary/10"
-                    style={{ aspectRatio: '1 / 1' }}>
+                <div className="product-card-image relative overflow-hidden bg-gradient-to-br from-secondary/40 to-secondary/10 aspect-square">
 
                     {/* Subtle background glow */}
-                    <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500"
-                        style={{ background: 'radial-gradient(circle at center, rgba(37,99,235,0.06) 0%, transparent 70%)' }} />
+                    <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500 bg-[radial-gradient(circle_at_center,rgba(37,99,235,0.06)_0%,transparent_70%)]" />
 
                     {product.images.length > 0 ? (
                         <Image
@@ -47,7 +45,7 @@ export function ProductCard({ product, featured = false }: ProductCardProps) {
 
                     {/* Top-left: Category badge */}
                     <div className="absolute left-3 top-3 z-20">
-                        <span className="inline-flex items-center rounded-lg bg-background/80 backdrop-blur-md px-2.5 py-1 text-[10px] font-bold uppercase tracking-widest border border-border/30 text-muted-foreground shadow-sm">
+                        <span className="inline-flex items-center rounded-lg bg-background/80 backdrop-blur-md px-2.5 py-1 text-xs font-semibold uppercase tracking-wider border border-border/30 text-muted-foreground shadow-sm">
                             {product.category.name}
                         </span>
                     </div>
@@ -60,7 +58,7 @@ export function ProductCard({ product, featured = false }: ProductCardProps) {
                     {/* Hot badge */}
                     {(product.id.charCodeAt(0) % 3 === 0) && (
                         <div className="absolute left-3 bottom-3 z-20">
-                            <span className="inline-flex items-center gap-1 rounded-lg bg-orange-500 px-2.5 py-1 text-[10px] font-bold text-white shadow-md">
+                            <span className="inline-flex items-center gap-1 rounded-lg bg-orange-500 px-2.5 py-1 text-xs font-semibold text-white shadow-md">
                                 <TrendingUp className="h-3 w-3" />
                                 HOT
                             </span>
@@ -69,7 +67,7 @@ export function ProductCard({ product, featured = false }: ProductCardProps) {
 
                     {/* Hover CTA overlay */}
                     <div className="product-card-overlay absolute inset-0 z-20 flex items-end justify-center pb-4 opacity-0 group-hover:opacity-100 pointer-events-none">
-                        <span className="inline-flex items-center gap-2 bg-primary text-primary-foreground px-5 py-2.5 rounded-xl text-xs font-bold shadow-xl shadow-primary/30 translate-y-3 group-hover:translate-y-0 transition-all duration-300">
+                        <span className="inline-flex items-center gap-2 bg-primary text-primary-foreground px-5 py-2.5 rounded-lg text-xs font-semibold shadow-xl shadow-primary/30 translate-y-3 group-hover:translate-y-0 transition-all duration-300">
                             <ShoppingCart className="h-3.5 w-3.5" />
                             Xem chi tiết
                         </span>
@@ -91,8 +89,8 @@ export function ProductCard({ product, featured = false }: ProductCardProps) {
                                 />
                             ))}
                         </div>
-                        <span className="text-[11px] text-muted-foreground font-medium">{rating.toFixed(1)}</span>
-                        <span className="text-[11px] text-muted-foreground/60">({reviews})</span>
+                        <span className="text-xs text-muted-foreground font-medium">{rating.toFixed(1)}</span>
+                        <span className="text-xs text-muted-foreground/60">({reviews})</span>
                     </div>
 
                     {/* Name */}
@@ -103,14 +101,14 @@ export function ProductCard({ product, featured = false }: ProductCardProps) {
                     {/* Price row */}
                     <div className="flex items-center justify-between pt-2.5 mt-auto border-t border-border/30">
                         <div>
-                            <p className="text-[10px] text-muted-foreground font-medium uppercase tracking-wider mb-0.5">Giá bán</p>
-                            <p className="text-base font-extrabold text-primary tracking-tight">
+                            <p className="text-xs text-muted-foreground font-medium uppercase tracking-wider mb-0.5">Giá bán</p>
+                            <p className="text-base font-bold text-primary tracking-tight">
                                 {formatPrice(Number(product.price))}
                             </p>
                         </div>
 
                         <button
-                            className="product-card-btn flex h-9 w-9 items-center justify-center rounded-xl bg-primary/10 text-primary transition-all duration-300 group-hover:bg-primary group-hover:text-white group-hover:shadow-lg group-hover:shadow-primary/25"
+                            className="product-card-btn flex h-9 w-9 items-center justify-center rounded-lg bg-primary/10 text-primary transition-all duration-300 group-hover:bg-primary group-hover:text-white group-hover:shadow-lg group-hover:shadow-primary/25"
                             aria-label="Thêm vào giỏ hàng"
                         >
                             <ShoppingCart className="h-4 w-4" />

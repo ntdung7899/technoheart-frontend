@@ -55,10 +55,10 @@ export default function LoginPage() {
                     <div className="absolute bottom-[10%] right-[10%] w-[400px] h-[400px] bg-purple-500/10 rounded-full blur-[120px]" />
                 </div>
                 <div className="relative text-center space-y-8 max-w-md animate-fade-in-up">
-                    <div className="h-20 w-20 rounded-3xl bg-primary flex items-center justify-center text-primary-foreground shadow-2xl mx-auto animate-float">
+                    <div className="h-20 w-20 rounded-2xl bg-primary flex items-center justify-center text-primary-foreground shadow-xl mx-auto animate-float">
                         <Heart className="h-10 w-10 fill-current" />
                     </div>
-                    <h2 className="text-4xl font-extrabold tracking-tight">
+                    <h2 className="text-4xl font-bold tracking-tight">
                         Techno<span className="text-primary">Heart</span>
                     </h2>
                     <p className="text-muted-foreground text-lg leading-relaxed">
@@ -87,11 +87,11 @@ export default function LoginPage() {
                                 <Heart className="h-6 w-6 fill-current" />
                             </div>
                         </Link>
-                        <h1 className="text-3xl font-extrabold tracking-tight mb-2">Chào mừng trở lại</h1>
+                        <h1 className="text-3xl font-bold tracking-tight mb-2">Chào mừng trở lại</h1>
                         <p className="text-muted-foreground">Đăng nhập để trải nghiệm công nghệ cùng Technoheart</p>
                     </div>
 
-                    <div className="rounded-2xl border border-border/50 bg-card p-7 shadow-xl">
+                    <div className="rounded-xl border border-border/50 bg-card p-7 shadow-lg">
                         <form onSubmit={handleSubmit} className="space-y-5">
                             {error && (
                                 <div className="rounded-xl bg-destructive/10 border border-destructive/20 px-4 py-3 text-sm text-destructive flex items-center gap-2 animate-fade-in">
@@ -118,7 +118,7 @@ export default function LoginPage() {
                             <div className="space-y-1.5">
                                 <div className="flex items-center justify-between ml-0.5">
                                     <label className="text-xs font-semibold text-muted-foreground">Mật khẩu</label>
-                                    <Link href="/forgot-password" className="text-[10px] font-bold text-primary hover:underline uppercase tracking-wider">
+                                    <Link href="/forgot-password" className="text-xs font-semibold text-primary hover:underline uppercase tracking-wider">
                                         Quên mật khẩu?
                                     </Link>
                                 </div>
@@ -159,21 +159,16 @@ export default function LoginPage() {
                         <div className="relative my-6">
                             <div className="section-divider" />
                             <div className="absolute inset-0 flex items-center justify-center">
-                                <span className="bg-card px-3 text-[10px] font-bold text-muted-foreground uppercase tracking-widest">
+                                <span className="bg-card px-3 text-xs font-semibold text-muted-foreground uppercase tracking-wider">
                                     Hoặc
                                 </span>
                             </div>
                         </div>
 
                         {/* Social Login */}
-                        <div className="grid grid-cols-2 gap-3">
-                            <button className="h-11 rounded-xl border border-border/60 bg-background hover:bg-secondary/60 transition-all flex items-center justify-center gap-2 text-sm font-medium">
-                                <Chrome className="h-4 w-4" /> Google
-                            </button>
-                            <button className="h-11 rounded-xl border border-border/60 bg-background hover:bg-secondary/60 transition-all flex items-center justify-center gap-2 text-sm font-medium">
-                                <Github className="h-4 w-4" /> Github
-                            </button>
-                        </div>
+                        <button className="w-full h-11 rounded-xl border border-border/60 bg-background hover:bg-secondary/60 transition-all flex items-center justify-center gap-2 text-sm font-medium">
+                            <Chrome className="h-4 w-4" /> Google
+                        </button>
                     </div>
 
                     <p className="text-center mt-6 text-sm text-muted-foreground">

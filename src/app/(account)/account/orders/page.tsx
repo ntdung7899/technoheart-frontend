@@ -59,17 +59,17 @@ export default function OrdersPage() {
 
     return (
         <div className="space-y-6">
-            <h1 className="text-2xl font-extrabold tracking-tight">Đơn hàng</h1>
+            <h1 className="text-2xl font-bold tracking-tight text-slate-800">Đơn hàng</h1>
 
             {/* Status Tabs */}
-            <div className="flex gap-2 overflow-x-auto pb-2">
+            <div className="flex gap-2 overflow-x-auto pb-1">
                 {tabs.map((tab) => (
                     <button
                         key={tab.value}
                         onClick={() => setFilter(tab.value)}
-                        className={`px-4 py-2 rounded-full text-xs font-bold whitespace-nowrap transition-all ${filter === tab.value
-                            ? "bg-primary text-primary-foreground shadow-md"
-                            : "bg-secondary/50 text-muted-foreground hover:bg-secondary"
+                        className={`px-4 py-1.5 rounded-full text-xs font-semibold whitespace-nowrap transition-all border ${filter === tab.value
+                            ? "bg-blue-600 text-white border-blue-600 shadow-sm"
+                            : "bg-white text-slate-500 border-slate-200 hover:border-blue-300 hover:text-blue-600"
                             }`}
                     >
                         {tab.label}
@@ -86,7 +86,7 @@ export default function OrdersPage() {
                     action={
                         <Link
                             href="/products"
-                            className="px-4 py-2 rounded-xl bg-primary text-primary-foreground text-sm font-bold hover:opacity-90 transition-opacity"
+                            className="px-4 py-2 rounded-xl bg-blue-600 text-white text-sm font-semibold hover:bg-blue-700 transition-colors"
                         >
                             Mua sắm ngay
                         </Link>
@@ -98,23 +98,23 @@ export default function OrdersPage() {
                         <Link
                             key={order.id}
                             href={`/account/orders/${order.id}`}
-                            className="block rounded-2xl border border-border/40 bg-card/50 p-5 hover:shadow-md transition-all group"
+                            className="block rounded-xl border border-slate-200 bg-white p-5 hover:border-blue-300 hover:shadow-md transition-all group"
                         >
                             <div className="flex items-center justify-between mb-3">
                                 <div className="flex items-center gap-3">
-                                    <span className="text-xs text-muted-foreground font-mono">
+                                    <span className="text-xs text-slate-400 font-mono font-medium">
                                         #{order.id.slice(-8).toUpperCase()}
                                     </span>
                                     <StatusBadge status={order.status} />
                                 </div>
-                                <ChevronRight className="h-4 w-4 text-muted-foreground group-hover:translate-x-1 transition-transform" />
+                                <ChevronRight className="h-4 w-4 text-slate-400 group-hover:translate-x-1 group-hover:text-blue-500 transition-all" />
                             </div>
                             <div className="flex items-center justify-between">
                                 <div>
-                                    <p className="text-sm font-medium">
+                                    <p className="text-sm font-semibold text-slate-700">
                                         {order.items.length} sản phẩm
                                     </p>
-                                    <p className="text-xs text-muted-foreground mt-0.5">
+                                    <p className="text-xs text-slate-400 mt-0.5">
                                         {new Date(order.createdAt).toLocaleDateString("vi-VN", {
                                             day: "2-digit",
                                             month: "2-digit",
@@ -122,7 +122,7 @@ export default function OrdersPage() {
                                         })}
                                     </p>
                                 </div>
-                                <p className="text-lg font-extrabold">
+                                <p className="text-lg font-bold text-slate-800">
                                     {formatPrice(order.total)}
                                 </p>
                             </div>

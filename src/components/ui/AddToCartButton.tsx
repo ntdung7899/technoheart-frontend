@@ -41,7 +41,7 @@ export function AddToCartButton({ product, quantity = 1 }: AddToCartButtonProps)
             onClick={handleAdd}
             disabled={isAdded}
             className={`
-                relative flex w-full items-center justify-center rounded-xl px-8 py-3.5 text-base font-bold transition-all duration-300
+                relative flex w-full items-center justify-center rounded-lg px-8 py-3.5 text-base font-semibold transition-all duration-300
                 ${isAdded
                     ? "bg-green-500 text-white shadow-lg shadow-green-500/20"
                     : "bg-primary text-primary-foreground shadow-lg shadow-primary/20 hover:shadow-xl hover:shadow-primary/30 active:scale-[0.98]"

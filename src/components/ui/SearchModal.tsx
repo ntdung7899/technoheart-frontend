@@ -222,7 +222,7 @@ export function SearchModal({ variant = "compact" }: SearchModalProps) {
                         ) : (
                             <>
                                 <div className="px-4 py-2.5 border-b border-border/40">
-                                    <p className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground/60 flex items-center gap-1.5">
+                                    <p className="text-xs font-semibold uppercase tracking-wider text-muted-foreground/60 flex items-center gap-1.5">
                                         <Sparkles className="h-3 w-3" />
                                         Gợi ý ({results.length})
                                     </p>
@@ -244,7 +244,7 @@ export function SearchModal({ variant = "compact" }: SearchModalProps) {
                                             <div className="flex-1 min-w-0">
                                                 <p className="font-semibold text-sm truncate group-hover:text-primary transition-colors">{product.name}</p>
                                                 <div className="flex items-center gap-2 mt-0.5">
-                                                    <span className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground/50">{product.category.name}</span>
+                                                    <span className="text-xs font-semibold uppercase tracking-wider text-muted-foreground/50">{product.category.name}</span>
                                                     <span className="text-xs text-muted-foreground/30">·</span>
                                                     <span className="text-sm font-bold text-primary">{formatPrice(Number(product.price))}</span>
                                                 </div>
@@ -300,7 +300,7 @@ export function SearchModal({ variant = "compact" }: SearchModalProps) {
                     ) : (
                         <>
                             <div className="px-4 py-2 border-b border-border/40">
-                                <p className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground/60">
+                                <p className="text-xs font-semibold uppercase tracking-wider text-muted-foreground/60">
                                     Gợi ý ({results.length})
                                 </p>
                             </div>
@@ -321,8 +321,8 @@ export function SearchModal({ variant = "compact" }: SearchModalProps) {
                                         <div className="flex-1 min-w-0">
                                             <p className="font-medium text-sm truncate group-hover:text-primary transition-colors">{product.name}</p>
                                             <div className="flex items-center gap-2 mt-0.5">
-                                                <span className="text-[10px] text-muted-foreground/50">{product.category.name}</span>
-                                                <span className="text-[10px] text-muted-foreground/20">·</span>
+                                                <span className="text-xs text-muted-foreground/50">{product.category.name}</span>
+                                                <span className="text-xs text-muted-foreground/20">·</span>
                                                 <span className="text-xs font-bold text-primary">{formatPrice(Number(product.price))}</span>
                                             </div>
                                         </div>

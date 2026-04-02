@@ -77,7 +77,7 @@ export function WishlistButton({ productId, variant = "icon", initialWishlisted 
                 onClick={toggle}
                 disabled={loading}
                 className={`
-                    flex items-center justify-center gap-2 rounded-xl font-bold text-sm py-3 px-6 transition-all active:scale-[0.98] border-2 w-full
+                    flex items-center justify-center gap-2 rounded-lg font-semibold text-sm py-3 px-6 transition-all active:scale-[0.98] border-2 w-full
                     ${wishlisted
                         ? "bg-rose-50 text-rose-500 border-rose-200 hover:bg-rose-100"
                         : "bg-white text-zinc-600 border-zinc-200 hover:text-rose-500 hover:border-rose-200 hover:bg-rose-50"

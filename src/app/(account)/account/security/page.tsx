@@ -84,7 +84,7 @@ export default function SecurityPage() {
 
     return (
         <div className="space-y-8 max-w-xl">
-            <h1 className="text-2xl font-extrabold tracking-tight">Bảo mật</h1>
+            <h1 className="text-2xl font-bold tracking-tight">Bảo mật</h1>
 
             {/* Change Password */}
             <div className="rounded-2xl border border-border/40 bg-card/50 p-6 space-y-4">
@@ -107,7 +107,7 @@ export default function SecurityPage() {
 
                 <div className="space-y-3">
                     <div className="space-y-1.5">
-                        <label className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground">
+                        <label className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
                             Mật khẩu hiện tại
                         </label>
                         <div className="relative">
@@ -130,7 +130,7 @@ export default function SecurityPage() {
                     </div>
 
                     <div className="space-y-1.5">
-                        <label className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground">
+                        <label className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
                             Mật khẩu mới
                         </label>
                         <input
@@ -144,7 +144,7 @@ export default function SecurityPage() {
                     </div>
 
                     <div className="space-y-1.5">
-                        <label className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground">
+                        <label className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
                             Xác nhận mật khẩu mới
                         </label>
                         <input

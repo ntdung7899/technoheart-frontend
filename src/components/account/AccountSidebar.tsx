@@ -1,6 +1,8 @@
 "use client";
 
+import { useState, useEffect } from "react";
 import Link from "next/link";
+import Image from "next/image";
 import { usePathname, useRouter } from "next/navigation";
 import {
     LayoutDashboard,
@@ -12,6 +14,9 @@ import {
     Shield,
     LogOut,
     TrendingUp,
+    ChevronsLeft,
+    ChevronsRight,
+    Store,
 } from "lucide-react";
 
 const navItems = [
@@ -28,6 +33,19 @@ const navItems = [
 export function AccountSidebar() {
     const pathname = usePathname();
     const router = useRouter();
+    const [collapsed, setCollapsed] = useState(false);
+
+    useEffect(() => {
+        const saved = localStorage.getItem("account-sidebar-collapsed");
+        if (saved === "true") setCollapsed(true);
+    }, []);
+
+    const toggleCollapsed = () => {
+        setCollapsed((prev) => {
+            localStorage.setItem("account-sidebar-collapsed", String(!prev));
+            return !prev;
+        });
+    };
 
     const handleLogout = async () => {
         await fetch("/api/auth/logout", { method: "POST" });
@@ -38,9 +56,40 @@ export function AccountSidebar() {
     return (
         <>
             {/* Desktop Sidebar */}
-            <aside className="hidden lg:flex flex-col w-64 shrink-0">
-                <div className="sticky top-20">
-                    <nav className="rounded-2xl border border-border/40 bg-card/50 backdrop-blur-xl p-2 shadow-sm">
+            <aside
+                className={`hidden lg:flex flex-col shrink-0 border-r border-th-blue/10 bg-th-dark transition-all duration-300 ${collapsed ? "w-17" : "w-60"}`}
+            >
+                <div className="flex flex-col h-full">
+                    {/* Logo / Brand */}
+                    <div className={`flex items-center h-20 border-b border-th-blue/10 px-4 ${collapsed ? "justify-center" : "gap-3"}`}>
+                        <Link href="/" className="flex items-center gap-2.5 shrink-0">
+                            <Image src="/logo-techno-web.png" alt="Technoheart" width={64} height={64} className="rounded-lg" />
+                            {!collapsed && (
+                                <span className="text-sm font-bold text-white tracking-tight">Technoheart</span>
+                            )}
+                        </Link>
+                    </div>
+
+                    {/* Back to shop */}
+                    <div className={`px-3 pt-4 pb-2 ${collapsed ? "px-2" : ""}`}>
+                        <Link
+                            href="/"
+                            className={`flex items-center gap-2.5 px-3 py-2 rounded-lg text-th-muted hover:text-th-blue-lt hover:bg-th-blue/5 transition-all text-xs font-medium ${collapsed ? "justify-center px-0" : ""}`}
+                        >
+                            <Store className="h-3.5 w-3.5 shrink-0" />
+                            {!collapsed && <span>Quay lại cửa hàng</span>}
+                        </Link>
+                    </div>
+
+                    {/* Nav Label */}
+                    {!collapsed && (
+                        <p className="px-6 pt-3 pb-1.5 text-[10px] font-semibold uppercase tracking-widest text-th-muted/40">
+                            Tài khoản
+                        </p>
+                    )}
+
+                    {/* Navigation */}
+                    <nav className={`flex-1 overflow-y-auto py-1 ${collapsed ? "px-2" : "px-3"}`}>
                         <ul className="space-y-0.5">
                             {navItems.map((item) => {
                                 const isActive =
@@ -51,34 +100,45 @@ export function AccountSidebar() {
                                     <li key={item.href}>
                                         <Link
                                             href={item.href}
-                                            className={`flex items-center gap-3 px-4 py-2.5 rounded-xl text-sm font-medium transition-all ${isActive
-                                                ? "bg-primary text-primary-foreground shadow-md"
-                                                : "text-muted-foreground hover:text-foreground hover:bg-secondary/50"
+                                            title={collapsed ? item.label : undefined}
+                                            className={`flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-all ${collapsed ? "justify-center px-0" : ""} ${isActive
+                                                ? "bg-th-blue/15 text-th-blue-lt"
+                                                : "text-th-muted hover:text-white hover:bg-white/5"
                                                 }`}
                                         >
-                                            <Icon className="h-4 w-4" />
-                                            {item.label}
+                                            <Icon className="h-4 w-4 shrink-0" />
+                                            {!collapsed && item.label}
                                         </Link>
                                     </li>
                                 );
                             })}
-                            <li>
-                                <button
-                                    onClick={handleLogout}
-                                    className="flex items-center gap-3 px-4 py-2.5 rounded-xl text-sm font-medium text-muted-foreground hover:text-destructive hover:bg-destructive/5 transition-all w-full"
-                                >
-                                    <LogOut className="h-4 w-4" />
-                                    Đăng xuất
-                                </button>
-                            </li>
                         </ul>
                     </nav>
+
+                    {/* Footer: Logout + Collapse */}
+                    <div className={`border-t border-th-blue/10 p-3 space-y-1 ${collapsed ? "px-2" : ""}`}>
+                        <button
+                            onClick={handleLogout}
+                            title={collapsed ? "Đăng xuất" : undefined}
+                            className={`flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium text-th-muted hover:text-red-400 hover:bg-red-500/10 transition-all w-full ${collapsed ? "justify-center px-0" : ""}`}
+                        >
+                            <LogOut className="h-4 w-4 shrink-0" />
+                            {!collapsed && "Đăng xuất"}
+                        </button>
+                        <button
+                            onClick={toggleCollapsed}
+                            className={`flex items-center gap-3 px-3 py-2 rounded-lg text-xs font-medium text-th-muted/50 hover:text-th-muted hover:bg-white/5 transition-all w-full ${collapsed ? "justify-center px-0" : ""}`}
+                        >
+                            {collapsed ? <ChevronsRight className="h-4 w-4" /> : <ChevronsLeft className="h-4 w-4" />}
+                            {!collapsed && "Thu gọn"}
+                        </button>
+                    </div>
                 </div>
             </aside>
 
             {/* Mobile Bottom Navigation */}
-            <nav className="lg:hidden fixed bottom-0 left-0 right-0 z-50 border-t border-border/40 bg-background/95 backdrop-blur-xl">
-                <div className="flex items-center justify-around px-2 py-1">
+            <nav className="lg:hidden fixed bottom-0 left-0 right-0 z-50 border-t border-th-blue/15 bg-th-dark/95 backdrop-blur-xl">
+                <div className="flex items-center justify-around px-2 py-1.5">
                     {navItems.slice(0, 5).map((item) => {
                         const isActive =
                             pathname === item.href ||
@@ -88,9 +148,9 @@ export function AccountSidebar() {
                             <Link
                                 key={item.href}
                                 href={item.href}
-                                className={`flex flex-col items-center gap-0.5 px-2 py-2 rounded-xl text-[10px] font-medium transition-all ${isActive
-                                    ? "text-primary"
-                                    : "text-muted-foreground"
+                                className={`flex flex-col items-center gap-0.5 px-2 py-1.5 rounded-lg text-[10px] font-medium transition-all ${isActive
+                                    ? "text-th-blue-lt"
+                                    : "text-th-muted/60"
                                     }`}
                             >
                                 <Icon className="h-5 w-5" />

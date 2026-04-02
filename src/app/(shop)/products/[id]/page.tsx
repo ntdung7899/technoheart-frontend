@@ -51,7 +51,7 @@ export default async function ProductDetailPage({ params }: Props) {
                     <div className="lg:col-span-5">
                         <div className="flex flex-col gap-4">
                             {/* Main Image */}
-                            <div className="group relative aspect-square w-full overflow-hidden rounded-2xl border border-zinc-200 bg-white">
+                            <div className="group relative aspect-square w-full overflow-hidden rounded-xl border border-zinc-200 bg-white">
                                 {product.images.length > 0 ? (
                                     <Image
                                         src={product.images[0]}
@@ -185,7 +185,7 @@ export default async function ProductDetailPage({ params }: Props) {
                     <div className="max-w-4xl">
                         <div className="space-y-6">
                             <div className="space-y-2">
-                                <div className="flex items-center gap-2 text-primary font-bold text-xs uppercase tracking-widest">
+                                <div className="flex items-center gap-2 text-primary font-semibold text-xs uppercase tracking-wider">
                                     <div className="h-1 w-6 bg-primary rounded-full"></div>
                                     Chi tiết
                                 </div>

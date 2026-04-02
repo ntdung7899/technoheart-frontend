@@ -91,25 +91,21 @@ export default function AdminAnalyticsClient() {
     const fmtVnd = (n: number) => n.toLocaleString('vi-VN', { style: 'currency', currency: 'VND' });
 
     return (
-        <div className="space-y-12 pb-20">
+        <div className="space-y-6 pb-12">
             {/* Header */}
-            <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
-                <div className="space-y-2">
-                    <div className="flex items-center gap-2 text-primary font-bold text-sm uppercase tracking-[0.2em]">
-                        <div className="h-1 w-6 bg-primary rounded-full" />
-                        Phân tích dữ liệu
-                    </div>
-                    <h1 className="text-5xl font-black tracking-tightest text-zinc-900">Báo cáo doanh thu</h1>
-                    <p className="text-zinc-500 font-medium text-lg">Phân tích chuyên sâu về hiệu suất bán hàng.</p>
+            <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+                <div>
+                    <h1 className="text-2xl font-bold text-slate-900">Báo cáo doanh thu</h1>
+                    <p className="text-slate-500 text-sm mt-1">Phân tích chuyên sâu về hiệu suất bán hàng.</p>
                 </div>
                 <div className="flex items-center gap-3 flex-wrap">
                     {/* Date presets */}
-                    <div className="flex gap-1 bg-zinc-100 rounded-2xl p-1">
+                    <div className="flex gap-0.5 bg-slate-100 rounded-lg p-1">
                         {PRESETS.map((p, i) => (
                             <button
                                 key={i}
                                 onClick={() => { setSelectedPreset(i); setFrom(""); setTo(""); }}
-                                className={`px-3 py-2 rounded-xl text-xs font-bold transition-all ${selectedPreset === i && !from ? "bg-white text-zinc-900 shadow-sm" : "text-zinc-500 hover:text-zinc-700"}`}
+                                className={`px-3 py-1.5 rounded-md text-xs font-medium transition-all ${selectedPreset === i && !from ? "bg-white text-slate-900 shadow-sm" : "text-slate-500 hover:text-slate-700"}`}
                             >
                                 {p.label}
                             </button>
@@ -118,7 +114,7 @@ export default function AdminAnalyticsClient() {
                     <button
                         onClick={handleExport}
                         disabled={exporting}
-                        className="h-12 px-6 rounded-2xl bg-primary text-primary-foreground font-black text-xs uppercase tracking-widest shadow-xl shadow-primary/20 hover:scale-[1.02] active:scale-95 transition-all flex items-center gap-2 disabled:opacity-60"
+                        className="h-9 px-4 rounded-lg bg-primary text-primary-foreground font-medium text-xs hover:opacity-90 active:scale-95 transition-all flex items-center gap-2 disabled:opacity-60"
                     >
                         {exporting ? <Loader2 className="h-4 w-4 animate-spin" /> : <Download className="h-4 w-4" />}
                         Xuất Excel
@@ -127,88 +123,88 @@ export default function AdminAnalyticsClient() {
             </div>
 
             {/* Custom date range */}
-            <div className="flex items-center gap-4 flex-wrap">
-                <div className="flex items-center gap-2 text-sm text-zinc-500">
+            <div className="flex items-center gap-3 flex-wrap">
+                <div className="flex items-center gap-2 text-sm text-slate-500">
                     <Calendar className="h-4 w-4" />
                     Tuỳ chọn:
                 </div>
                 <input type="date" value={from} onChange={e => setFrom(e.target.value)}
-                    className="h-10 px-3 rounded-xl border border-zinc-200 text-sm font-medium bg-white"
+                    className="h-9 px-3 rounded-lg border border-slate-200 text-sm bg-white"
                 />
-                <span className="text-zinc-400 text-sm">→</span>
+                <span className="text-slate-400 text-sm">→</span>
                 <input type="date" value={to} onChange={e => setTo(e.target.value)}
-                    className="h-10 px-3 rounded-xl border border-zinc-200 text-sm font-medium bg-white"
+                    className="h-9 px-3 rounded-lg border border-slate-200 text-sm bg-white"
                 />
                 <button
                     onClick={handleCustomFilter}
-                    className="h-10 px-4 rounded-xl bg-zinc-900 text-white text-xs font-bold hover:bg-zinc-800 transition-all"
+                    className="h-9 px-4 rounded-lg bg-slate-900 text-white text-xs font-medium hover:bg-slate-800 transition-colors"
                 >
                     Áp dụng
                 </button>
             </div>
 
             {loading ? (
-                <div className="flex items-center justify-center py-32">
+                <div className="flex items-center justify-center py-20">
                     <Loader2 className="h-8 w-8 animate-spin text-primary" />
                 </div>
             ) : data ? (
                 <>
                     {/* Stats */}
-                    <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                         {[
                             { label: 'Tổng doanh thu', value: fmtVnd(data.totalRevenue), icon: DollarSign, color: 'text-emerald-600', bg: 'bg-emerald-50' },
                             { label: 'Giá trị TB/đơn', value: fmtVnd(data.avgOrderValue), icon: Layers, color: 'text-blue-600', bg: 'bg-blue-50' },
                             { label: 'Tổng đơn hàng', value: data.totalOrders.toString(), icon: ShoppingBag, color: 'text-purple-600', bg: 'bg-purple-50' },
                         ].map((stat, idx) => (
-                            <div key={idx} className="p-8 rounded-[2.5rem] bg-white border border-zinc-200 shadow-xl shadow-zinc-200/30 space-y-4">
-                                <div className={`h-12 w-12 rounded-2xl ${stat.bg} ${stat.color} flex items-center justify-center shadow-inner`}>
-                                    <stat.icon className="h-6 w-6" />
+                            <div key={idx} className="p-5 rounded-xl bg-white border border-slate-200 shadow-sm space-y-3">
+                                <div className={`h-10 w-10 rounded-lg ${stat.bg} ${stat.color} flex items-center justify-center`}>
+                                    <stat.icon className="h-5 w-5" />
                                 </div>
                                 <div>
-                                    <p className="text-[10px] font-black uppercase tracking-[0.2em] text-zinc-400 mb-1">{stat.label}</p>
-                                    <h3 className="text-3xl font-black text-zinc-900 tracking-tightest">{stat.value}</h3>
+                                    <p className="text-xs font-medium text-slate-400 mb-1">{stat.label}</p>
+                                    <h3 className="text-2xl font-bold text-slate-900">{stat.value}</h3>
                                 </div>
                             </div>
                         ))}
                     </div>
 
-                    <div className="grid grid-cols-1 lg:grid-cols-3 gap-10">
+                    <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
                         {/* Revenue breakdown */}
-                        <div className="lg:col-span-2 p-10 rounded-[2.5rem] bg-white border border-zinc-200 shadow-xl shadow-zinc-200/30 space-y-8">
+                        <div className="lg:col-span-2 p-5 rounded-xl bg-white border border-slate-200 shadow-sm space-y-6">
                             <div className="space-y-1">
-                                <h3 className="text-2xl font-black tracking-tight text-zinc-900">Phân tích doanh thu</h3>
-                                <p className="text-zinc-500 text-sm font-medium">Tổng hợp theo sản phẩm bán chạy</p>
+                                <h3 className="text-lg font-bold text-slate-900">Phân tích doanh thu</h3>
+                                <p className="text-slate-500 text-sm">Tổng hợp theo sản phẩm bán chạy</p>
                             </div>
 
                             {data.topProducts.length === 0 ? (
-                                <div className="flex flex-col items-center justify-center py-16 gap-4 text-zinc-400">
-                                    <Package className="h-12 w-12 opacity-20" />
-                                    <p className="font-bold">Chưa có dữ liệu trong khoảng thời gian này</p>
+                                <div className="flex flex-col items-center justify-center py-12 gap-3 text-slate-400">
+                                    <Package className="h-10 w-10 opacity-20" />
+                                    <p className="text-sm font-medium">Chưa có dữ liệu trong khoảng thời gian này</p>
                                 </div>
                             ) : (
-                                <div className="space-y-6">
+                                <div className="space-y-5">
                                     {data.topProducts.slice(0, 6).map((product, idx) => {
                                         const maxRev = data.topProducts[0]?.revenue || 1;
                                         return (
-                                            <div key={idx} className="group space-y-2">
+                                            <div key={idx} className="group space-y-1.5">
                                                 <div className="flex items-center justify-between">
-                                                    <div className="flex items-center gap-3">
-                                                        <span className="h-7 w-7 rounded-lg bg-zinc-100 flex items-center justify-center text-[10px] font-black text-zinc-500">
+                                                    <div className="flex items-center gap-2">
+                                                        <span className="h-6 w-6 rounded-md bg-slate-100 flex items-center justify-center text-[10px] font-medium text-slate-500">
                                                             {idx + 1}
                                                         </span>
-                                                        <span className="text-sm font-bold text-zinc-900 group-hover:text-primary transition-colors">{product.name}</span>
+                                                        <span className="text-sm font-medium text-slate-900 group-hover:text-primary transition-colors">{product.name}</span>
                                                     </div>
-                                                    <span className="text-xs font-bold text-zinc-500">{product.quantity} đã bán</span>
+                                                    <span className="text-xs text-slate-500">{product.quantity} đã bán</span>
                                                 </div>
-                                                <div className="h-2 w-full bg-zinc-50 rounded-full overflow-hidden">
+                                                <div className="h-1.5 w-full bg-slate-50 rounded-full overflow-hidden">
                                                     <div
                                                         className={`h-full ${COLORS[idx % COLORS.length]} rounded-full transition-all duration-1000`}
                                                         style={{ width: `${(product.revenue / maxRev) * 100}%` }}
                                                     />
                                                 </div>
-                                                <div className="flex justify-between text-[10px] font-black text-zinc-400 uppercase tracking-widest">
+                                                <div className="flex justify-between text-[11px] text-slate-400">
                                                     <span>Doanh thu</span>
-                                                    <span className="text-zinc-900">{fmtVnd(product.revenue)}</span>
+                                                    <span className="font-medium text-slate-900">{fmtVnd(product.revenue)}</span>
                                                 </div>
                                             </div>
                                         );
@@ -218,32 +214,32 @@ export default function AdminAnalyticsClient() {
                         </div>
 
                         {/* Quick stats sidebar */}
-                        <div className="space-y-6">
-                            <div className="p-8 rounded-[2.5rem] bg-white border border-zinc-200 shadow-xl shadow-zinc-200/30 space-y-4">
-                                <h3 className="text-lg font-black tracking-tight text-zinc-900">Trạng thái đơn hàng</h3>
-                                <div className="space-y-3">
+                        <div className="space-y-4">
+                            <div className="p-5 rounded-xl bg-white border border-slate-200 shadow-sm space-y-3">
+                                <h3 className="text-sm font-bold text-slate-900">Trạng thái đơn hàng</h3>
+                                <div className="space-y-2.5">
                                     <div className="flex items-center justify-between">
-                                        <span className="text-sm font-medium text-zinc-500">Đã giao</span>
-                                        <span className="text-sm font-black text-emerald-600">{data.deliveredOrders}</span>
+                                        <span className="text-sm text-slate-500">Đã giao</span>
+                                        <span className="text-sm font-bold text-emerald-600">{data.deliveredOrders}</span>
                                     </div>
                                     <div className="flex items-center justify-between">
-                                        <span className="text-sm font-medium text-zinc-500">Tổng đơn</span>
-                                        <span className="text-sm font-black text-zinc-900">{data.totalOrders}</span>
+                                        <span className="text-sm text-slate-500">Tổng đơn</span>
+                                        <span className="text-sm font-bold text-slate-900">{data.totalOrders}</span>
                                     </div>
-                                    <div className="h-px bg-zinc-100" />
+                                    <div className="h-px bg-slate-100" />
                                     <div className="flex items-center justify-between">
-                                        <span className="text-sm font-medium text-zinc-500">Tỷ lệ hoàn tất</span>
-                                        <span className="text-sm font-black text-primary">
+                                        <span className="text-sm text-slate-500">Tỷ lệ hoàn tất</span>
+                                        <span className="text-sm font-bold text-primary">
                                             {data.totalOrders > 0 ? ((data.deliveredOrders / data.totalOrders) * 100).toFixed(1) : 0}%
                                         </span>
                                     </div>
                                 </div>
                             </div>
 
-                            <div className="p-8 rounded-[2.5rem] bg-white border border-zinc-200 shadow-xl shadow-zinc-200/30 space-y-4">
-                                <h3 className="text-lg font-black tracking-tight text-zinc-900">Doanh thu đã giao</h3>
-                                <p className="text-3xl font-black text-emerald-600 tracking-tightest">{fmtVnd(data.deliveredRevenue)}</p>
-                                <p className="text-[10px] font-bold text-zinc-400 uppercase tracking-widest">Chỉ tính đơn DELIVERED</p>
+                            <div className="p-5 rounded-xl bg-white border border-slate-200 shadow-sm space-y-3">
+                                <h3 className="text-sm font-bold text-slate-900">Doanh thu đã giao</h3>
+                                <p className="text-2xl font-bold text-emerald-600">{fmtVnd(data.deliveredRevenue)}</p>
+                                <p className="text-[11px] text-slate-400">Chỉ tính đơn DELIVERED</p>
                             </div>
                         </div>
                     </div>

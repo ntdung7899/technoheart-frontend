@@ -112,7 +112,7 @@ export default function ProfilePage() {
 
     return (
         <div className="space-y-6 max-w-xl">
-            <h1 className="text-2xl font-extrabold tracking-tight">Hồ sơ</h1>
+            <h1 className="text-2xl font-bold tracking-tight">Hồ sơ</h1>
 
             {/* Profile Form */}
             <div className="rounded-2xl border border-border/40 bg-card/50 p-6 space-y-5">
@@ -144,7 +144,7 @@ export default function ProfilePage() {
 
                 {/* Name */}
                 <div className="space-y-1.5">
-                    <label className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground">
+                    <label className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
                         Họ và tên
                     </label>
                     <input
@@ -157,7 +157,7 @@ export default function ProfilePage() {
 
                 {/* Phone */}
                 <div className="space-y-1.5">
-                    <label className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground">
+                    <label className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
                         Số điện thoại
                     </label>
                     <input
@@ -171,7 +171,7 @@ export default function ProfilePage() {
 
                 {/* Avatar URL */}
                 <div className="space-y-1.5">
-                    <label className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground">
+                    <label className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
                         URL ảnh đại diện
                     </label>
                     <input
@@ -221,7 +221,7 @@ export default function ProfilePage() {
                         )}
 
                         <div className="space-y-1.5">
-                            <label className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground">
+                            <label className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
                                 Mật khẩu hiện tại
                             </label>
                             <div className="relative">
@@ -244,7 +244,7 @@ export default function ProfilePage() {
                         </div>
 
                         <div className="space-y-1.5">
-                            <label className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground">
+                            <label className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
                                 Mật khẩu mới
                             </label>
                             <input
@@ -258,7 +258,7 @@ export default function ProfilePage() {
                         </div>
 
                         <div className="space-y-1.5">
-                            <label className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground">
+                            <label className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
                                 Xác nhận mật khẩu mới
                             </label>
                             <input

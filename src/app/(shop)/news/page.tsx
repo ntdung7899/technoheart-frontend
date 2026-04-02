@@ -32,7 +32,7 @@ export default async function NewsPage() {
                     <div className="absolute top-[-20%] right-[-10%] w-[400px] h-[400px] bg-primary/5 rounded-full blur-[120px]" />
                 </div>
                 <div className="container mx-auto px-4 lg:px-8 text-center relative">
-                    <h1 className="text-4xl md:text-5xl font-extrabold tracking-tight mb-4 animate-fade-in-up">
+                    <h1 className="text-4xl md:text-5xl font-bold tracking-tight mb-4 animate-fade-in-up">
                         Tin tức &amp; Sự kiện
                     </h1>
                     <p className="text-muted-foreground text-lg max-w-2xl mx-auto animate-fade-in-up" style={{ animationDelay: '0.1s' }}>
@@ -52,7 +52,7 @@ export default async function NewsPage() {
                         {/* Featured Post */}
                         {featuredPost && (
                             <div className="mb-14 animate-fade-in-up">
-                                <Link href={`/news/${featuredPost.id}`} className="group relative block overflow-hidden rounded-2xl bg-card border border-border/50 shadow-lg hover:shadow-2xl transition-shadow duration-500">
+                                <Link href={`/news/${featuredPost.id}`} className="group relative block overflow-hidden rounded-xl bg-card border border-border/50 shadow-lg hover:shadow-xl transition-shadow duration-500">
                                     <div className="grid lg:grid-cols-2 gap-0">
                                         <div className="relative aspect-[16/9] lg:aspect-auto lg:min-h-[360px] overflow-hidden bg-secondary/20">
                                             {featuredPost.image ? (
@@ -71,7 +71,7 @@ export default async function NewsPage() {
                                         </div>
                                         <div className="p-8 md:p-10 lg:p-12 flex flex-col justify-center">
                                             <div className="flex items-center gap-3 mb-5">
-                                                <span className="bg-primary px-3 py-1 rounded-lg text-xs font-bold text-primary-foreground">
+                                                <span className="bg-primary px-3 py-1 rounded-lg text-xs font-semibold text-primary-foreground">
                                                     {featuredPost.category}
                                                 </span>
                                                 <span className="text-xs text-muted-foreground font-medium flex items-center gap-1.5">
@@ -100,7 +100,7 @@ export default async function NewsPage() {
                                     <Link
                                         key={post.id}
                                         href={`/news/${post.id}`}
-                                        className="group flex flex-col bg-card rounded-2xl border border-border/50 overflow-hidden card-hover"
+                                        className="group flex flex-col bg-card rounded-xl border border-border/50 overflow-hidden card-hover"
                                     >
                                         <div className="relative aspect-[16/10] overflow-hidden bg-secondary/20">
                                             {post.image ? (
@@ -116,13 +116,13 @@ export default async function NewsPage() {
                                                 </div>
                                             )}
                                             <div className="absolute top-3 left-3">
-                                                <span className="bg-background/90 backdrop-blur-sm px-2.5 py-1 rounded-lg text-[10px] font-bold uppercase tracking-wider border border-border/50">
+                                                <span className="bg-background/90 backdrop-blur-sm px-2.5 py-1 rounded-lg text-xs font-semibold uppercase tracking-wider border border-border/50">
                                                     {post.category}
                                                 </span>
                                             </div>
                                         </div>
                                         <div className="p-5 flex flex-col flex-1">
-                                            <div className="flex items-center gap-4 text-[10px] text-muted-foreground font-semibold mb-3 uppercase tracking-wider">
+                                            <div className="flex items-center gap-4 text-xs text-muted-foreground font-semibold mb-3 uppercase tracking-wider">
                                                 <span className="flex items-center gap-1.5"><Calendar className="w-3 h-3" /> {formatDate(post.createdAt)}</span>
                                                 <span className="flex items-center gap-1.5"><Clock className="w-3 h-3" /> {post.readTime}</span>
                                             </div>
@@ -144,7 +144,7 @@ export default async function NewsPage() {
                 )}
 
                 {/* Newsletter */}
-                <section className="mt-20 rounded-2xl gradient-hero border border-border/40 p-8 md:p-12 relative overflow-hidden">
+                <section className="mt-20 rounded-xl gradient-hero border border-border/40 p-8 md:p-12 relative overflow-hidden">
                     <div className="absolute inset-0 pointer-events-none">
                         <div className="absolute top-[-20%] right-[-20%] w-[300px] h-[300px] bg-primary/5 rounded-full blur-[100px]" />
                     </div>

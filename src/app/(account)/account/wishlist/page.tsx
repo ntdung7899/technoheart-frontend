@@ -55,7 +55,7 @@ export default function WishlistPage() {
 
     return (
         <div className="space-y-6">
-            <h1 className="text-2xl font-extrabold tracking-tight">Yêu thích</h1>
+            <h1 className="text-2xl font-bold tracking-tight">Yêu thích</h1>
 
             {items.length === 0 ? (
                 <EmptyState
@@ -101,7 +101,7 @@ export default function WishlistPage() {
                                         {item.product.name}
                                     </p>
                                 </Link>
-                                <p className="text-lg font-extrabold mt-1">
+                                <p className="text-lg font-bold mt-1">
                                     {Number(item.product.price).toLocaleString("vi-VN")}₫
                                 </p>
                                 <p className="text-xs text-muted-foreground">

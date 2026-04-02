@@ -50,7 +50,7 @@ export async function GET(req: Request) {
         ]);
 
         // Aggregate stats
-        const [totalApproved, totalPending, totalPaid] = await Promise.all([
+        const [totalApproved, totalPending, totalPaid, totalCancelled] = await Promise.all([
             prisma.commission.aggregate({
                 where: { affiliateId: profile.id, status: "APPROVED" },
                 _sum: { amount: true },
@@ -61,6 +61,10 @@ export async function GET(req: Request) {
             }),
             prisma.commission.aggregate({
                 where: { affiliateId: profile.id, status: "PAID" },
+                _sum: { amount: true },
+            }),
+            prisma.commission.aggregate({
+                where: { affiliateId: profile.id, status: "CANCELLED" },
                 _sum: { amount: true },
             }),
         ]);
@@ -85,6 +89,7 @@ export async function GET(req: Request) {
                 totalApproved: Number(totalApproved._sum.amount || 0),
                 totalPending: Number(totalPending._sum.amount || 0),
                 totalPaid: Number(totalPaid._sum.amount || 0),
+                totalCancelled: Number(totalCancelled._sum.amount || 0),
             },
         });
     } catch (error) {

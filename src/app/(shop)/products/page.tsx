@@ -62,13 +62,13 @@ export default async function ProductsPage({ searchParams }: Props) {
                 {/* Sidebar */}
                 <aside className="w-full md:w-64 space-y-8">
                     <div>
-                        <h3 className="mb-4 text-xs font-black uppercase tracking-widest text-muted-foreground/50">Danh mục</h3>
+                        <h3 className="mb-4 text-xs font-semibold uppercase tracking-wider text-muted-foreground/50">Danh mục</h3>
                         <ul className="space-y-1.5">
                             <li>
                                 <Link
                                     href="/products"
                                     className={clsx(
-                                        "block px-4 py-2.5 rounded-xl transition-all text-sm font-bold",
+                                        "block px-4 py-2.5 rounded-lg transition-all text-sm font-semibold",
                                         !categoryFilter ? "bg-primary text-primary-foreground shadow-lg shadow-primary/20" : "hover:bg-secondary text-muted-foreground hover:text-foreground"
                                     )}
                                 >
@@ -80,7 +80,7 @@ export default async function ProductsPage({ searchParams }: Props) {
                                     <Link
                                         href={`/products?category=${cat.id}`}
                                         className={clsx(
-                                            "block px-4 py-2.5 rounded-xl transition-all text-sm font-bold",
+                                            "block px-4 py-2.5 rounded-lg transition-all text-sm font-semibold",
                                             categoryFilter === cat.id ? "bg-primary text-primary-foreground shadow-lg shadow-primary/20" : "hover:bg-secondary text-muted-foreground hover:text-foreground"
                                         )}
                                     >
@@ -95,15 +95,15 @@ export default async function ProductsPage({ searchParams }: Props) {
                 {/* Product Grid */}
                 <div className="flex-1">
                     <div className="mb-10 border-b border-border/40 pb-8">
-                        <div className="flex items-center gap-2 text-primary font-bold text-[10px] uppercase tracking-[0.2em] mb-2">
+                        <div className="flex items-center gap-2 text-primary font-semibold text-xs uppercase tracking-wider mb-2">
                             <div className="h-1 w-4 bg-primary rounded-full"></div>
-                            BỘ SƯU TẬP
+                            BỘ SƯ̐U TẬP
                         </div>
-                        <h1 className="text-4xl font-black tracking-tightest lg:text-5xl text-foreground">
+                        <h1 className="text-4xl font-bold tracking-tight lg:text-5xl text-foreground">
                             {selectedCategory ? selectedCategory.name : "Tất cả sản phẩm"}
                         </h1>
                         <p className="text-muted-foreground mt-3 font-medium text-lg">
-                            Tìm thấy <span className="text-foreground font-black">{products.length}</span> sản phẩm phù hợp
+                            Tìm thấy <span className="text-foreground font-bold">{products.length}</span> sản phẩm phù hợp
                         </p>
                     </div>
 
@@ -116,13 +116,13 @@ export default async function ProductsPage({ searchParams }: Props) {
                             ))}
                         </div>
                     ) : (
-                        <div className="flex flex-col items-center justify-center py-20 text-center border-2 border-dashed border-border/50 rounded-[2.5rem] bg-muted/5 h-[400px]">
-                            <div className="h-20 w-20 bg-background shadow-xl rounded-[1.5rem] flex items-center justify-center mb-6">
+                        <div className="flex flex-col items-center justify-center py-20 text-center border-2 border-dashed border-border/50 rounded-2xl bg-muted/5 h-[400px]">
+                            <div className="h-20 w-20 bg-background shadow-xl rounded-xl flex items-center justify-center mb-6">
                                 <Search className="h-8 w-8 text-primary" />
                             </div>
-                            <h3 className="text-2xl font-black tracking-tight">Không tìm thấy sản phẩm</h3>
+                            <h3 className="text-2xl font-bold tracking-tight">Không tìm thấy sản phẩm</h3>
                             <p className="text-muted-foreground mt-3 max-w-xs mx-auto font-medium">Chúng tôi không tìm thấy sản phẩm nào phù hợp trong danh mục này.</p>
-                            <Link href="/products" className="mt-8 inline-flex h-12 items-center justify-center rounded-2xl bg-primary px-8 text-xs font-black uppercase tracking-widest text-primary-foreground shadow-xl shadow-primary/20 transition-all hover:scale-105 active:scale-95">
+                            <Link href="/products" className="mt-8 inline-flex h-12 items-center justify-center rounded-xl bg-primary px-8 text-xs font-semibold uppercase tracking-wider text-primary-foreground shadow-xl shadow-primary/20 transition-all hover:scale-105 active:scale-95">
                                 Xóa bộ lọc
                             </Link>
                         </div>

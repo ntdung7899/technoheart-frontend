@@ -24,7 +24,7 @@ interface Commission {
 interface CommissionData {
     commissions: Commission[];
     pagination: { page: number; limit: number; total: number; totalPages: number };
-    summary: { totalApproved: number; totalPending: number; totalPaid: number };
+    summary: { totalApproved: number; totalPending: number; totalPaid: number; totalCancelled: number };
 }
 
 const STATUS_LABELS: Record<string, { label: string; color: string }> = {
@@ -78,25 +78,29 @@ export default function CommissionsPage() {
                     <ArrowLeft className="h-4 w-4" />
                 </Link>
                 <div>
-                    <h1 className="text-2xl font-extrabold tracking-tight">Lịch sử hoa hồng</h1>
+                    <h1 className="text-2xl font-bold tracking-tight">Lịch sử hoa hồng</h1>
                     <p className="text-muted-foreground text-sm mt-1">Chi tiết các khoản hoa hồng</p>
                 </div>
             </div>
 
             {/* Summary */}
             {data && (
-                <div className="grid grid-cols-3 gap-3">
+                <div className="grid grid-cols-2 gap-3">
                     <div className="rounded-2xl border border-border/40 bg-card/50 p-4 text-center">
-                        <p className="text-lg font-extrabold text-amber-600">{formatPrice(data.summary.totalPending)}</p>
+                        <p className="text-lg font-bold text-amber-600">{formatPrice(data.summary.totalPending)}</p>
                         <p className="text-xs text-muted-foreground mt-1">Đang chờ</p>
                     </div>
                     <div className="rounded-2xl border border-border/40 bg-card/50 p-4 text-center">
-                        <p className="text-lg font-extrabold text-blue-600">{formatPrice(data.summary.totalApproved)}</p>
+                        <p className="text-lg font-bold text-blue-600">{formatPrice(data.summary.totalApproved)}</p>
                         <p className="text-xs text-muted-foreground mt-1">Đã duyệt</p>
                     </div>
                     <div className="rounded-2xl border border-border/40 bg-card/50 p-4 text-center">
-                        <p className="text-lg font-extrabold text-emerald-600">{formatPrice(data.summary.totalPaid)}</p>
+                        <p className="text-lg font-bold text-emerald-600">{formatPrice(data.summary.totalPaid)}</p>
                         <p className="text-xs text-muted-foreground mt-1">Đã thanh toán</p>
+                    </div>
+                    <div className="rounded-2xl border border-border/40 bg-card/50 p-4 text-center">
+                        <p className="text-lg font-bold text-red-500">{formatPrice(data.summary.totalCancelled)}</p>
+                        <p className="text-xs text-muted-foreground mt-1">Bị từ chối</p>
                     </div>
                 </div>
             )}

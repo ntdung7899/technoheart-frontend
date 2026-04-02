@@ -77,10 +77,10 @@ function SignupContent() {
                     <div className="absolute bottom-[10%] left-[10%] w-[400px] h-[400px] bg-purple-500/10 rounded-full blur-[120px]" />
                 </div>
                 <div className="relative text-center space-y-8 max-w-md animate-fade-in-up">
-                    <div className="h-20 w-20 rounded-3xl bg-primary flex items-center justify-center text-primary-foreground shadow-2xl mx-auto animate-float">
+                    <div className="h-20 w-20 rounded-2xl bg-primary flex items-center justify-center text-primary-foreground shadow-xl mx-auto animate-float">
                         <Heart className="h-10 w-10 fill-current" />
                     </div>
-                    <h2 className="text-4xl font-extrabold tracking-tight">
+                    <h2 className="text-4xl font-bold tracking-tight">
                         Techno<span className="text-primary">Heart</span>
                     </h2>
                     <p className="text-muted-foreground text-lg leading-relaxed">
@@ -108,11 +108,11 @@ function SignupContent() {
                                 <Heart className="h-6 w-6 fill-current" />
                             </div>
                         </Link>
-                        <h1 className="text-3xl font-extrabold tracking-tight mb-2">Tạo tài khoản mới</h1>
+                        <h1 className="text-3xl font-bold tracking-tight mb-2">Tạo tài khoản mới</h1>
                         <p className="text-muted-foreground">Bắt đầu hành trình mua sắm cùng Technoheart</p>
                     </div>
 
-                    <div className="rounded-2xl border border-border/50 bg-card p-7 shadow-xl">
+                    <div className="rounded-xl border border-border/50 bg-card p-7 shadow-lg">
                         <form onSubmit={handleSubmit} className="space-y-4">
                             {referralCode && (
                                 <div className="rounded-xl bg-primary/10 border border-primary/20 px-4 py-3 text-sm text-primary flex items-center gap-2 animate-fade-in">
@@ -203,7 +203,7 @@ function SignupContent() {
                             <div className="pt-1">
                                 <div className="flex items-start gap-2 mb-5 ml-0.5">
                                     <CheckCircle2 className="h-3.5 w-3.5 text-primary mt-0.5 shrink-0" />
-                                    <p className="text-[11px] text-muted-foreground">
+                                    <p className="text-xs text-muted-foreground">
                                         Tôi đồng ý với <Link href="/terms" className="text-primary hover:underline">Điều khoản dịch vụ</Link> và <Link href="/privacy" className="text-primary hover:underline">Chính sách bảo mật</Link>.
                                     </p>
                                 </div>
@@ -224,7 +224,7 @@ function SignupContent() {
                         <div className="relative my-6">
                             <div className="section-divider" />
                             <div className="absolute inset-0 flex items-center justify-center">
-                                <span className="bg-card px-3 text-[10px] font-bold text-muted-foreground uppercase tracking-widest">
+                                <span className="bg-card px-3 text-xs font-semibold text-muted-foreground uppercase tracking-wider">
                                     Hoặc
                                 </span>
                             </div>
@@ -234,9 +234,9 @@ function SignupContent() {
                             <button className="h-11 rounded-xl border border-border/60 bg-background hover:bg-secondary/60 transition-all flex items-center justify-center gap-2 text-sm font-medium">
                                 <Chrome className="h-4 w-4" /> Google
                             </button>
-                            <button className="h-11 rounded-xl border border-border/60 bg-background hover:bg-secondary/60 transition-all flex items-center justify-center gap-2 text-sm font-medium">
+                            {/* <button className="h-11 rounded-xl border border-border/60 bg-background hover:bg-secondary/60 transition-all flex items-center justify-center gap-2 text-sm font-medium">
                                 <Github className="h-4 w-4" /> Github
-                            </button>
+                            </button> */}
                         </div>
                     </div>
 

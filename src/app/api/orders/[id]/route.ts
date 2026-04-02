@@ -2,6 +2,7 @@
 import prisma from "@/lib/prisma";
 import { NextResponse } from "next/server";
 import { getSession } from "@/lib/auth-utils";
+import { calculateCommissions } from "@/lib/affiliate-utils";
 
 export async function PATCH(
     req: Request,
@@ -22,6 +23,15 @@ export async function PATCH(
             where: { id },
             data: { status }
         });
+
+        // Trigger commission calculation when order is delivered
+        if (status === "DELIVERED") {
+            try {
+                await calculateCommissions(id);
+            } catch (err) {
+                console.error("Commission calculation failed for order", id, err);
+            }
+        }
 
         return NextResponse.json(order);
     } catch (error) {

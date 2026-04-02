@@ -68,7 +68,7 @@ export default function TeamPage() {
     return (
         <div className="space-y-6">
             <div>
-                <h1 className="text-2xl font-extrabold tracking-tight">Mạng lưới</h1>
+                <h1 className="text-2xl font-bold tracking-tight">Mạng lưới</h1>
                 <p className="text-muted-foreground text-sm mt-1">
                     Danh sách thành viên bạn đã giới thiệu
                 </p>
@@ -77,11 +77,11 @@ export default function TeamPage() {
             {/* Summary */}
             <div className="grid grid-cols-2 gap-4">
                 <div className="rounded-2xl border border-border/40 bg-card/50 p-4 text-center">
-                    <p className="text-3xl font-extrabold text-primary">{f1.length}</p>
+                    <p className="text-3xl font-bold text-primary">{f1.length}</p>
                     <p className="text-xs text-muted-foreground mt-1">F1 – Giới thiệu trực tiếp</p>
                 </div>
                 <div className="rounded-2xl border border-border/40 bg-card/50 p-4 text-center">
-                    <p className="text-3xl font-extrabold">{f2.length}</p>
+                    <p className="text-3xl font-bold">{f2.length}</p>
                     <p className="text-xs text-muted-foreground mt-1">F2 – Giới thiệu gián tiếp</p>
                 </div>
             </div>

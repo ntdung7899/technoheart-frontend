@@ -20,7 +20,7 @@ export default function CartPage() {
                     <span className="text-foreground font-medium">Giỏ hàng</span>
                 </nav>
 
-                <h1 className="text-3xl font-extrabold tracking-tight mb-8">Giỏ hàng của bạn</h1>
+                <h1 className="text-3xl font-bold tracking-tight mb-8">Giỏ hàng của bạn</h1>
                 <CartClient />
             </div>
         </div>

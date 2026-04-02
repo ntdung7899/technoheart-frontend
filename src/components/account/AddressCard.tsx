@@ -31,7 +31,7 @@ export function AddressCard({ address, onEdit, onDelete, onSetDefault }: Address
                         {address.label || "Địa chỉ"}
                     </span>
                     {address.isDefault && (
-                        <span className="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-bold bg-primary/10 text-primary border border-primary/20">
+                        <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-semibold bg-primary/10 text-primary border border-primary/20">
                             Mặc định
                         </span>
                     )}

@@ -26,9 +26,14 @@ export default function AdminNewsPage() {
 
     const fetchArticles = async () => {
         setLoading(true);
-        const res = await fetch("/api/news?admin=true");
-        const data = await res.json();
-        setArticles(data.articles || []);
+        try {
+            const res = await fetch("/api/news?admin=true");
+            if (!res.ok) throw new Error(res.statusText);
+            const data = await res.json();
+            setArticles(data.articles || []);
+        } catch {
+            setArticles([]);
+        }
         setLoading(false);
     };
 
@@ -67,79 +72,75 @@ export default function AdminNewsPage() {
     };
 
     return (
-        <div className="space-y-10 pb-20">
+        <div className="space-y-6 pb-12">
             {/* Header */}
-            <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
-                <div className="space-y-2">
-                    <div className="flex items-center gap-2 text-primary font-bold text-sm uppercase tracking-[0.2em]">
-                        <div className="h-1 w-6 bg-primary rounded-full" />
-                        Nội dung
-                    </div>
-                    <h1 className="text-5xl font-black tracking-tight text-zinc-900">Quản lý Tin tức</h1>
-                    <p className="text-zinc-500 font-medium text-lg">Viết và quản lý các bài đăng trên trang tin tức.</p>
+            <div className="flex flex-col md:flex-row md:items-end justify-between gap-4">
+                <div>
+                    <h1 className="text-2xl font-bold text-slate-900">Tin tức</h1>
+                    <p className="text-slate-500 text-sm mt-1">Viết và quản lý bài đăng trên trang tin tức.</p>
                 </div>
-                <div className="flex items-center gap-3">
+                <div className="flex items-center gap-2">
                     <Link
                         href="/admin/news/categories"
-                        className="inline-flex items-center gap-2 h-14 px-6 rounded-2xl border border-zinc-200 bg-white text-zinc-700 font-black text-xs uppercase tracking-widest hover:bg-zinc-50 transition-all shadow-sm"
+                        className="h-9 px-3 rounded-lg border border-slate-200 text-slate-600 text-sm font-medium hover:bg-slate-50 transition-colors flex items-center gap-2"
                     >
-                        <Tag className="h-4 w-4" />
+                        <Tag className="h-3.5 w-3.5" />
                         Danh mục
                     </Link>
                     <Link
                         href="/admin/news/new"
-                        className="inline-flex items-center gap-3 h-14 px-8 rounded-2xl bg-primary text-primary-foreground font-black text-sm uppercase tracking-widest shadow-xl shadow-primary/20 hover:scale-[1.02] active:scale-95 transition-all"
+                        className="h-9 px-4 rounded-lg bg-primary text-primary-foreground text-sm font-medium hover:opacity-90 transition-opacity flex items-center gap-2"
                     >
-                        <Plus className="h-5 w-5" />
+                        <Plus className="h-4 w-4" />
                         Viết bài mới
                     </Link>
                 </div>
             </div>
 
             {/* Stats row */}
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-5">
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
                 {[
-                    { label: "Tổng bài viết", value: articles.length, color: "text-zinc-900" },
+                    { label: "Tổng bài viết", value: articles.length, color: "text-slate-900" },
                     { label: "Đã xuất bản", value: articles.filter(a => a.published).length, color: "text-emerald-600" },
-                    { label: "Bản nháp", value: articles.filter(a => !a.published).length, color: "text-orange-500" },
+                    { label: "Bản nháp", value: articles.filter(a => !a.published).length, color: "text-amber-600" },
                     { label: "Nổi bật", value: articles.filter(a => a.featured).length, color: "text-yellow-500" },
                 ].map((s, i) => (
-                    <div key={i} className="p-6 rounded-[1.5rem] bg-white border border-zinc-200 shadow-sm">
-                        <p className="text-[10px] font-black uppercase tracking-[0.2em] text-zinc-400 mb-1">{s.label}</p>
-                        <p className={`text-4xl font-black ${s.color}`}>{s.value}</p>
+                    <div key={i} className="p-4 rounded-xl bg-white border border-slate-200 shadow-sm">
+                        <p className="text-xs text-slate-500 mb-1">{s.label}</p>
+                        <p className={`text-2xl font-bold ${s.color}`}>{s.value}</p>
                     </div>
                 ))}
             </div>
 
             {/* Search + Table */}
-            <div className="rounded-[2rem] border border-zinc-200 bg-white shadow-xl shadow-zinc-100 overflow-hidden">
-                <div className="p-6 border-b border-zinc-100 flex items-center gap-4">
+            <div className="rounded-xl border border-slate-200 bg-white shadow-sm overflow-hidden">
+                <div className="p-4 border-b border-slate-100 flex items-center gap-3">
                     <div className="relative flex-1 max-w-sm">
-                        <Search className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-zinc-400" />
+                        <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
                         <input
                             type="text"
                             placeholder="Tìm kiếm bài viết..."
                             value={searchQuery}
                             onChange={e => setSearchQuery(e.target.value)}
-                            className="h-11 w-full rounded-2xl border border-zinc-200 bg-zinc-50 pl-11 pr-4 text-sm font-medium focus:outline-none focus:ring-4 focus:ring-primary/10 focus:border-primary/30 transition-all"
+                            className="h-9 w-full rounded-lg border border-slate-200 bg-slate-50 pl-9 pr-3 text-sm focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary/30 transition-all"
                         />
                     </div>
-                    <span className="text-sm font-bold text-zinc-400">{filtered.length} bài viết</span>
+                    <span className="text-xs text-slate-400">{filtered.length} bài viết</span>
                 </div>
 
                 {loading ? (
-                    <div className="flex items-center justify-center py-24">
+                    <div className="flex items-center justify-center py-20">
                         <Loader2 className="h-8 w-8 animate-spin text-primary" />
                     </div>
                 ) : filtered.length === 0 ? (
-                    <div className="flex flex-col items-center justify-center py-24 gap-4 text-zinc-400">
-                        <Newspaper className="h-12 w-12 opacity-20" />
-                        <p className="font-bold text-base">
+                    <div className="flex flex-col items-center justify-center py-20 gap-2 text-slate-400">
+                        <Newspaper className="h-8 w-8 opacity-30" />
+                        <p className="text-sm">
                             {articles.length === 0 ? "Chưa có bài viết nào" : "Không tìm thấy kết quả"}
                         </p>
                         {articles.length === 0 && (
-                            <Link href="/admin/news/new" className="text-sm text-primary font-bold hover:underline">
-                                Viết bài đầu tiên →
+                            <Link href="/admin/news/new" className="text-sm text-primary hover:underline">
+                                Viết bài đầu tiên
                             </Link>
                         )}
                     </div>
@@ -147,78 +148,74 @@ export default function AdminNewsPage() {
                     <div className="overflow-x-auto">
                         <table className="w-full">
                             <thead>
-                                <tr className="bg-zinc-50 border-b border-zinc-100">
-                                    <th className="px-6 py-5 text-left text-[10px] font-black uppercase tracking-[0.2em] text-zinc-400">Tiêu đề</th>
-                                    <th className="px-6 py-5 text-left text-[10px] font-black uppercase tracking-[0.2em] text-zinc-400">Danh mục</th>
-                                    <th className="px-6 py-5 text-center text-[10px] font-black uppercase tracking-[0.2em] text-zinc-400">Trạng thái</th>
-                                    <th className="px-6 py-5 text-center text-[10px] font-black uppercase tracking-[0.2em] text-zinc-400">Nổi bật</th>
-                                    <th className="px-6 py-5 text-left text-[10px] font-black uppercase tracking-[0.2em] text-zinc-400">Ngày tạo</th>
-                                    <th className="px-6 py-5 text-right text-[10px] font-black uppercase tracking-[0.2em] text-zinc-400">Thao tác</th>
+                                <tr className="border-b border-slate-100">
+                                    <th className="px-4 py-3 text-left text-xs font-medium text-slate-500">Tiêu đề</th>
+                                    <th className="px-4 py-3 text-left text-xs font-medium text-slate-500">Danh mục</th>
+                                    <th className="px-4 py-3 text-center text-xs font-medium text-slate-500">Trạng thái</th>
+                                    <th className="px-4 py-3 text-center text-xs font-medium text-slate-500">Nổi bật</th>
+                                    <th className="px-4 py-3 text-left text-xs font-medium text-slate-500">Ngày tạo</th>
+                                    <th className="px-4 py-3 text-right text-xs font-medium text-slate-500">Thao tác</th>
                                 </tr>
                             </thead>
-                            <tbody className="divide-y divide-zinc-50">
+                            <tbody className="divide-y divide-slate-50">
                                 {filtered.map(article => (
-                                    <tr key={article.id} className="group hover:bg-zinc-50/80 transition-colors">
-                                        <td className="px-6 py-5 max-w-xs">
-                                            <p className="font-bold text-sm text-zinc-900 line-clamp-1 group-hover:text-primary transition-colors">
+                                    <tr key={article.id} className="group hover:bg-slate-50/50 transition-colors">
+                                        <td className="px-4 py-3 max-w-xs">
+                                            <p className="text-sm font-medium text-slate-900 line-clamp-1 group-hover:text-primary transition-colors">
                                                 {article.title}
                                             </p>
-                                            <p className="text-[11px] text-zinc-400 font-medium mt-0.5">
+                                            <p className="text-[11px] text-slate-400 mt-0.5">
                                                 {article.readTime} · {article.author.name || article.author.email}
                                             </p>
                                         </td>
-                                        <td className="px-6 py-5">
-                                            <span className={`inline-flex items-center px-3 py-1.5 rounded-xl text-[10px] font-black uppercase tracking-widest ring-1 ring-inset ${categoryColors[article.category] || "bg-zinc-100 text-zinc-600 ring-zinc-200"}`}>
+                                        <td className="px-4 py-3">
+                                            <span className={`inline-flex items-center px-2 py-0.5 rounded-md text-[11px] font-medium ${categoryColors[article.category] || "bg-slate-100 text-slate-600"}`}>
                                                 {article.category}
                                             </span>
                                         </td>
-                                        <td className="px-6 py-5 text-center">
+                                        <td className="px-4 py-3 text-center">
                                             <button
                                                 onClick={() => handleToggle(article.id, "published", article.published)}
-                                                className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-[10px] font-black uppercase tracking-widest ring-1 ring-inset transition-all hover:scale-105 ${article.published
-                                                    ? "bg-emerald-50 text-emerald-600 ring-emerald-200"
-                                                    : "bg-orange-50 text-orange-500 ring-orange-200"
+                                                className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-md text-[11px] font-medium transition-colors ${article.published
+                                                    ? "bg-emerald-50 text-emerald-600"
+                                                    : "bg-amber-50 text-amber-600"
                                                     }`}
-                                                title="Click để thay đổi"
                                             >
                                                 {article.published
-                                                    ? <><Eye className="h-3 w-3" /> Đã xuất bản</>
-                                                    : <><EyeOff className="h-3 w-3" /> Bản nháp</>
+                                                    ? <><Eye className="h-3 w-3" /> Xuất bản</>
+                                                    : <><EyeOff className="h-3 w-3" /> Nháp</>
                                                 }
                                             </button>
                                         </td>
-                                        <td className="px-6 py-5 text-center">
+                                        <td className="px-4 py-3 text-center">
                                             <button
                                                 onClick={() => handleToggle(article.id, "featured", article.featured)}
-                                                className="inline-flex items-center justify-center h-9 w-9 rounded-xl hover:bg-zinc-100 transition-all mx-auto"
-                                                title={article.featured ? "Bỏ nổi bật" : "Đặt nổi bật"}
+                                                className="inline-flex items-center justify-center h-8 w-8 rounded-md hover:bg-slate-100 transition-colors mx-auto"
                                             >
                                                 {article.featured
                                                     ? <Star className="h-4 w-4 text-yellow-500 fill-yellow-500" />
-                                                    : <StarOff className="h-4 w-4 text-zinc-300" />
+                                                    : <StarOff className="h-4 w-4 text-slate-300" />
                                                 }
                                             </button>
                                         </td>
-                                        <td className="px-6 py-5">
-                                            <span className="inline-flex items-center gap-1.5 text-[11px] font-bold text-zinc-400">
+                                        <td className="px-4 py-3">
+                                            <span className="flex items-center gap-1 text-xs text-slate-400">
                                                 <Calendar className="h-3 w-3" />
                                                 {new Date(article.createdAt).toLocaleDateString("vi-VN")}
                                             </span>
                                         </td>
-                                        <td className="px-6 py-5">
-                                            <div className="flex items-center justify-end gap-2">
+                                        <td className="px-4 py-3">
+                                            <div className="flex items-center justify-end gap-1">
                                                 <Link
                                                     href={`/admin/news/${article.id}/edit`}
-                                                    className="h-9 w-9 flex items-center justify-center rounded-xl hover:bg-primary/10 hover:text-primary transition-all text-zinc-400"
-                                                    title="Chỉnh sửa"
+                                                    className="h-8 w-8 flex items-center justify-center rounded-md hover:bg-slate-100 hover:text-primary transition-colors text-slate-400"
                                                 >
                                                     <Pencil className="h-4 w-4" />
                                                 </Link>
                                                 <button
                                                     onClick={() => handleDelete(article.id)}
                                                     disabled={deletingId === article.id}
-                                                    className="h-9 w-9 flex items-center justify-center rounded-xl hover:bg-red-50 hover:text-red-500 transition-all text-zinc-400 disabled:opacity-50"
-                                                    title="Xoá"
+                                                    className="h-8 w-8 flex items-center justify-center rounded-md hover:bg-red-50 hover:text-red-500 transition-colors text-slate-400 disabled:opacity-50"
                                                 >
                                                     {deletingId === article.id
                                                         ? <Loader2 className="h-4 w-4 animate-spin" />

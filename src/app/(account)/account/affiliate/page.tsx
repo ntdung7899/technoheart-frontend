@@ -25,8 +25,8 @@ interface AffiliateData {
         pendingEarnings: number;
         rates: { f1Rate: number; f2Rate: number };
         achievement: { rate: number; label: string } | null;
-        progression: { nextRank: string | null; pvNeeded: number; progress: number };
-        rankInfo: { label: string; minPersonalPV: number; description: string; color: string };
+        progression: { nextRank: string | null; pvNeeded: number; progress: number; pvType: "personal" | "team" };
+        rankInfo: { label: string; minPersonalPV: number; minTeamPV: number; description: string; color: string };
     };
 }
 
@@ -48,11 +48,11 @@ const COMMISSION_TABLE = [
 ];
 
 const ACHIEVEMENT_TABLE = [
-    { level: "L1", title: "Đại diện kinh doanh", rate: "3%", condition: "VIP + Nhóm 20.000 PV" },
-    { level: "L2", title: "Giám đốc khu vực", rate: "5%", condition: "VIP + 2 L1/2 nhánh" },
-    { level: "L3", title: "Giám đốc vùng", rate: "7%", condition: "VVIP + 2 L2/2 nhánh + 1 L1" },
-    { level: "L4", title: "Đại sứ TH quốc gia", rate: "8%", condition: "VVIP + 3 L3/3 nhánh" },
-    { level: "L5", title: "Đại sứ TH toàn cầu", rate: "9%", condition: "VVIP + 3 L4/3 nhánh" },
+    { level: "L1", title: "Đại diện kinh doanh", rate: "3%", condition: "VIP + Nhóm ≥ 20.000 PV" },
+    { level: "L2", title: "Giám đốc khu vực", rate: "5%", condition: "VIP + Nhóm ≥ 60.000 PV" },
+    { level: "L3", title: "Giám đốc vùng", rate: "7%", condition: "VVIP + Nhóm ≥ 170.000 PV" },
+    { level: "L4", title: "Đại sứ TH quốc gia", rate: "8%", condition: "VVIP + Nhóm ≥ 600.000 PV" },
+    { level: "L5", title: "Đại sứ TH toàn cầu", rate: "9%", condition: "VVIP + Nhóm ≥ 2.000.000 PV" },
 ];
 
 export default function AffiliatePage() {
@@ -75,6 +75,8 @@ export default function AffiliatePage() {
         }
     };
 
+    const PV_RATE = 26000;
+
     useEffect(() => {
         fetchProfile();
     }, []);
@@ -93,12 +95,36 @@ export default function AffiliatePage() {
         }
     };
 
-    const copyReferralLink = () => {
+    const copyReferralLink = async () => {
         if (!data?.profile?.referralCode) return;
         const link = `${window.location.origin}/signup?ref=${data.profile.referralCode}`;
-        navigator.clipboard.writeText(link);
-        setCopied(true);
-        setTimeout(() => setCopied(false), 2000);
+        try {
+            if (navigator.clipboard) {
+                await navigator.clipboard.writeText(link);
+            } else {
+                const textarea = document.createElement("textarea");
+                textarea.value = link;
+                textarea.style.position = "fixed";
+                textarea.style.opacity = "0";
+                document.body.appendChild(textarea);
+                textarea.select();
+                document.execCommand("copy");
+                document.body.removeChild(textarea);
+            }
+            setCopied(true);
+            setTimeout(() => setCopied(false), 2000);
+        } catch {
+            const textarea = document.createElement("textarea");
+            textarea.value = link;
+            textarea.style.position = "fixed";
+            textarea.style.opacity = "0";
+            document.body.appendChild(textarea);
+            textarea.select();
+            document.execCommand("copy");
+            document.body.removeChild(textarea);
+            setCopied(true);
+            setTimeout(() => setCopied(false), 2000);
+        }
     };
 
     if (loading) {
@@ -114,7 +140,7 @@ export default function AffiliatePage() {
         return (
             <div className="space-y-8">
                 <div>
-                    <h1 className="text-2xl font-extrabold tracking-tight">Affiliate Marketing</h1>
+                    <h1 className="text-2xl font-bold tracking-tight">Affiliate Marketing</h1>
                     <p className="text-muted-foreground text-sm mt-1">
                         Kiếm thu nhập không giới hạn khi giới thiệu sản phẩm Technoheart
                     </p>
@@ -135,6 +161,17 @@ export default function AffiliatePage() {
                             <p className="text-xs text-muted-foreground mt-1">{b.desc}</p>
                         </div>
                     ))}
+                </div>
+
+                {/* PV Info */}
+                <div className="rounded-2xl border border-primary/20 bg-primary/5 p-5">
+                    <h2 className="font-bold mb-2">Quy đổi PV</h2>
+                    <p className="text-sm text-muted-foreground">
+                        1 PV = <span className="font-bold text-foreground">{PV_RATE.toLocaleString("vi-VN")} VNĐ</span>
+                    </p>
+                    <p className="text-xs text-muted-foreground mt-1">
+                        Ví dụ: Đơn hàng 2.600.000đ = 100 PV
+                    </p>
                 </div>
 
                 {/* Commission Table */}
@@ -227,7 +264,7 @@ export default function AffiliatePage() {
         <div className="space-y-6">
             <div className="flex items-center justify-between">
                 <div>
-                    <h1 className="text-2xl font-extrabold tracking-tight">Affiliate Dashboard</h1>
+                    <h1 className="text-2xl font-bold tracking-tight">Affiliate Dashboard</h1>
                     <p className="text-muted-foreground text-sm mt-1">Quản lý hoạt động affiliate của bạn</p>
                 </div>
                 <span className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-sm font-bold ${rankDisplay.badge}`}>
@@ -243,28 +280,28 @@ export default function AffiliatePage() {
                         <DollarSign className="h-4 w-4" />
                         Tổng thu nhập
                     </div>
-                    <p className="text-xl font-extrabold">{formatPrice(profile!.totalEarnings)}</p>
+                    <p className="text-xl font-bold">{formatPrice(profile!.totalEarnings)}</p>
                 </div>
                 <div className="rounded-2xl border border-border/40 bg-card/50 p-4">
                     <div className="flex items-center gap-2 text-muted-foreground text-xs font-medium mb-2">
                         <TrendingUp className="h-4 w-4" />
                         PV cá nhân
                     </div>
-                    <p className="text-xl font-extrabold">{profile!.personalPV.toLocaleString("vi-VN")}</p>
+                    <p className="text-xl font-bold">{profile!.personalPV.toLocaleString("vi-VN")}</p>
                 </div>
                 <div className="rounded-2xl border border-border/40 bg-card/50 p-4">
                     <div className="flex items-center gap-2 text-muted-foreground text-xs font-medium mb-2">
                         <BarChart3 className="h-4 w-4" />
                         PV nhóm
                     </div>
-                    <p className="text-xl font-extrabold">{profile!.teamPV.toLocaleString("vi-VN")}</p>
+                    <p className="text-xl font-bold">{profile!.teamPV.toLocaleString("vi-VN")}</p>
                 </div>
                 <div className="rounded-2xl border border-border/40 bg-card/50 p-4">
                     <div className="flex items-center gap-2 text-muted-foreground text-xs font-medium mb-2">
                         <Users className="h-4 w-4" />
                         Mạng lưới
                     </div>
-                    <p className="text-xl font-extrabold">
+                    <p className="text-xl font-bold">
                         {stats!.f1Count} <span className="text-sm font-normal text-muted-foreground">F1</span>
                         {" / "}
                         {stats!.f2Count} <span className="text-sm font-normal text-muted-foreground">F2</span>
@@ -288,7 +325,7 @@ export default function AffiliatePage() {
                         />
                     </div>
                     <p className="text-xs text-muted-foreground mt-2">
-                        Còn cần <span className="font-bold text-foreground">{stats!.progression.pvNeeded.toLocaleString("vi-VN")} PV</span> để đạt {stats!.progression.nextRank}
+                        Còn cần <span className="font-bold text-foreground">{stats!.progression.pvNeeded.toLocaleString("vi-VN")} PV {stats!.progression.pvType === "team" ? "nhóm" : "cá nhân"}</span> để đạt {stats!.progression.nextRank}
                     </p>
                 </div>
             )}
@@ -297,7 +334,7 @@ export default function AffiliatePage() {
             <div className="rounded-2xl border border-border/40 bg-card/50 p-5">
                 <h3 className="text-sm font-bold mb-3">Mã giới thiệu của bạn</h3>
                 <div className="flex items-center gap-3">
-                    <div className="flex-1 flex items-center gap-2 rounded-xl bg-secondary/50 px-4 py-3 font-mono text-lg font-bold tracking-widest">
+                    <div className="flex-1 flex items-center gap-2 rounded-xl bg-secondary/50 px-4 py-3 font-mono text-lg font-semibold tracking-wider">
                         {profile!.referralCode}
                     </div>
                     <button
@@ -329,11 +366,11 @@ export default function AffiliatePage() {
                 <h3 className="text-sm font-bold mb-3">Tỷ lệ hoa hồng hiện tại</h3>
                 <div className="grid grid-cols-2 gap-4">
                     <div className="rounded-xl bg-primary/5 border border-primary/20 p-4 text-center">
-                        <p className="text-2xl font-extrabold text-primary">{(stats!.rates.f1Rate * 100).toFixed(0)}%</p>
+                        <p className="text-2xl font-bold text-primary">{(stats!.rates.f1Rate * 100).toFixed(0)}%</p>
                         <p className="text-xs text-muted-foreground mt-1">Hoa hồng F1</p>
                     </div>
                     <div className="rounded-xl bg-secondary/50 border border-border/20 p-4 text-center">
-                        <p className="text-2xl font-extrabold">{stats!.rates.f2Rate > 0 ? `${(stats!.rates.f2Rate * 100).toFixed(1)}%` : "—"}</p>
+                        <p className="text-2xl font-bold">{stats!.rates.f2Rate > 0 ? `${(stats!.rates.f2Rate * 100).toFixed(1)}%` : "—"}</p>
                         <p className="text-xs text-muted-foreground mt-1">Hoa hồng F2</p>
                     </div>
                 </div>
@@ -383,6 +420,11 @@ export default function AffiliatePage() {
                     <ArrowRight className="h-4 w-4 text-muted-foreground" />
                 </Link>
             </div>
+
+            {/* PV Rate Info */}
+            <p className="text-xs text-center text-muted-foreground">
+                Quy đổi: 1 PV = {PV_RATE.toLocaleString("vi-VN")} VNĐ
+            </p>
         </div>
     );
 }

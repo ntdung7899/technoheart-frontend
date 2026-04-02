@@ -1,7 +1,10 @@
 import { getSession } from "@/lib/auth-utils";
 import prisma from "@/lib/prisma";
 import { NextResponse } from "next/server";
-import { getCommissionRates, getBaseRankFromPV, orderTotalToPV } from "@/lib/affiliate-utils";
+import {
+    getCommissionRates, getBaseRankFromPV, getFullRank,
+    orderTotalToPV, getAchievementBonus, SAME_RANK_RATE
+} from "@/lib/affiliate-utils";
 
 // Called when an order's status is changed to DELIVERED
 // This triggers commission calculation and PV updates
@@ -44,15 +47,13 @@ export async function POST(req: Request) {
         });
         if (buyerProfile) {
             const newPersonalPV = buyerProfile.personalPV + orderPV;
-            const newRank = getBaseRankFromPV(newPersonalPV);
+            const newRank = getFullRank(newPersonalPV, buyerProfile.teamPV);
 
             await prisma.affiliateProfile.update({
                 where: { id: buyerProfile.id },
                 data: {
                     personalPV: newPersonalPV,
-                    rank: buyerProfile.rank === "BA" || buyerProfile.rank === "VIP" || buyerProfile.rank === "VVIP"
-                        ? newRank
-                        : buyerProfile.rank,
+                    rank: newRank,
                 },
             });
         }
@@ -85,13 +86,38 @@ export async function POST(req: Request) {
                     });
 
                     // Update F1 earnings & team PV
+                    const newTeamPV = f1Profile.teamPV + orderPV;
+                    const newRank = getFullRank(f1Profile.personalPV, newTeamPV);
                     await prisma.affiliateProfile.update({
                         where: { id: f1Profile.id },
                         data: {
                             totalEarnings: { increment: f1Amount },
                             teamPV: { increment: orderPV },
+                            rank: newRank,
                         },
                     });
+
+                    // Module 2-3: Thưởng thành tích (% doanh thu nhóm)
+                    const achievementBonus = getAchievementBonus(newRank);
+                    if (achievementBonus) {
+                        const achievementAmount = orderTotal * achievementBonus.rate;
+                        commissionsToCreate.push({
+                            affiliateId: f1Profile.id,
+                            orderId,
+                            amount: achievementAmount,
+                            rate: achievementBonus.rate,
+                            level: 1,
+                            type: "ACHIEVEMENT",
+                            status: "APPROVED",
+                        });
+
+                        await prisma.affiliateProfile.update({
+                            where: { id: f1Profile.id },
+                            data: {
+                                totalEarnings: { increment: achievementAmount },
+                            },
+                        });
+                    }
                 }
 
                 // F2 commission (referrer of the referrer)
@@ -119,13 +145,64 @@ export async function POST(req: Request) {
                             });
 
                             // Update F2 earnings & team PV
+                            const newTeamPV = f2Profile.teamPV + orderPV;
+                            const newRank = getFullRank(f2Profile.personalPV, newTeamPV);
                             await prisma.affiliateProfile.update({
                                 where: { id: f2Profile.id },
                                 data: {
                                     totalEarnings: { increment: f2Amount },
                                     teamPV: { increment: orderPV },
+                                    rank: newRank,
                                 },
                             });
+
+                            // Module 2-3: Thưởng thành tích for F2
+                            const f2AchievementBonus = getAchievementBonus(newRank);
+                            if (f2AchievementBonus) {
+                                const achievementAmount = orderTotal * f2AchievementBonus.rate;
+                                commissionsToCreate.push({
+                                    affiliateId: f2Profile.id,
+                                    orderId,
+                                    amount: achievementAmount,
+                                    rate: f2AchievementBonus.rate,
+                                    level: 2,
+                                    type: "ACHIEVEMENT",
+                                    status: "APPROVED",
+                                });
+
+                                await prisma.affiliateProfile.update({
+                                    where: { id: f2Profile.id },
+                                    data: {
+                                        totalEarnings: { increment: achievementAmount },
+                                    },
+                                });
+                            }
+
+                            // Thu nhập đồng cấp: nếu F1 và F2 cùng cấp, F2 nhận 20% thu nhập F1
+                            if (f1Profile && f1Profile.rank === f2Profile.rank) {
+                                const f1EarningsThisOrder = commissionsToCreate
+                                    .filter(c => c.affiliateId === f1Profile.id)
+                                    .reduce((sum, c) => sum + c.amount, 0);
+                                const sameRankAmount = f1EarningsThisOrder * SAME_RANK_RATE;
+                                if (sameRankAmount > 0) {
+                                    commissionsToCreate.push({
+                                        affiliateId: f2Profile.id,
+                                        orderId,
+                                        amount: sameRankAmount,
+                                        rate: SAME_RANK_RATE,
+                                        level: 2,
+                                        type: "REFERRAL",
+                                        status: "APPROVED",
+                                    });
+
+                                    await prisma.affiliateProfile.update({
+                                        where: { id: f2Profile.id },
+                                        data: {
+                                            totalEarnings: { increment: sameRankAmount },
+                                        },
+                                    });
+                                }
+                            }
                         }
                     }
                 }

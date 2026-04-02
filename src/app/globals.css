@@ -82,6 +82,17 @@
   --radius-md: calc(var(--radius) - 2px);
   --radius-sm: calc(var(--radius) - 4px);
   --font-sans: 'Inter', system-ui, -apple-system, sans-serif;
+
+  /* Technoheart brand colors — use as text-th-dark, bg-th-dark, border-th-border, etc. */
+  --color-th-dark: #0A1628;
+  --color-th-dark-alt: #0D1F3C;
+  --color-th-blue: #3B82F6;
+  --color-th-blue-lt: #60A5FA;
+  --color-th-yellow: #FACC15;
+  --color-th-muted: #93C5FD;
+  --color-th-dim: #CBD5E1;
+  --color-th-border: rgba(59, 130, 246, 0.2);
+  --color-th-card: rgba(255, 255, 255, 0.03);
 }
 
 
@@ -446,10 +457,6 @@ body {
 
 /* ---- Header ---- */
 .th-header {
-  position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
   z-index: 50;
   width: 100%;
   background: rgba(10, 22, 40, 0.88);

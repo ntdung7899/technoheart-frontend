@@ -146,7 +146,7 @@ export default function AddressesPage() {
     return (
         <div className="space-y-6">
             <div className="flex items-center justify-between">
-                <h1 className="text-2xl font-extrabold tracking-tight">Địa chỉ</h1>
+                <h1 className="text-2xl font-bold tracking-tight">Địa chỉ</h1>
                 <button
                     onClick={openAdd}
                     className="h-9 px-4 rounded-xl bg-primary text-primary-foreground text-xs font-bold flex items-center gap-1.5 hover:opacity-90 transition-opacity"
@@ -179,7 +179,7 @@ export default function AddressesPage() {
 
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                         <div className="space-y-1">
-                            <label className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground">
+                            <label className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
                                 Nhãn
                             </label>
                             <input
@@ -191,7 +191,7 @@ export default function AddressesPage() {
                             />
                         </div>
                         <div className="space-y-1">
-                            <label className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground">
+                            <label className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
                                 Quốc gia
                             </label>
                             <input
@@ -204,7 +204,7 @@ export default function AddressesPage() {
                     </div>
 
                     <div className="space-y-1">
-                        <label className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground">
+                        <label className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
                             Địa chỉ
                         </label>
                         <input
@@ -218,7 +218,7 @@ export default function AddressesPage() {
 
                     <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
                         <div className="space-y-1">
-                            <label className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground">
+                            <label className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
                                 Thành phố
                             </label>
                             <input
@@ -229,7 +229,7 @@ export default function AddressesPage() {
                             />
                         </div>
                         <div className="space-y-1">
-                            <label className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground">
+                            <label className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
                                 Tỉnh/Quận
                             </label>
                             <input
@@ -240,7 +240,7 @@ export default function AddressesPage() {
                             />
                         </div>
                         <div className="space-y-1">
-                            <label className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground">
+                            <label className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
                                 Mã bưu điện
                             </label>
                             <input
@@ -254,7 +254,7 @@ export default function AddressesPage() {
 
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                         <div className="space-y-1">
-                            <label className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground">
+                            <label className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
                                 Vĩ độ (Latitude)
                             </label>
                             <input
@@ -267,7 +267,7 @@ export default function AddressesPage() {
                             />
                         </div>
                         <div className="space-y-1">
-                            <label className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground">
+                            <label className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
                                 Kinh độ (Longitude)
                             </label>
                             <input
