@@ -59,6 +59,17 @@ export async function GET() {
             orderBy: { createdAt: "desc" },
         });
 
+        // Find the intermediate F1 parent for each F2 member
+        const f2UserIds = f2Referrals.map((r) => r.refereeId);
+        let f2ParentMap = new Map<string, string>();
+        if (f2UserIds.length > 0) {
+            const parentReferrals = await prisma.referral.findMany({
+                where: { refereeId: { in: f2UserIds }, level: 1 },
+                select: { referrerId: true, refereeId: true },
+            });
+            f2ParentMap = new Map(parentReferrals.map((r) => [r.refereeId, r.referrerId]));
+        }
+
         return NextResponse.json({
             f1: f1Referrals.map((r) => ({
                 id: r.id,
@@ -69,6 +80,7 @@ export async function GET() {
                 id: r.id,
                 user: r.referee,
                 joinedAt: r.createdAt,
+                parentUserId: f2ParentMap.get(r.refereeId) ?? null,
             })),
         });
     } catch (error) {

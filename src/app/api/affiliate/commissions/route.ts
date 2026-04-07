@@ -21,12 +21,16 @@ export async function GET(req: Request) {
 
         const { searchParams } = new URL(req.url);
         const status = searchParams.get("status");
+        const memberId = searchParams.get("memberId");
         const page = parseInt(searchParams.get("page") || "1");
         const limit = 20;
 
         const where: any = { affiliateId: profile.id };
         if (status && ["PENDING", "APPROVED", "PAID", "CANCELLED"].includes(status)) {
             where.status = status;
+        }
+        if (memberId) {
+            where.order = { userId: memberId };
         }
 
         const [commissions, total] = await Promise.all([
