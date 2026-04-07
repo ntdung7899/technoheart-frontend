@@ -70,12 +70,11 @@ async function main() {
             address = await prisma.address.create({
                 data: {
                     userId: user.id,
-                    fullName: user.name || 'Test User',
-                    phone: '0901234567',
-                    province: 'Hồ Chí Minh',
-                    district: 'Quận 1',
-                    ward: 'Phường Bến Nghé',
-                    detail: '123 Nguyễn Huệ',
+                    street: '123 Nguyen Hue',
+                    city: 'Ho Chi Minh',
+                    state: 'Ho Chi Minh',
+                    zip: '700000',
+                    country: 'Vietnam',
                     isDefault: true,
                 },
             });
