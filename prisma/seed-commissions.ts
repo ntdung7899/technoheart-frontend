@@ -109,12 +109,11 @@ async function main() {
                 buyerAddr = await prisma.address.create({
                     data: {
                         userId: buyerId,
-                        fullName: `Buyer ${i}`,
-                        phone: '0901234567',
-                        province: 'Hồ Chí Minh',
-                        district: 'Quận 1',
-                        ward: 'Phường Bến Nghé',
-                        detail: '456 Lê Lợi',
+                        street: '456 Le Loi',
+                        city: 'Ho Chi Minh',
+                        state: 'Ho Chi Minh',
+                        zip: '700000',
+                        country: 'Vietnam',
                         isDefault: true,
                     },
                 });
@@ -166,7 +165,7 @@ async function main() {
         else if (i < 18) status = 'PENDING';
         else status = 'CANCELLED';
 
-        const type = i < 17 ? 'REFERRAL' : 'ACHIEVEMENT';
+        const type = (i < 17 ? 'REFERRAL' : 'ACHIEVEMENT') as 'REFERRAL' | 'ACHIEVEMENT';
 
         // Spread dates over the last 3 months
         const daysAgo = Math.floor(Math.random() * 90);
