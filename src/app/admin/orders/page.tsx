@@ -1,6 +1,8 @@
 import prisma from "@/lib/prisma";
 import AdminOrdersClient from "@/components/admin/OrdersClient";
 
+export const dynamic = 'force-dynamic';
+
 export default async function AdminOrdersPage() {
     const orders = await prisma.order.findMany({
         include: {
