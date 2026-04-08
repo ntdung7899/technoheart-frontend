@@ -48,8 +48,11 @@ export function AccountHeader() {
 
     useEffect(() => {
         fetch("/api/auth/me")
-            .then((r) => (r.ok ? r.json() : null))
-            .then((d) => { if (d) setUser({ name: d.name, email: d.email }); })
+            .then((r) => {
+                if (r.status === 401) { window.location.href = "/login"; return null; }
+                return r.ok ? r.json() : null;
+            })
+            .then((d) => { if (d?.user) setUser({ name: d.user.name, email: d.user.email }); })
             .catch(() => {});
     }, []);
 

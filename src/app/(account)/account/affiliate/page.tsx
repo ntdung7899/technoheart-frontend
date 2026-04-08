@@ -15,6 +15,7 @@ export default function AffiliatePage() {
     const [data, setData] = useState<AffiliateData | null>(null);
     const [loading, setLoading] = useState(true);
     const [registering, setRegistering] = useState(false);
+    const [registerError, setRegisterError] = useState<string | null>(null);
 
     const fetchProfile = async () => {
         try {
@@ -36,13 +37,22 @@ export default function AffiliatePage() {
 
     const handleRegister = async () => {
         setRegistering(true);
+        setRegisterError(null);
         try {
             const res = await fetch("/api/affiliate/register", { method: "POST" });
             if (res.ok) {
                 await fetchProfile();
+            } else {
+                const json = await res.json().catch(() => ({}));
+                if (res.status === 401) {
+                    window.location.href = "/login";
+                } else {
+                    setRegisterError(json.error || "Đăng ký thất bại, vui lòng thử lại");
+                }
             }
         } catch (err) {
             console.error(err);
+            setRegisterError("Lỗi kết nối, vui lòng thử lại");
         } finally {
             setRegistering(false);
         }
@@ -57,7 +67,7 @@ export default function AffiliatePage() {
     }
 
     if (!data?.registered) {
-        return <NotRegisteredView registering={registering} onRegister={handleRegister} />;
+        return <NotRegisteredView registering={registering} onRegister={handleRegister} error={registerError} />;
     }
 
     const { profile, stats } = data;

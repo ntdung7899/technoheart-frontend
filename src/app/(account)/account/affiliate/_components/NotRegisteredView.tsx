@@ -4,9 +4,10 @@ import { PV_RATE, COMMISSION_TABLE, ACHIEVEMENT_TABLE } from "./constants";
 interface Props {
     registering: boolean;
     onRegister: () => void;
+    error?: string | null;
 }
 
-export function NotRegisteredView({ registering, onRegister }: Props) {
+export function NotRegisteredView({ registering, onRegister, error }: Props) {
     return (
         <div className="space-y-8">
             <div>
@@ -120,6 +121,9 @@ export function NotRegisteredView({ registering, onRegister }: Props) {
                     )}
                     <span>{registering ? "Đang đăng ký..." : "Đăng ký Affiliate"}</span>
                 </button>
+                {error && (
+                    <p className="mt-3 text-sm text-red-300 font-medium">{error}</p>
+                )}
             </div>
         </div>
     );

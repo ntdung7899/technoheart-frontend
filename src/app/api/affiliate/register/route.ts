@@ -11,6 +11,15 @@ export async function POST() {
         }
 
         const userId = session.id as string;
+        if (!userId || typeof userId !== "string") {
+            return NextResponse.json({ error: "Invalid session" }, { status: 401 });
+        }
+
+        // Verify user exists in DB (session could be stale)
+        const user = await prisma.user.findUnique({ where: { id: userId } });
+        if (!user) {
+            return NextResponse.json({ error: "Phiên đăng nhập hết hạn, vui lòng đăng nhập lại" }, { status: 401 });
+        }
 
         // Check if already registered
         const existing = await prisma.affiliateProfile.findUnique({

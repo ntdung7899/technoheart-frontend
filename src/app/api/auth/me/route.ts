@@ -1,4 +1,4 @@
-import { getSession } from "@/lib/auth-utils";
+import { getSession, logout } from "@/lib/auth-utils";
 import prisma from "@/lib/prisma";
 import { NextResponse } from "next/server";
 
@@ -24,7 +24,9 @@ export async function GET() {
         });
 
         if (!user) {
-            return NextResponse.json({ error: "User not found" }, { status: 404 });
+            // Session is stale — clear it and tell the client to re-authenticate
+            await logout();
+            return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
         }
 
         return NextResponse.json({ user });
