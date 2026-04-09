@@ -9,6 +9,9 @@ export default function AdminProductsPage() {
     const [products, setProducts] = useState<any[]>([]);
     const [loading, setLoading] = useState(true);
     const [searchTerm, setSearchTerm] = useState("");
+    const [isFilterOpen, setIsFilterOpen] = useState(false);
+    const [tempFilter, setTempFilter] = useState("all");      
+    const [appliedFilter, setAppliedFilter] = useState("all"); 
 
     useEffect(() => {
         fetchProducts();
@@ -46,10 +49,20 @@ export default function AdminProductsPage() {
         }
     };
 
-    const filteredProducts = products.filter((p: any) =>
+    const getStockFilter = (p: any) => {
+        if (appliedFilter === "inStock") return p.stock > 0;
+        if (appliedFilter === "lowStock") return p.stock > 0 && p.stock < 10;
+        if (appliedFilter === "outOfStock") return p.stock === 0;
+        return true;
+    };
+
+    const filteredProducts = products.filter((p: any) => {
+    const matchSearch =
         p.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        p.category.name.toLowerCase().includes(searchTerm.toLowerCase())
-    );
+        p.category.name.toLowerCase().includes(searchTerm.toLowerCase());
+
+    return matchSearch && getStockFilter(p);
+    });
 
     return (
         <div className="space-y-6 pb-12">
@@ -80,10 +93,31 @@ export default function AdminProductsPage() {
                         onChange={(e) => setSearchTerm(e.target.value)}
                     />
                 </div>
-                <button className="h-9 px-3 rounded-lg border border-slate-200 hover:bg-slate-50 transition-colors flex items-center gap-2 text-sm text-slate-600">
+                <button
+                    onClick={() => setIsFilterOpen(true)}
+                    className="h-9 px-3 rounded-lg border border-slate-200 hover:bg-slate-50 flex items-center gap-2 text-sm text-slate-600"
+                    >
                     <Filter className="h-3.5 w-3.5" /> Lọc
                 </button>
             </div>
+            {appliedFilter !== "all" && (
+                <div className="flex items-center gap-2">
+                    <span className="text-xs text-slate-400">Đang lọc:</span>
+
+                    <div className="flex items-center gap-1 px-2 py-1 bg-blue-50 text-blue-600 text-xs rounded-md">
+                        {appliedFilter === "inStock" && "Còn hàng"}
+                        {appliedFilter === "lowStock" && "Sắp hết hàng"}
+                        {appliedFilter === "outOfStock" && "Hết hàng"}
+
+                        <button
+                            onClick={() => setAppliedFilter("all")}
+                            className="ml-1 hover:text-red-500"
+                        >
+                            ✕
+                        </button>
+                    </div>
+                </div>
+            )}
 
             {/* Products Table */}
             {loading ? (
@@ -168,6 +202,43 @@ export default function AdminProductsPage() {
                                 )}
                             </tbody>
                         </table>
+                    </div>
+                </div>
+            )}
+            {isFilterOpen && (
+                <div className="fixed inset-0 bg-black/30 flex items-center justify-center z-50">
+                    <div className="bg-white p-5 rounded-lg w-80 space-y-4">
+                    <h3 className="font-semibold">Bộ lọc sản phẩm</h3>
+
+                        <select
+                            value={tempFilter}
+                            onChange={(e) => setTempFilter(e.target.value)}
+                            className="w-full h-9 px-3 rounded-lg border border-slate-200 text-sm"
+                            >
+                            <option value="all">Tất cả</option>
+                            <option value="inStock">Còn hàng</option>
+                            <option value="lowStock">Sắp hết hàng</option>
+                            <option value="outOfStock">Hết hàng</option>
+                        </select>
+
+                        <div className="flex justify-end gap-2">
+                            <button
+                                onClick={() => setIsFilterOpen(false)}
+                                className="px-3 py-1 border rounded"
+                                >
+                                Hủy
+                            </button>
+
+                            <button
+                                onClick={() => {
+                                    setAppliedFilter(tempFilter);
+                                    setIsFilterOpen(false);
+                                }}
+                                className="px-3 py-1 bg-primary text-white rounded"
+                                >
+                                Áp dụng
+                            </button>
+                        </div>
                     </div>
                 </div>
             )}
