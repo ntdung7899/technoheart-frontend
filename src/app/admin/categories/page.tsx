@@ -22,6 +22,7 @@ export default function AdminCategoriesPage() {
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [formData, setFormData] = useState({ name: "", image: "" });
     const [editingId, setEditingId] = useState<string | null>(null);
+    const [searchTerm, setSearchTerm] = useState("");
 
 
     useEffect(() => {
@@ -92,6 +93,10 @@ export default function AdminCategoriesPage() {
         }
     };
 
+    const filteredCategories = categories.filter((category: any) =>
+        category.name.toLowerCase().includes(searchTerm.toLowerCase())
+    );
+
     return (
         <div className="space-y-6 pb-12">
             {/* Header */}
@@ -116,6 +121,8 @@ export default function AdminCategoriesPage() {
                     type="text"
                     placeholder="Tìm kiếm danh mục..."
                     className="h-9 w-full rounded-lg border border-slate-200 bg-white pl-9 pr-3 text-sm focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary/30 transition-all"
+                    value={searchTerm}
+                    onChange={(e) => setSearchTerm(e.target.value)}
                 />
             </div>
 
@@ -138,7 +145,7 @@ export default function AdminCategoriesPage() {
                                 </tr>
                             </thead>
                             <tbody className="divide-y divide-slate-50">
-                                {categories.map((category: any) => (
+                                {filteredCategories.map((category: any) => (
                                     <tr key={category.id} className="group hover:bg-slate-50/50 transition-colors">
                                         <td className="px-4 py-3">
                                             <div className="relative h-10 w-10 rounded-lg border border-slate-200 bg-white mx-auto overflow-hidden flex items-center justify-center">
