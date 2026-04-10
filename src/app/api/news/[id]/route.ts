@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
 import prisma from '@/lib/prisma';
+import { getSession } from '@/lib/auth-utils';
 
 // GET /api/news/[id]
 export async function GET(
@@ -31,7 +32,17 @@ export async function PATCH(
         }
 
         const body = await request.json();
-        const { title, excerpt, content, category, image, featured, published, readTime } = body;
+        const { title, excerpt, content, categoryId, image, featured, published, readTime } = body;
+
+        let categoryName = undefined;
+        if (categoryId) {
+            const cat = await prisma.newsCategory.findUnique({
+                where: { id: categoryId }
+            });
+            if (cat) {
+                categoryName = cat.name;
+            }
+        }
 
         const article = await prisma.news.update({
             where: { id },
@@ -39,7 +50,8 @@ export async function PATCH(
                 ...(title !== undefined && { title }),
                 ...(excerpt !== undefined && { excerpt }),
                 ...(content !== undefined && { content }),
-                ...(category !== undefined && { category }),
+                ...(categoryId !== undefined && { newsCategoryId: categoryId }),
+                ...(categoryName !== undefined && { category: categoryName }),
                 ...(image !== undefined && { image }),
                 ...(featured !== undefined && { featured }),
                 ...(published !== undefined && { published }),

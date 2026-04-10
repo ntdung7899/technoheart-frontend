@@ -103,7 +103,7 @@ export default function AdminNewsPage() {
                     { label: "Tổng bài viết", value: articles.length, color: "text-slate-900" },
                     { label: "Đã xuất bản", value: articles.filter(a => a.published).length, color: "text-emerald-600" },
                     { label: "Bản nháp", value: articles.filter(a => !a.published).length, color: "text-amber-600" },
-                    { label: "Nổi bật", value: articles.filter(a => a.featured).length, color: "text-yellow-500" },
+                    // { label: "Nổi bật", value: articles.filter(a => a.featured).length, color: "text-yellow-500" },
                 ].map((s, i) => (
                     <div key={i} className="p-4 rounded-xl bg-white border border-slate-200 shadow-sm">
                         <p className="text-xs text-slate-500 mb-1">{s.label}</p>
@@ -152,7 +152,7 @@ export default function AdminNewsPage() {
                                     <th className="px-4 py-3 text-left text-xs font-medium text-slate-500">Tiêu đề</th>
                                     <th className="px-4 py-3 text-left text-xs font-medium text-slate-500">Danh mục</th>
                                     <th className="px-4 py-3 text-center text-xs font-medium text-slate-500">Trạng thái</th>
-                                    <th className="px-4 py-3 text-center text-xs font-medium text-slate-500">Nổi bật</th>
+                                    {/* <th className="px-4 py-3 text-center text-xs font-medium text-slate-500">Nổi bật</th> */}
                                     <th className="px-4 py-3 text-left text-xs font-medium text-slate-500">Ngày tạo</th>
                                     <th className="px-4 py-3 text-right text-xs font-medium text-slate-500">Thao tác</th>
                                 </tr>
@@ -187,7 +187,7 @@ export default function AdminNewsPage() {
                                                 }
                                             </button>
                                         </td>
-                                        <td className="px-4 py-3 text-center">
+                                        {/* <td className="px-4 py-3 text-center">
                                             <button
                                                 onClick={() => handleToggle(article.id, "featured", article.featured)}
                                                 className="inline-flex items-center justify-center h-8 w-8 rounded-md hover:bg-slate-100 transition-colors mx-auto"
@@ -197,7 +197,7 @@ export default function AdminNewsPage() {
                                                     : <StarOff className="h-4 w-4 text-slate-300" />
                                                 }
                                             </button>
-                                        </td>
+                                        </td> */}
                                         <td className="px-4 py-3">
                                             <span className="flex items-center gap-1 text-xs text-slate-400">
                                                 <Calendar className="h-3 w-3" />
