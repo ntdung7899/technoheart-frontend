@@ -5,6 +5,7 @@ import Link from "next/link";
 import Image from "next/image";
 import { EmptyState } from "@/components/account/EmptyState";
 import { Heart, Loader2, Trash2, ShoppingCart, Package } from "lucide-react";
+import { useRouter } from "next/navigation";
 
 interface WishlistItem {
     id: string;
@@ -22,6 +23,7 @@ export default function WishlistPage() {
     const [items, setItems] = useState<WishlistItem[]>([]);
     const [loading, setLoading] = useState(true);
     const [removing, setRemoving] = useState<string | null>(null);
+    const router = useRouter(); 
 
     useEffect(() => {
         fetch("/api/account/wishlist")
@@ -121,9 +123,10 @@ export default function WishlistPage() {
                                         <Trash2 className="h-4 w-4" />
                                     )}
                                 </button>
-                                <button
+                               <button
+                                    onClick={() => router.push('/cart')} 
                                     className="p-2 rounded-xl text-muted-foreground hover:text-primary hover:bg-primary/5 transition-colors"
-                                    title="Thêm vào giỏ"
+                                    title="Đến giỏ hàng"
                                 >
                                     <ShoppingCart className="h-4 w-4" />
                                 </button>
