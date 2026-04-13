@@ -1,13 +1,16 @@
 import { Eye, Loader2 } from "lucide-react";
 import { AffiliateProfile, RANK_LABELS, formatPrice } from "./constants";
+import { Pencil, Trash2 } from "lucide-react";
 
 interface Props {
     profiles: AffiliateProfile[];
     loading: boolean;
     onViewCommissions: (affiliateId: string) => void;
+    onEdit: (affiliateId: string) => void;
+    onDelete: (affiliateId: string) => void;
 }
 
-export default function AffiliatesTable({ profiles, loading, onViewCommissions }: Props) {
+export default function AffiliatesTable({ profiles, loading, onViewCommissions, onEdit, onDelete }: Props) {
     return (
         <div className="rounded-xl border border-slate-200 bg-white shadow-sm overflow-hidden">
             {loading ? (
@@ -68,6 +71,24 @@ export default function AffiliatesTable({ profiles, loading, onViewCommissions }
                                                 className="inline-flex items-center gap-1 px-2.5 py-1.5 rounded-md bg-slate-100 hover:bg-primary hover:text-white text-slate-600 text-xs font-medium transition-colors"
                                             >
                                                 <Eye className="h-3.5 w-3.5" /> Chi tiết
+                                            </button>                        
+                                        </td>
+                                        <td className="px-4 py-3 text-center">
+                                            <button
+                                                onClick={() => onEdit(p.id)}
+                                                title="Chỉnh sửa"
+                                                className="p-1.5 rounded-md bg-slate-100 hover:bg-amber-500 hover:text-white text-slate-600 transition-colors"
+                                            >
+                                                <Pencil className="h-4 w-4" />
+                                            </button>
+                                        </td>
+                                        <td className="px-4 py-3 text-center">
+                                            <button
+                                                onClick={() => onDelete(p.id)}
+                                                title="Xóa đối tác"
+                                                className="p-1.5 rounded-md bg-slate-100 hover:bg-red-500 hover:text-white text-slate-600 transition-colors"
+                                            >
+                                                <Trash2 className="h-4 w-4" />
                                             </button>
                                         </td>
                                     </tr>

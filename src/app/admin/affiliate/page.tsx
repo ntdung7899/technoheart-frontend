@@ -10,6 +10,7 @@ import CommissionsFilter from "./_components/CommissionsFilter";
 import BulkActions from "./_components/BulkActions";
 import CommissionsTable from "./_components/CommissionsTable";
 import Pagination from "./_components/Pagination";
+import { useRouter } from "next/navigation";
 
 export default function AdminAffiliatePage() {
     const [view, setView] = useState<"affiliates" | "commissions">("affiliates");
@@ -25,6 +26,7 @@ export default function AdminAffiliatePage() {
     const [updating, setUpdating] = useState(false);
     const [page, setPage] = useState(1);
     const [totalPages, setTotalPages] = useState(1);
+    const router = useRouter();
 
     const fetchAffiliates = useCallback(async () => {
         setLoading(true);
@@ -106,6 +108,34 @@ export default function AdminAffiliatePage() {
         setView("commissions");
     };
 
+    const handleEditAffiliate = (affiliateId: string) => {
+        router.push(`/admin/affiliate/${affiliateId}`);
+    };
+
+    const handleDeleteAffiliate = async (affiliateId: string) => {
+        if (!window.confirm("Bạn có chắc chắn muốn xóa đối tác này không?")) return;
+
+        try {
+            setLoading(true);
+            const res = await fetch(`/api/affiliate/admin`, {
+                method: "DELETE",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ affiliateId }),
+            });
+
+            if (res.ok) {
+                setProfiles(profiles.filter(p => p.id !== affiliateId));
+            } else {
+                const data = await res.json();
+                alert(data.error || "Xóa thất bại");
+            }
+        } catch (error) {
+            console.error("Lỗi khi xóa:", error);
+        } finally {
+            setLoading(false);
+        }
+    };
+
     const toggleSelectAll = () => {
         if (selectedCommissions.length === commissions.length) {
             setSelectedCommissions([]);
@@ -152,6 +182,8 @@ export default function AdminAffiliatePage() {
                         profiles={profiles}
                         loading={loading}
                         onViewCommissions={viewAffiliateCommissions}
+                        onEdit={handleEditAffiliate}
+                        onDelete={handleDeleteAffiliate}
                     />
                 </>
             )}

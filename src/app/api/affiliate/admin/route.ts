@@ -107,3 +107,30 @@ export async function GET(req: Request) {
         return NextResponse.json({ error: "Server error" }, { status: 500 });
     }
 }
+
+// DELETE: Remove an affiliate profile (only if no commissions exist)
+export async function DELETE(req: Request) {
+    try {
+        const session = await getSession();
+        if (!session?.id) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+
+        const user = await prisma.user.findUnique({ where: { id: session.id as string } });
+        if (!user || user.role !== "ADMIN") return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+
+        const { affiliateId } = await req.json();
+
+        if (!affiliateId) return NextResponse.json({ error: "Thiếu ID đối tác" }, { status: 400 });
+
+        await prisma.affiliateProfile.delete({
+            where: { id: affiliateId },
+        });
+
+        return NextResponse.json({ success: true, message: "Đã xóa đối tác thành công" });
+    } catch (error) {
+        console.error("Admin delete affiliate error:", error);
+        if (error instanceof Error && error.message.includes("Foreign key constraint")) {
+             return NextResponse.json({ error: "Không thể xóa đối tác này vì đã phát sinh hoa hồng." }, { status: 400 });
+        }
+        return NextResponse.json({ error: "Server error" }, { status: 500 });
+    }
+}
