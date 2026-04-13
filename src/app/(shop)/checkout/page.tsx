@@ -2,7 +2,7 @@
 "use client";
 
 import { useCartStore } from "@/store/cart";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { Loader2, ArrowLeft, ShieldCheck, Truck, CreditCard, MapPin } from "lucide-react";
 import Link from "next/link";
@@ -69,6 +69,34 @@ export default function CheckoutPage() {
             setLoading(false);
         }
     };
+
+    useEffect(() => {
+        const fetchDefaultAddress = async () => {
+            try {
+                const res = await fetch("/api/addresses"); 
+                if (res.ok) {
+                    const data = await res.json();
+                    
+                    if (data.addresses && data.addresses.length > 0) {
+                        const defaultAddr = data.addresses[0];
+                        
+                        setFormData((prev) => ({
+                            ...prev,
+                            street: defaultAddr.street || "",
+                            city: defaultAddr.city || "",
+                            state: defaultAddr.state || "",
+                            zip: defaultAddr.zip || "",
+                            country: defaultAddr.country || "",
+                        }));
+                    }
+                }
+            } catch (error) {
+                console.error("Lỗi khi tải địa chỉ mặc định:", error);
+            }
+        };
+
+        fetchDefaultAddress();
+    }, []);
 
     if (items.length === 0) {
         return (
