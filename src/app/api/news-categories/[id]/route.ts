@@ -21,6 +21,8 @@ export async function PATCH(
         : undefined;
 
     try {
+        const oldCategory = await prisma.newsCategory.findUnique({ where: { id } });
+
         const category = await prisma.newsCategory.update({
             where: { id },
             data: {
@@ -29,6 +31,21 @@ export async function PATCH(
                 ...(color && { color }),
             },
         });
+
+        if (name && oldCategory && oldCategory.name !== name.trim()) {
+            await prisma.news.updateMany({
+                where: {
+                    OR: [
+                        { newsCategoryId: id },
+                        { category: oldCategory.name } 
+                    ]
+                },
+                data: {
+                    category: name.trim(),
+                    newsCategoryId: id  
+                }
+            });
+        }
         return NextResponse.json(category);
     } catch (e: any) {
         if (e.code === "P2002") return NextResponse.json({ error: "Tên đã tồn tại" }, { status: 409 });
@@ -47,6 +64,21 @@ export async function DELETE(
     }
 
     const { id } = await params;
-    await prisma.newsCategory.delete({ where: { id } });
-    return NextResponse.json({ success: true });
+
+    try {
+        await prisma.news.updateMany({
+            where: { newsCategoryId: id },
+            data: {
+                newsCategoryId: null,         
+                category: "Chưa có danh mục"   
+            }
+        });
+
+        await prisma.newsCategory.delete({ where: { id } });
+
+        return NextResponse.json({ success: true });
+    } catch (error) {
+        console.error(error);
+        return NextResponse.json({ error: "Lỗi server khi xóa danh mục" }, { status: 500 });
+    }
 }

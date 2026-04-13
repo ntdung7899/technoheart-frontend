@@ -9,8 +9,6 @@ import {
 } from "lucide-react";
 import RichTextEditor from "@/components/admin/RichTextEditor";
 
-const CATEGORIES = ["Công nghệ", "Đánh giá", "Đời sống", "Khuyến mãi", "Mẹo vặt"];
-
 export default function EditNewsPage({ params }: { params: Promise<{ id: string }> }) {
     const { id } = use(params);
     const router = useRouter();
@@ -18,12 +16,14 @@ export default function EditNewsPage({ params }: { params: Promise<{ id: string 
     const [fetching, setFetching] = useState(true);
     const [error, setError] = useState("");
     const [preview, setPreview] = useState(false);
+    const [categories, setCategories] = useState<any[]>([]);
+    const [fallbackCategoryName, setFallbackCategoryName] = useState("");
 
     const [form, setForm] = useState({
         title: "",
         excerpt: "",
         content: "",
-        category: "Công nghệ",
+        categoryId: "",
         image: "",
         readTime: "5 phút",
         featured: false,
@@ -41,16 +41,34 @@ export default function EditNewsPage({ params }: { params: Promise<{ id: string 
                         title: data.title,
                         excerpt: data.excerpt,
                         content: data.content,
-                        category: data.category,
+                        categoryId: data.newsCategoryId || "",
                         image: data.image || "",
                         readTime: data.readTime,
                         featured: data.featured,
                         published: data.published,
                     });
+                    if (!data.newsCategoryId && data.category) {
+                        setFallbackCategoryName(data.category);
+                    }
                 }
                 setFetching(false);
             });
     }, [id]);
+
+    useEffect(() => {
+        fetch("/api/news-categories")
+            .then(res => res.json())
+            .then(setCategories);
+    }, []);
+
+    useEffect(() => {
+        if (!form.categoryId && fallbackCategoryName && categories.length > 0) {
+            const matchedCategory = categories.find(c => c.name === fallbackCategoryName);
+            if (matchedCategory) {
+                setForm(prev => ({ ...prev, categoryId: matchedCategory.id }));
+            }
+        }
+    }, [form.categoryId, fallbackCategoryName, categories]);
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
@@ -161,7 +179,7 @@ export default function EditNewsPage({ params }: { params: Promise<{ id: string 
                                 <div className={`absolute top-1 h-4 w-4 rounded-full bg-white shadow transition-transform ${form.published ? "translate-x-5" : "translate-x-1"}`} />
                             </div>
                         </label>
-                        <label className="flex items-center justify-between gap-3 cursor-pointer">
+                        {/* <label className="flex items-center justify-between gap-3 cursor-pointer">
                             <div className="flex items-center gap-2.5">
                                 <Star className={`h-4 w-4 ${form.featured ? "text-yellow-500 fill-yellow-500" : "text-slate-300"}`} />
                                 <span className="text-sm font-medium text-slate-700">Nổi bật</span>
@@ -169,17 +187,28 @@ export default function EditNewsPage({ params }: { params: Promise<{ id: string 
                             <div onClick={() => set("featured", !form.featured)} className={`relative h-6 w-11 rounded-full transition-colors cursor-pointer ${form.featured ? "bg-yellow-400" : "bg-slate-200"}`}>
                                 <div className={`absolute top-1 h-4 w-4 rounded-full bg-white shadow transition-transform ${form.featured ? "translate-x-5" : "translate-x-1"}`} />
                             </div>
-                        </label>
+                        </label> */}
                     </div>
 
                     <div className="rounded-xl border border-slate-200 bg-white shadow-sm p-5 space-y-3">
                         <p className="text-xs font-medium text-slate-500">Danh mục</p>
                         <div className="flex flex-wrap gap-2">
-                            {CATEGORIES.map(cat => (
-                                <button key={cat} type="button" onClick={() => set("category", cat)}
-                                    className={`px-3 py-1.5 rounded-md text-xs font-medium transition-all ${form.category === cat ? "bg-primary text-white shadow-md" : "bg-slate-100 text-slate-600 hover:bg-slate-200"}`}
+                            {categories.map((cat) => (
+                                <button
+                                key={cat.id}
+                                type="button"
+                                onClick={() => set("categoryId", cat.id)}
+                                className={`px-3 py-1.5 rounded-md text-xs font-medium transition-all ${
+                                    form.categoryId === cat.id
+                                    ? "text-white shadow-md"
+                                    : "bg-slate-100 text-slate-600 hover:bg-slate-200"
+                                }`}
+                                style={{
+                                    backgroundColor:
+                                    form.categoryId === cat.id ? cat.color : undefined,
+                                }}
                                 >
-                                    {cat}
+                                {cat.name}
                                 </button>
                             ))}
                         </div>
