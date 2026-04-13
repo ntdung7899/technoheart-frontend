@@ -40,8 +40,10 @@ export async function POST(request: Request) {
         const body = await request.json();
         const { title, excerpt, content, category, image, featured, published, readTime } = body;
 
-        if (!title || !excerpt || !content) {
-            return NextResponse.json({ error: 'Thiếu các trường bắt buộc' }, { status: 400 });
+        if (!title || !excerpt || !content || !category) {
+            return NextResponse.json({ 
+                error: 'Thiếu các trường bắt buộc (Tiêu đề, Tóm tắt, Nội dung, Danh mục)' 
+            }, { status: 400 });
         }
 
         const article = await prisma.news.create({
@@ -49,7 +51,7 @@ export async function POST(request: Request) {
                 title,
                 excerpt,
                 content,
-                category: category || 'Công nghệ',
+                category,
                 image: image || null,
                 featured: !!featured,
                 published: !!published,
