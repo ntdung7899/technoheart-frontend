@@ -2,24 +2,23 @@
 "use client";
 
 import { useCartStore } from "@/store/cart";
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { Loader2, ArrowLeft, ShieldCheck, Truck, CreditCard, MapPin } from "lucide-react";
 import Link from "next/link";
 import Image from "next/image";
 import { formatPrice } from "@/lib/utils";
 
-
 export default function CheckoutPage() {
     const { items, total, clearCart } = useCartStore();
     const router = useRouter();
     const [loading, setLoading] = useState(false);
     const [formData, setFormData] = useState({
+        name: "",
+        phone: "",
         street: "",
+        ward: "",
         city: "",
-        state: "",
-        zip: "",
-        country: "",
         referralCode: "",
     });
 
@@ -40,11 +39,11 @@ export default function CheckoutPage() {
                 body: JSON.stringify({
                     items,
                     address: {
+                        name: formData.name,
+                        phone: formData.phone,
                         street: formData.street,
+                        ward: formData.ward,
                         city: formData.city,
-                        state: formData.state,
-                        zip: formData.zip,
-                        country: formData.country,
                     },
                     total: total(),
                     referralCode: formData.referralCode || undefined,
@@ -70,33 +69,9 @@ export default function CheckoutPage() {
         }
     };
 
-    useEffect(() => {
-        const fetchDefaultAddress = async () => {
-            try {
-                const res = await fetch("/api/addresses"); 
-                if (res.ok) {
-                    const data = await res.json();
-                    
-                    if (data.addresses && data.addresses.length > 0) {
-                        const defaultAddr = data.addresses[0];
-                        
-                        setFormData((prev) => ({
-                            ...prev,
-                            street: defaultAddr.street || "",
-                            city: defaultAddr.city || "",
-                            state: defaultAddr.state || "",
-                            zip: defaultAddr.zip || "",
-                            country: defaultAddr.country || "",
-                        }));
-                    }
-                }
-            } catch (error) {
-                console.error("Lỗi khi tải địa chỉ mặc định:", error);
-            }
-        };
-
-        fetchDefaultAddress();
-    }, []);
+    // PV Exchange Rate (1 PV = 26,000 VND)
+    const PV_EXCHANGE_RATE = 26000;
+    const pvValue = Math.floor(total() / PV_EXCHANGE_RATE);
 
     if (items.length === 0) {
         return (
@@ -144,72 +119,47 @@ export default function CheckoutPage() {
                         </div>
 
                         <form onSubmit={handleSubmit} className="space-y-6">
-                            <div className="grid grid-cols-1 gap-6 p-8 rounded-xl border border-border/40 bg-card/50 backdrop-blur-xl shadow-xl relative overflow-hidden">
-                                <div className="absolute top-0 right-0 -translate-y-1/2 translate-x-1/2 w-32 h-32 bg-primary/5 rounded-full blur-2xl" />
+                            <div className="space-y-4 relative z-10">
+                                    {/* Hàng 1: Tên & SĐT */}
+                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                        <div className="space-y-2">
+                                            <label className="text-xs font-semibold uppercase tracking-wider text-muted-foreground ml-1">Họ và tên</label>
+                                            <input type="text" name="name" required placeholder="Nhập họ tên người nhận..."
+                                                className="h-12 w-full rounded-xl border border-border/50 bg-secondary/30 px-4 text-sm focus:outline-none focus:ring-2 focus:ring-primary/20 transition-all"
+                                                value={formData.name} onChange={handleChange} />
+                                        </div>
+                                        <div className="space-y-2">
+                                            <label className="text-xs font-semibold uppercase tracking-wider text-muted-foreground ml-1">Số điện thoại</label>
+                                            <input type="tel" name="phone" required placeholder="Nhập số điện thoại..."
+                                                className="h-12 w-full rounded-xl border border-border/50 bg-secondary/30 px-4 text-sm focus:outline-none focus:ring-2 focus:ring-primary/20 transition-all"
+                                                value={formData.phone} onChange={handleChange} />
+                                        </div>
+                                    </div>
 
-                                <div className="space-y-4">
+                                    {/* Hàng 2: Địa chỉ cụ thể */}
                                     <div className="space-y-2">
-                                        <label className="text-xs font-semibold uppercase tracking-wider text-muted-foreground ml-1">Địa chỉ cụ thể</label>
-                                        <input
-                                            type="text"
-                                            name="street"
-                                            required
-                                            placeholder="Số nhà, tên đường..."
+                                        <label className="text-xs font-semibold uppercase tracking-wider text-muted-foreground ml-1">Địa chỉ cụ thể (Số nhà, đường)</label>
+                                        <input type="text" name="street" required placeholder="Số nhà, tên đường..."
                                             className="h-12 w-full rounded-xl border border-border/50 bg-secondary/30 px-4 text-sm focus:outline-none focus:ring-2 focus:ring-primary/20 transition-all"
-                                            value={formData.street}
-                                            onChange={handleChange}
-                                        />
+                                            value={formData.street} onChange={handleChange} />
                                     </div>
-                                    <div className="grid grid-cols-2 gap-4">
+
+                                    {/* Hàng 3: Phường & TP */}
+                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                                         <div className="space-y-2">
-                                            <label className="text-xs font-semibold uppercase tracking-wider text-muted-foreground ml-1">Thành phố</label>
-                                            <input
-                                                type="text"
-                                                name="city"
-                                                required
+                                            <label className="text-xs font-semibold uppercase tracking-wider text-muted-foreground ml-1">Phường / Xã</label>
+                                            <input type="text" name="ward" required placeholder="Tên Phường / Xã..."
                                                 className="h-12 w-full rounded-xl border border-border/50 bg-secondary/30 px-4 text-sm focus:outline-none focus:ring-2 focus:ring-primary/20 transition-all"
-                                                value={formData.city}
-                                                onChange={handleChange}
-                                            />
+                                                value={formData.ward} onChange={handleChange} />
                                         </div>
                                         <div className="space-y-2">
-                                            <label className="text-xs font-semibold uppercase tracking-wider text-muted-foreground ml-1">Tỉnh / Thành</label>
-                                            <input
-                                                type="text"
-                                                name="state"
-                                                required
+                                            <label className="text-xs font-semibold uppercase tracking-wider text-muted-foreground ml-1">Quận / Huyện / TP</label>
+                                            <input type="text" name="city" required placeholder="Tên Quận / Huyện / TP..."
                                                 className="h-12 w-full rounded-xl border border-border/50 bg-secondary/30 px-4 text-sm focus:outline-none focus:ring-2 focus:ring-primary/20 transition-all"
-                                                value={formData.state}
-                                                onChange={handleChange}
-                                            />
-                                        </div>
-                                    </div>
-                                    <div className="grid grid-cols-2 gap-4">
-                                        <div className="space-y-2">
-                                            <label className="text-xs font-semibold uppercase tracking-wider text-muted-foreground ml-1">Mã bưu điện</label>
-                                            <input
-                                                type="text"
-                                                name="zip"
-                                                required
-                                                className="h-12 w-full rounded-xl border border-border/50 bg-secondary/30 px-4 text-sm focus:outline-none focus:ring-2 focus:ring-primary/20 transition-all"
-                                                value={formData.zip}
-                                                onChange={handleChange}
-                                            />
-                                        </div>
-                                        <div className="space-y-2">
-                                            <label className="text-xs font-semibold uppercase tracking-wider text-muted-foreground ml-1">Quốc gia</label>
-                                            <input
-                                                type="text"
-                                                name="country"
-                                                required
-                                                className="h-12 w-full rounded-xl border border-border/50 bg-secondary/30 px-4 text-sm focus:outline-none focus:ring-2 focus:ring-primary/20 transition-all"
-                                                value={formData.country}
-                                                onChange={handleChange}
-                                            />
+                                                value={formData.city} onChange={handleChange} />
                                         </div>
                                     </div>
                                 </div>
-                            </div>
 
                             {/* Referral Code */}
                             <div className="space-y-2 pt-4">
@@ -320,6 +270,11 @@ export default function CheckoutPage() {
                                 <p className="text-xs text-muted-foreground font-semibold uppercase tracking-wider text-right">Đã bao gồm thuế VAT</p>
                             </div>
 
+                            <div className="flex justify-between items-baseline pt-2">
+                                <span className="text-sm font-bold text-amber-600">Quy ra PV</span>
+                                <span className="text-xl font-bold text-amber-600">{pvValue.toLocaleString("vi-VN")} PV</span>
+                            </div>
+                            
                             <div className="mt-8 p-4 rounded-xl bg-primary/5 border border-primary/10 flex items-center gap-4">
                                 <ShieldCheck className="h-8 w-8 text-primary" />
                                 <div className="text-xs leading-snug">

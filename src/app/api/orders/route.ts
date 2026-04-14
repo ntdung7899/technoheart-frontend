@@ -40,7 +40,11 @@ export async function POST(req: Request) {
         // Create Address record
         const newAddress = await prisma.address.create({
             data: {
-                ...address,
+                name: address.name,
+                phone: address.phone,
+                street: address.street,
+                ward: address.ward,
+                city: address.city,
                 user: connectedUser
             }
         });
