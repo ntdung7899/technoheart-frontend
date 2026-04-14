@@ -1,6 +1,7 @@
 import { getSession } from "@/lib/auth-utils";
 import prisma from "@/lib/prisma";
 import { NextResponse } from "next/server";
+import { startOfDay, endOfDay, parseISO, isValid } from "date-fns";
 
 export async function GET(req: Request) {
     try {
@@ -22,6 +23,8 @@ export async function GET(req: Request) {
         const { searchParams } = new URL(req.url);
         const status = searchParams.get("status");
         const memberId = searchParams.get("memberId");
+        const startDate = searchParams.get("startDate");
+        const endDate = searchParams.get("endDate");
         const page = parseInt(searchParams.get("page") || "1");
         const limit = 20;
 
@@ -31,6 +34,28 @@ export async function GET(req: Request) {
         }
         if (memberId) {
             where.order = { userId: memberId };
+        }
+
+        if (startDate || endDate) {
+            const dateFilter: any = {}; 
+
+            if (startDate) {
+                const parsedStart = parseISO(startDate);
+                if (isValid(parsedStart)) { 
+                    dateFilter.gte = startOfDay(parsedStart);
+                }
+            }
+
+            if (endDate) {
+                const parsedEnd = parseISO(endDate);
+                if (isValid(parsedEnd)) {
+                    dateFilter.lte = endOfDay(parsedEnd);
+                }
+            }
+
+            if (Object.keys(dateFilter).length > 0) {
+                where.createdAt = dateFilter;
+            }
         }
 
         const [commissions, total] = await Promise.all([
