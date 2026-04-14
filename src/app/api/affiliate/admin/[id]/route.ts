@@ -5,7 +5,7 @@ import { NextResponse } from "next/server";
 // GET: Lấy thông tin 1 đối tác
 export async function GET(
     req: Request,
-    { params }: { params: { id: string } }
+    { params }: { params: Promise<{ id: string }> }
 ) {
     try {
         const session = await getSession();
@@ -14,7 +14,6 @@ export async function GET(
         const user = await prisma.user.findUnique({ where: { id: session.id as string } });
         if (!user || user.role !== "ADMIN") return NextResponse.json({ error: "Forbidden" }, { status: 403 });
 
-        // FIX Ở ĐÂY: Thêm await cho params (Dành cho Next.js 15+)
         const { id: affiliateId } = await params;
 
         const profile = await prisma.affiliateProfile.findUnique({
@@ -38,7 +37,7 @@ export async function GET(
 // PATCH: Sửa thông tin đối tác
 export async function PATCH(
     req: Request,
-    { params }: { params: { id: string } }
+    { params }: { params: Promise<{ id: string }> }
 ) {
     try {
         const session = await getSession();
