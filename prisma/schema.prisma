@@ -164,11 +164,14 @@ model Review {
 
 model Address {
   id        String  @id @default(cuid())
+  name      String? 
+  phone     String? 
+  ward      String?
   street    String
   city      String
-  state     String
-  zip       String
-  country   String
+  state     String?
+  zip       String?
+  country   String?
   userId    String
   isDefault Boolean @default(false)
   label     String?
