@@ -206,10 +206,10 @@ export default function AdminAffiliatePage() {
                 <div className="flex items-center gap-3"> 
                     <button 
                             onClick={handleExportExcel}
-                            className="flex items-center gap-2 px-4 py-2 bg-emerald-600 text-white rounded-lg hover:bg-emerald-700 transition-colors text-sm font-medium shadow-sm"
+                            className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors text-sm font-medium shadow-sm"
                         >
                             <Download className="h-4 w-4" />
-                            Xuất Excel
+                            Xuất dữ liệu
                     </button>
                     <div className="flex gap-1 bg-slate-100 rounded-lg p-1">
                        
