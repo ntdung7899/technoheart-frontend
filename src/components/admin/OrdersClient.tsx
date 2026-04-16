@@ -51,7 +51,6 @@ export default function AdminOrdersClient({ initialOrders }: { initialOrders: Or
     const [loading, setLoading] = useState<string | null>(null);
     const [searchQuery, setSearchQuery] = useState("");
     
-    // ĐEM BỘ LỌC TRỞ LẠI: Tách thành 2 state cho 2 loại trạng thái
     const [deliveryFilter, setDeliveryFilter] = useState<string>("");
     const [paymentFilter, setPaymentFilter] = useState<string>("");
     
