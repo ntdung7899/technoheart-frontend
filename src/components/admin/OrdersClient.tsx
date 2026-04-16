@@ -50,6 +50,11 @@ export default function AdminOrdersClient({ initialOrders }: { initialOrders: Or
     
     const [loading, setLoading] = useState<string | null>(null);
     const [searchQuery, setSearchQuery] = useState("");
+    
+    // ĐEM BỘ LỌC TRỞ LẠI: Tách thành 2 state cho 2 loại trạng thái
+    const [deliveryFilter, setDeliveryFilter] = useState<string>("");
+    const [paymentFilter, setPaymentFilter] = useState<string>("");
+    
     const menuRef = useRef<HTMLDivElement>(null);
 
     useEffect(() => {
@@ -92,12 +97,18 @@ export default function AdminOrdersClient({ initialOrders }: { initialOrders: Or
         }
     };
 
+    // LOGIC LỌC DỮ LIỆU ĐÃ ĐƯỢC CẬP NHẬT
     const filtered = orders.filter(o => {
         const query = searchQuery.toLowerCase();
-        return !query ||
+        const matchSearch = !query ||
             o.id.toLowerCase().includes(query) ||
             o.user.name?.toLowerCase().includes(query) ||
             o.user.email.toLowerCase().includes(query);
+            
+        const matchDelivery = !deliveryFilter || o.status === deliveryFilter;
+        const matchPayment = !paymentFilter || o.paymentStatus === paymentFilter;
+
+        return matchSearch && matchDelivery && matchPayment;
     });
 
     return (
@@ -105,21 +116,45 @@ export default function AdminOrdersClient({ initialOrders }: { initialOrders: Or
             {/* Header */}
             <div>
                 <h1 className="text-2xl font-bold text-slate-900">Đơn hàng</h1>
-                <p className="text-slate-500 text-sm mt-1">Quản lý trạng thái thanh toán và giao hàng.</p>
+                <p className="text-slate-500 text-sm mt-1">Theo dõi và cập nhật trạng thái các đơn hàng.</p>
             </div>
 
             {/* Filter & Search */}
-            <div className="flex items-center gap-3">
-                <div className="relative flex-1 max-w-md group">
+            <div className="flex flex-wrap items-center gap-3">
+                <div className="relative flex-1 min-w-[250px] max-w-md group">
                     <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400 group-focus-within:text-primary transition-colors" />
                     <input
                         type="text"
-                        placeholder="Tìm theo mã đơn hoặc email..."
+                        placeholder="Tìm theo mã đơn hoặc tên khách..."
                         value={searchQuery}
                         onChange={e => setSearchQuery(e.target.value)}
                         className="h-9 w-full rounded-lg border border-slate-200 bg-white pl-9 pr-3 text-sm focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary/30 transition-all"
                     />
                 </div>
+
+                {/* Dropdown Lọc Thanh toán */}
+                <select
+                    value={paymentFilter}
+                    onChange={e => setPaymentFilter(e.target.value)}
+                    className="h-9 px-3 pr-8 rounded-lg border border-slate-200 hover:bg-slate-50 transition-colors text-sm bg-white appearance-none cursor-pointer"
+                >
+                    <option value="">Tất cả thanh toán</option>
+                    {PAYMENT_OPTIONS.map(s => (
+                        <option key={s.value} value={s.value}>{s.label}</option>
+                    ))}
+                </select>
+
+                {/* Dropdown Lọc Giao hàng */}
+                <select
+                    value={deliveryFilter}
+                    onChange={e => setDeliveryFilter(e.target.value)}
+                    className="h-9 px-3 pr-8 rounded-lg border border-slate-200 hover:bg-slate-50 transition-colors text-sm bg-white appearance-none cursor-pointer"
+                >
+                    <option value="">Tất cả giao hàng</option>
+                    {DELIVERY_OPTIONS.map(s => (
+                        <option key={s.value} value={s.value}>{s.label}</option>
+                    ))}
+                </select>
             </div>
 
             {/* Orders Table */}
