@@ -16,6 +16,11 @@ export async function GET() {
             where: { userId },
             include: {
                 user: { select: { name: true, email: true, avatar: true } },
+                withdrawals: {
+                    orderBy: { createdAt: 'desc' },
+                    take: 1,
+                    select: { bankName: true, accountNumber: true, accountName: true }
+                }
             },
         });
 
@@ -47,6 +52,7 @@ export async function GET() {
                 totalEarnings: Number(profile.totalEarnings),
                 paidEarnings: Number(profile.paidEarnings),
                 availableBalance: Number(profile.totalEarnings) - Number(profile.paidEarnings),
+                lastWithdrawal: profile.withdrawals?.[0] || null,
             },
             stats: {
                 f1Count,

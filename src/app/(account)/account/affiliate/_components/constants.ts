@@ -12,6 +12,13 @@ export interface AffiliateData {
         personalPV: number;
         teamPV: number;
         totalEarnings: number;
+        paidEarnings: number;
+        
+        lastWithdrawal?: {
+            bankName: string;
+            accountNumber: string;
+            accountName: string;
+        };
     };
     stats?: {
         f1Count: number;
