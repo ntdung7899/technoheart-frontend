@@ -10,12 +10,14 @@ import { RankProgression } from "./_components/RankProgression";
 import { ReferralCode } from "./_components/ReferralCode";
 import { CommissionRates } from "./_components/CommissionRates";
 import { QuickLinks } from "./_components/QuickLinks";
+import { WithdrawalCard } from "./_components/WithdrawalCard";
 
 export default function AffiliatePage() {
     const [data, setData] = useState<AffiliateData | null>(null);
     const [loading, setLoading] = useState(true);
     const [registering, setRegistering] = useState(false);
     const [registerError, setRegisterError] = useState<string | null>(null);
+    const [withdrawing, setWithdrawing] = useState(false);
 
     const fetchProfile = async () => {
         try {
@@ -58,6 +60,40 @@ export default function AffiliatePage() {
         }
     };
 
+    const handleWithdraw = async (
+        amount: number, 
+        bankName: string, 
+        accountNumber: string, 
+        accountName: string
+    ) => {
+        setWithdrawing(true);
+        try {
+            const res = await fetch("/api/affiliate/withdraw", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ 
+                    amount, 
+                    bankName, 
+                    accountNumber, 
+                    accountName 
+                }),
+            });
+            
+            if (res.ok) {
+                alert("Yêu cầu rút tiền đã được gửi thành công!");
+                await fetchProfile();
+            } else {
+                const error = await res.json();
+                alert(error.message || "Có lỗi xảy ra khi xử lý giao dịch");
+            }
+        } catch (err) {
+            console.error(err);
+            alert("Lỗi kết nối đến máy chủ");
+        } finally {
+            setWithdrawing(false);
+        }
+    };
+
     if (loading) {
         return (
             <div className="flex items-center justify-center py-20">
@@ -73,6 +109,8 @@ export default function AffiliatePage() {
     const { profile, stats } = data;
     const rankDisplay = RANK_DISPLAY[profile!.rank] || RANK_DISPLAY.BA;
     const RankIcon = rankDisplay.icon;
+    const availableBalanceVND = Number(profile!.totalEarnings || 0) - Number(profile!.paidEarnings || 0);
+    const availableBalancePV = Math.floor(availableBalanceVND / PV_RATE);
 
     return (
         <div className="space-y-6">
@@ -86,7 +124,12 @@ export default function AffiliatePage() {
                     {rankDisplay.label}
                 </span>
             </div>
-
+            <WithdrawalCard 
+                balance={availableBalancePV}
+                onWithdraw={handleWithdraw}
+                loading={withdrawing}
+                lastBankInfo={profile?.lastWithdrawal}
+            />
             <StatsCards profile={profile!} stats={stats!} />
             <RankProgression profile={profile!} stats={stats!} rankGradient={rankDisplay.gradient} />
             <ReferralCode referralCode={profile!.referralCode} />

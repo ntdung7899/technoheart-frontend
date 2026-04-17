@@ -39,6 +39,8 @@ export default function CommissionsPage() {
     const [loading, setLoading] = useState(true);
     const [statusFilter, setStatusFilter] = useState<string>("");
     const [page, setPage] = useState(1);
+    const [startDate, setStartDate] = useState<string>("");
+    const [endDate, setEndDate] = useState<string>("");
 
     useEffect(() => {
         const fetchCommissions = async () => {
@@ -46,6 +48,8 @@ export default function CommissionsPage() {
             try {
                 const params = new URLSearchParams();
                 if (statusFilter) params.set("status", statusFilter);
+                if (startDate) params.set("startDate", startDate);
+                if (endDate) params.set("endDate", endDate);
                 params.set("page", String(page));
                 const res = await fetch(`/api/affiliate/commissions?${params}`);
                 if (res.ok) {
@@ -58,7 +62,7 @@ export default function CommissionsPage() {
             }
         };
         fetchCommissions();
-    }, [statusFilter, page]);
+    }, [statusFilter, page, startDate, endDate]);
 
     if (loading && !data) {
         return (
@@ -127,6 +131,27 @@ export default function CommissionsPage() {
                         </button>
                     ))}
                 </div>
+                <input
+                    type="date"
+                    value={startDate}
+                    onChange={(e) => { setStartDate(e.target.value); setPage(1); }}
+                    className="text-xs border border-border/40 bg-card/50 rounded-md px-2 py-1.5 focus:outline-none focus:ring-1 focus:ring-primary"
+                />
+                <span className="text-muted-foreground text-xs">-</span>
+                <input
+                    type="date"
+                    value={endDate}
+                    onChange={(e) => { setEndDate(e.target.value); setPage(1); }}
+                    className="text-xs border border-border/40 bg-card/50 rounded-md px-2 py-1.5 focus:outline-none focus:ring-1 focus:ring-primary"
+                />
+                {(startDate || endDate) && (
+                    <button 
+                        onClick={() => { setStartDate(""); setEndDate(""); setPage(1); }}
+                        className="text-xs text-red-500 hover:underline ml-1"
+                    >
+                        Xoá
+                    </button>
+                )}
             </div>
 
             {/* Commission List */}

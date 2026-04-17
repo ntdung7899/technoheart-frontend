@@ -16,6 +16,7 @@ export default async function AdminOrdersPage() {
         id: o.id,
         total: Number(o.total).toString(),
         status: o.status,
+        paymentStatus: o.paymentStatus,
         createdAt: o.createdAt.toISOString(),
         user: { name: o.user.name, email: o.user.email },
         _count: o._count,
