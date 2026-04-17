@@ -26,7 +26,7 @@ export default function SecurityPage() {
     });
 
     // 2FA
-    const [twoFAEnabled, setTwoFAEnabled] = useState(false);
+    // const [twoFAEnabled, setTwoFAEnabled] = useState(false);
 
     useEffect(() => {
         fetch("/api/account/security/history")
@@ -169,7 +169,7 @@ export default function SecurityPage() {
             </div>
 
             {/* 2FA Toggle (UI Only) */}
-            <div className="rounded-2xl border border-border/40 bg-card/50 p-6">
+            {/* <div className="rounded-2xl border border-border/40 bg-card/50 p-6">
                 <div className="flex items-center justify-between">
                     <div className="flex items-center gap-3">
                         <div className="h-10 w-10 rounded-xl bg-secondary/50 flex items-center justify-center">
@@ -200,7 +200,7 @@ export default function SecurityPage() {
                         </p>
                     </div>
                 )}
-            </div>
+            </div> */}
 
             {/* Login History */}
             <div className="rounded-2xl border border-border/40 bg-card/50 p-6 space-y-4">
