@@ -124,6 +124,21 @@ export default function AdminAffiliatePage() {
                     >
                         <DollarSign className="h-4 w-4 inline mr-1.5" />Hoa hồng
                     </button>
+                    <div className="flex gap-1 bg-slate-100 rounded-lg p-1">
+                       
+                        <button
+                            onClick={() => { setView("affiliates"); setPage(1); }}
+                            className={`px-4 py-2 rounded-md text-sm font-medium transition-all ${view === "affiliates" ? "bg-white text-slate-900 shadow-sm" : "text-slate-500 hover:text-slate-700"}`}
+                        >
+                            <Users className="h-4 w-4 inline mr-1.5" />Đối tác
+                        </button>
+                        <button
+                            onClick={() => { setView("commissions"); setPage(1); }}
+                            className={`px-4 py-2 rounded-md text-sm font-medium transition-all ${view === "commissions" ? "bg-white text-slate-900 shadow-sm" : "text-slate-500 hover:text-slate-700"}`}
+                        >
+                            <DollarSign className="h-4 w-4 inline mr-1.5" />Hoa hồng
+                        </button>
+                    </div>
                 </div>
             </div>
 
