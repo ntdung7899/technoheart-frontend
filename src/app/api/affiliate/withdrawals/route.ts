@@ -1,7 +1,14 @@
-import { getSession } from "@/lib/auth-utils";
 import prisma from "@/lib/prisma";
 import { NextResponse } from "next/server";
-import { getCommissionRates, getAchievementBonus, getPVForNextRank, RANK_INFO } from "@/lib/affiliate-utils";
+import { getSession } from "@/lib/auth-utils";
+import { 
+    getCommissionRates, 
+    getAchievementBonus, 
+    getPVForNextRank, 
+    RANK_INFO 
+} from "@/lib/affiliate-utils";
+
+const PV_RATE = 26000;
 
 export async function GET() {
     try {
@@ -15,12 +22,17 @@ export async function GET() {
         const profile = await prisma.affiliateProfile.findUnique({
             where: { userId },
             include: {
-                user: { select: { name: true, email: true, avatar: true } },
+                user: { 
+                    select: { 
+                        name: true, 
+                        email: true, 
+                        avatar: true 
+                    } 
+                },
                 withdrawals: {
                     orderBy: { createdAt: 'desc' },
-                    // XÓA 'take: 1' Ở ĐÂY ĐỂ LẤY TOÀN BỘ LỊCH SỬ
                     select: { 
-                        id: true, // THÊM CÁC TRƯỜNG NÀY ĐỂ HIỂN THỊ LỊCH SỬ
+                        id: true,
                         amount: true,
                         status: true,
                         createdAt: true,
@@ -36,13 +48,11 @@ export async function GET() {
             return NextResponse.json({ registered: false });
         }
 
-        // Get referral counts
         const [f1Count, f2Count] = await Promise.all([
             prisma.referral.count({ where: { referrerId: userId, level: 1 } }),
             prisma.referral.count({ where: { referrerId: userId, level: 2 } }),
         ]);
 
-        // Pending commissions
         const pendingCommissions = await prisma.commission.aggregate({
             where: { affiliateId: profile.id, status: "PENDING" },
             _sum: { amount: true },
@@ -60,8 +70,7 @@ export async function GET() {
                 totalEarnings: Number(profile.totalEarnings),
                 paidEarnings: Number(profile.paidEarnings),
                 availableBalance: Number(profile.totalEarnings) - Number(profile.paidEarnings),
-                lastWithdrawal: profile.withdrawals?.[0] || null, // Vẫn giữ lại lệnh đầu tiên cho Widget Rút Tiền
-                // TRẢ RA TOÀN BỘ MẢNG WITHDRAWALS ĐỂ DÙNG CHO BẢNG LỊCH SỬ
+                lastWithdrawal: profile.withdrawals?.[0] || null,
                 withdrawals: profile.withdrawals 
             },
             stats: {
@@ -75,7 +84,7 @@ export async function GET() {
             },
         });
     } catch (error) {
-        console.error("Affiliate profile error:", error);
-        return NextResponse.json({ error: "Server error" }, { status: 500 });
+        console.error("Affiliate API Error:", error);
+        return NextResponse.json({ error: "Internal Server Error" }, { status: 500 });
     }
 }

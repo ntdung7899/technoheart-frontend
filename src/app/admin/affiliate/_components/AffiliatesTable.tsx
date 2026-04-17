@@ -1,6 +1,5 @@
-import { Eye, Loader2 } from "lucide-react";
+import { Eye, Loader2, Pencil, Trash2 } from "lucide-react";
 import { AffiliateProfile, RANK_LABELS, formatPrice } from "./constants";
-import { Pencil, Trash2 } from "lucide-react";
 
 interface Props {
     profiles: AffiliateProfile[];
@@ -29,7 +28,6 @@ export default function AffiliatesTable({ profiles, loading, onViewCommissions, 
                                 <th className="px-4 py-3 text-right text-xs font-medium text-slate-500">PV cá nhân</th>
                                 <th className="px-4 py-3 text-right text-xs font-medium text-slate-500">PV nhóm</th>
                                 <th className="px-4 py-3 text-right text-xs font-medium text-slate-500">Tổng thu nhập</th>
-                                <th className="px-4 py-3 text-right text-xs font-medium text-amber-500">Chờ duyệt</th>
                                 <th className="px-4 py-3 text-center text-xs font-medium text-slate-500">Thao tác</th>
                             </tr>
                         </thead>
@@ -58,38 +56,29 @@ export default function AffiliatesTable({ profiles, loading, onViewCommissions, 
                                         <td className="px-4 py-3 text-right text-sm font-medium">{p.personalPV.toLocaleString("vi-VN")}</td>
                                         <td className="px-4 py-3 text-right text-sm font-medium">{p.teamPV.toLocaleString("vi-VN")}</td>
                                         <td className="px-4 py-3 text-right text-sm font-medium text-slate-900">{formatPrice(p.totalEarnings)}</td>
-                                        <td className="px-4 py-3 text-right">
-                                            {p.commissionSummary.pending > 0 ? (
-                                                <span className="text-sm font-medium text-amber-600">{formatPrice(p.commissionSummary.pending)}</span>
-                                            ) : (
-                                                <span className="text-slate-300 text-sm">—</span>
-                                            )}
-                                        </td>
-                                        <td className="px-4 py-3 text-center">
-                                            <button
-                                                onClick={() => onViewCommissions(p.id)}
-                                                className="inline-flex items-center gap-1 px-2.5 py-1.5 rounded-md bg-slate-100 hover:bg-primary hover:text-white text-slate-600 text-xs font-medium transition-colors"
-                                            >
-                                                <Eye className="h-3.5 w-3.5" /> Chi tiết
-                                            </button>                        
-                                        </td>
-                                        <td className="px-4 py-3 text-center">
-                                            <button
-                                                onClick={() => onEdit(p.id)}
-                                                title="Chỉnh sửa"
-                                                className="p-1.5 rounded-md bg-slate-100 hover:bg-amber-500 hover:text-white text-slate-600 transition-colors"
-                                            >
-                                                <Pencil className="h-4 w-4" />
-                                            </button>
-                                        </td>
-                                        <td className="px-4 py-3 text-center">
-                                            <button
-                                                onClick={() => onDelete(p.id)}
-                                                title="Xóa đối tác"
-                                                className="p-1.5 rounded-md bg-slate-100 hover:bg-red-500 hover:text-white text-slate-600 transition-colors"
-                                            >
-                                                <Trash2 className="h-4 w-4" />
-                                            </button>
+                                        <td className="px-4 py-3">
+                                            <div className="flex items-center justify-center gap-2">
+                                                <button
+                                                    onClick={() => onViewCommissions(p.id)}
+                                                    className="inline-flex items-center gap-1 px-2.5 py-1.5 rounded-md bg-slate-100 hover:bg-primary hover:text-white text-slate-600 text-xs font-medium transition-colors"
+                                                >
+                                                    <Eye className="h-3.5 w-3.5" /> Chi tiết
+                                                </button>
+                                                <button
+                                                    onClick={() => onEdit(p.id)}
+                                                    title="Chỉnh sửa"
+                                                    className="p-1.5 rounded-md bg-slate-100 hover:bg-amber-500 hover:text-white text-slate-600 transition-colors"
+                                                >
+                                                    <Pencil className="h-4 w-4" />
+                                                </button>
+                                                <button
+                                                    onClick={() => onDelete(p.id)}
+                                                    title="Xóa đối tác"
+                                                    className="p-1.5 rounded-md bg-slate-100 hover:bg-red-500 hover:text-white text-slate-600 transition-colors"
+                                                >
+                                                    <Trash2 className="h-4 w-4" />
+                                                </button>
+                                            </div>
                                         </td>
                                     </tr>
                                 );

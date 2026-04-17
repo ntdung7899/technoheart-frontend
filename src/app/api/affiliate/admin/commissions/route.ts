@@ -19,6 +19,7 @@ export async function GET(req: Request) {
         const { searchParams } = new URL(req.url);
         const affiliateId = searchParams.get("affiliateId") || "";
         const status = searchParams.get("status") || "";
+        const search = searchParams.get("search") || "";
         const page = parseInt(searchParams.get("page") || "1");
         const limit = 20;
 
@@ -26,6 +27,13 @@ export async function GET(req: Request) {
         if (affiliateId) where.affiliateId = affiliateId;
         if (status && ["PENDING", "APPROVED", "PAID", "CANCELLED"].includes(status)) {
             where.status = status;
+        }
+
+        if (search) {
+            where.OR = [
+                { order: { user: { name: { contains: search, mode: "insensitive" } } } },
+                { affiliate: { user: { name: { contains: search, mode: "insensitive" } } } }, 
+            ];
         }
 
         const [commissions, total] = await Promise.all([
@@ -96,12 +104,10 @@ export async function PATCH(req: Request) {
             data: { status },
         });
 
-        // If paying out, increment paidEarnings for each affiliate
         if (status === "PAID") {
             const commissions = await prisma.commission.findMany({
                 where: { id: { in: commissionIds } },
             });
-            // Group amounts by affiliateId
             const payouts = new Map<string, number>();
             for (const c of commissions) {
                 payouts.set(c.affiliateId, (payouts.get(c.affiliateId) || 0) + Number(c.amount));
@@ -114,7 +120,6 @@ export async function PATCH(req: Request) {
             }
         }
 
-        // If cancelling, subtract from affiliate earnings
         if (status === "CANCELLED") {
             const commissions = await prisma.commission.findMany({
                 where: { id: { in: commissionIds } },

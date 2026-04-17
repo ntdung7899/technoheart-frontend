@@ -1,13 +1,11 @@
 "use client";
 
 import { useEffect, useState, useCallback } from "react";
-import { Users, DollarSign } from "lucide-react";
+import { Users, DollarSign, Search } from "lucide-react"; // Đã thêm icon Search
 import { AffiliateProfile, CommissionItem, Overview } from "./_components/constants";
 import OverviewCards from "./_components/OverviewCards";
 import AffiliatesFilter from "./_components/AffiliatesFilter";
 import AffiliatesTable from "./_components/AffiliatesTable";
-import CommissionsFilter from "./_components/CommissionsFilter";
-import BulkActions from "./_components/BulkActions";
 import CommissionsTable from "./_components/CommissionsTable";
 import Pagination from "./_components/Pagination";
 import { useRouter } from "next/navigation";
@@ -20,10 +18,6 @@ export default function AdminAffiliatePage() {
     const [loading, setLoading] = useState(true);
     const [search, setSearch] = useState("");
     const [rankFilter, setRankFilter] = useState("");
-    const [statusFilter, setStatusFilter] = useState("");
-    const [selectedAffiliateId, setSelectedAffiliateId] = useState("");
-    const [selectedCommissions, setSelectedCommissions] = useState<string[]>([]);
-    const [updating, setUpdating] = useState(false);
     const [page, setPage] = useState(1);
     const [totalPages, setTotalPages] = useState(1);
     const router = useRouter();
@@ -53,8 +47,7 @@ export default function AdminAffiliatePage() {
         setLoading(true);
         try {
             const params = new URLSearchParams();
-            if (selectedAffiliateId) params.set("affiliateId", selectedAffiliateId);
-            if (statusFilter) params.set("status", statusFilter);
+            if (search) params.set("search", search);
             params.set("page", String(page));
             const res = await fetch(`/api/affiliate/admin/commissions?${params}`, { cache: "no-store" });
             if (res.ok) {
@@ -67,7 +60,7 @@ export default function AdminAffiliatePage() {
         } finally {
             setLoading(false);
         }
-    }, [selectedAffiliateId, statusFilter, page]);
+    }, [search, page]); 
 
     useEffect(() => {
         if (view === "affiliates") {
@@ -77,34 +70,8 @@ export default function AdminAffiliatePage() {
         }
     }, [view, fetchAffiliates, fetchCommissions]);
 
-    const updateCommissionStatus = async (status: string) => {
-        if (selectedCommissions.length === 0) return;
-        setUpdating(true);
-        try {
-            const res = await fetch("/api/affiliate/admin/commissions", {
-                method: "PATCH",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ commissionIds: selectedCommissions, status }),
-            });
-            if (res.ok) {
-                setCommissions(prev => prev.map(c =>
-                    selectedCommissions.includes(c.id) ? { ...c, status } : c
-                ));
-                setSelectedCommissions([]);
-                fetchCommissions();
-            }
-        } catch (err) {
-            console.error(err);
-        } finally {
-            setUpdating(false);
-        }
-    };
-
-    const viewAffiliateCommissions = (affiliateId: string) => {
-        setSelectedAffiliateId(affiliateId);
+    const viewAffiliateCommissions = () => {
         setPage(1);
-        setStatusFilter("");
-        setSelectedCommissions([]);
         setView("commissions");
     };
 
@@ -136,14 +103,6 @@ export default function AdminAffiliatePage() {
         }
     };
 
-    const toggleSelectAll = () => {
-        if (selectedCommissions.length === commissions.length) {
-            setSelectedCommissions([]);
-        } else {
-            setSelectedCommissions(commissions.map((c) => c.id));
-        }
-    };
-
     return (
         <div className="space-y-6 pb-12">
             {/* Header */}
@@ -154,13 +113,13 @@ export default function AdminAffiliatePage() {
                 </div>
                 <div className="flex gap-1 bg-slate-100 rounded-lg p-1">
                     <button
-                        onClick={() => { setView("affiliates"); setPage(1); setSelectedAffiliateId(""); }}
+                        onClick={() => { setView("affiliates"); setPage(1); setSearch(""); }}
                         className={`px-4 py-2 rounded-md text-sm font-medium transition-all ${view === "affiliates" ? "bg-white text-slate-900 shadow-sm" : "text-slate-500 hover:text-slate-700"}`}
                     >
                         <Users className="h-4 w-4 inline mr-1.5" />Đối tác
                     </button>
                     <button
-                        onClick={() => { setView("commissions"); setPage(1); setSelectedAffiliateId(""); }}
+                        onClick={() => { setView("commissions"); setPage(1); setSearch(""); }}
                         className={`px-4 py-2 rounded-md text-sm font-medium transition-all ${view === "commissions" ? "bg-white text-slate-900 shadow-sm" : "text-slate-500 hover:text-slate-700"}`}
                     >
                         <DollarSign className="h-4 w-4 inline mr-1.5" />Hoa hồng
@@ -189,30 +148,27 @@ export default function AdminAffiliatePage() {
             )}
 
             {view === "commissions" && (
-                <>
-                    <CommissionsFilter
-                        hasAffiliate={!!selectedAffiliateId}
-                        statusFilter={statusFilter}
-                        onStatusChange={(v) => { setStatusFilter(v); setPage(1); setSelectedCommissions([]); }}
-                        onBack={() => { setSelectedAffiliateId(""); setPage(1); }}
-                    />
-                    <BulkActions
-                        count={selectedCommissions.length}
-                        updating={updating}
-                        onApprove={() => updateCommissionStatus("APPROVED")}
-                        onPay={() => updateCommissionStatus("PAID")}
-                        onCancel={() => updateCommissionStatus("CANCELLED")}
-                    />
+                <div className="space-y-4">
+                    <div className="flex justify-start mb-4">
+                        <div className="relative w-full sm:w-80"> 
+                            <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                <Search className="h-4 w-4 text-slate-400" />
+                            </div>
+                            <input
+                                type="text"
+                                placeholder="Tìm theo đối tác, tên khách..."
+                                value={search}
+                                onChange={(e) => { setSearch(e.target.value); setPage(1); }}
+                                className="block w-full pl-10 pr-4 py-2 bg-white border border-slate-200 rounded-lg focus:ring-2 focus:ring-primary/20 focus:border-primary text-sm outline-none transition-all"
+                            />
+                        </div>
+                    </div>
+                    
                     <CommissionsTable
                         commissions={commissions}
                         loading={loading}
-                        selectedIds={selectedCommissions}
-                        onToggleSelect={(id, checked) =>
-                            setSelectedCommissions((prev) => checked ? [...prev, id] : prev.filter((x) => x !== id))
-                        }
-                        onToggleAll={toggleSelectAll}
                     />
-                </>
+                </div>
             )}
 
             <Pagination page={page} totalPages={totalPages} onPageChange={setPage} />

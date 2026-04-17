@@ -8,7 +8,6 @@ import {
     ShoppingBag,
     BarChart3,
     Users,
-    Settings,
     ArrowLeft,
     Heart,
     LayoutDashboard,
@@ -24,7 +23,9 @@ import {
     X,
     ChevronsLeft,
     ChevronsRight,
-    LogOut
+    LogOut,
+    ChevronDown,
+    Wallet
 } from 'lucide-react';
 
 export default function AdminLayout({
@@ -38,6 +39,8 @@ export default function AdminLayout({
     const [sidebarOpen, setSidebarOpen] = useState(false);
     const [collapsed, setCollapsed] = useState(false);
 
+    const [openMenus, setOpenMenus] = useState<Record<string, boolean>>({});
+
     useEffect(() => {
         const saved = localStorage.getItem('admin-sidebar-collapsed');
         if (saved === 'true') setCollapsed(true);
@@ -48,6 +51,16 @@ export default function AdminLayout({
             localStorage.setItem('admin-sidebar-collapsed', String(!prev));
             return !prev;
         });
+    };
+
+    useEffect(() => {
+        if (pathname.startsWith('/admin/affiliate')) {
+            setOpenMenus(prev => ({ ...prev, 'Affiliate': true }));
+        }
+    }, [pathname]);
+
+    const toggleMenu = (label: string) => {
+        setOpenMenus(prev => ({ ...prev, [label]: !prev[label] }));
     };
 
     useEffect(() => {
@@ -100,7 +113,15 @@ export default function AdminLayout({
         { label: 'Danh mục', href: '/admin/categories', icon: LayoutGrid },
         { label: 'Đơn hàng', href: '/admin/orders', icon: ShoppingBag },
         { label: 'Tin tức', href: '/admin/news', icon: Newspaper },
-        { label: 'Affiliate', href: '/admin/affiliate', icon: TrendingUp },
+        { 
+            label: 'Affiliate', 
+            icon: TrendingUp,
+            prefix: '/admin/affiliate',
+            children: [
+                { label: 'Tổng quan', href: '/admin/affiliate', icon: LayoutDashboard },
+                { label: 'Yêu cầu rút tiền', href: '/admin/affiliate/withdrawals', icon: Wallet },
+            ]
+        },
         { label: 'Khách hàng', href: '/admin/users', icon: Users },
         { label: 'Báo cáo', href: '/admin/analytics', icon: BarChart3 },
         { label: 'Liên hệ', href: '/admin/contact', icon: MessageSquare },
@@ -128,16 +149,69 @@ export default function AdminLayout({
                     )}
                     <nav className="space-y-0.5">
                         {navItems.map((item) => {
+                            if (item.children) {
+                                const isParentActive = pathname.startsWith(item.prefix || '');
+                                const isOpen = openMenus[item.label];
+
+                                return (
+                                    <div key={item.label} className="space-y-0.5">
+                                        <button
+                                            onClick={() => {
+                                                if (isCollapsed) toggleCollapsed();
+                                                toggleMenu(item.label);
+                                            }}
+                                            className={`flex items-center w-full ${isCollapsed ? 'justify-center' : 'justify-between'} gap-3 px-3 py-2.5 rounded-lg text-[13px] font-medium transition-all ${
+                                                isParentActive
+                                                    ? 'bg-white/5 text-white'
+                                                    : 'text-slate-400 hover:text-white hover:bg-white/5'
+                                            }`}
+                                        >
+                                            <div className={`flex items-center ${isCollapsed ? 'justify-center' : 'gap-3'}`}>
+                                                <item.icon className={`h-[18px] w-[18px] flex-shrink-0 ${isParentActive ? 'text-primary' : ''}`} />
+                                                {!isCollapsed && item.label}
+                                            </div>
+                                            {!isCollapsed && (
+                                                <ChevronDown className={`h-4 w-4 text-slate-400 transition-transform duration-200 ${isOpen ? 'rotate-180' : ''}`} />
+                                            )}
+                                        </button>
+
+                                        {isOpen && !isCollapsed && (
+                                            <div className="pl-4 pr-3 py-1 space-y-0.5 border-l border-white/5 ml-5 mt-1">
+                                                {item.children.map(child => {
+                                                    const isChildActive = pathname === child.href;
+                                                    return (
+                                                        <Link
+                                                            key={child.href}
+                                                            href={child.href}
+                                                            className={`flex items-center gap-3 px-3 py-2 rounded-lg text-[12px] font-medium transition-all ${
+                                                                isChildActive
+                                                                    ? 'bg-primary/10 text-primary'
+                                                                    : 'text-slate-400 hover:text-white hover:bg-white/5'
+                                                            }`}
+                                                        >
+                                                            {/* HIỂN THỊ ICON CỦA MENU CON TẠI ĐÂY */}
+                                                            {child.icon && <child.icon className="h-4 w-4 flex-shrink-0" />}
+                                                            {child.label}
+                                                        </Link>
+                                                    );
+                                                })}
+                                            </div>
+                                        )}
+                                    </div>
+                                );
+                            }
+
                             const isActive = pathname === item.href || (item.href !== '/admin' && pathname.startsWith(item.href));
                             return (
                                 <Link
                                     key={item.href}
                                     href={item.href}
                                     title={isCollapsed ? item.label : undefined}
-                                    className={`flex items-center ${isCollapsed ? 'justify-center' : 'gap-3'} px-3 py-2.5 rounded-lg text-[13px] font-medium transition-all ${isActive
-                                        ? 'bg-white/10 text-white'
-                                        : 'text-slate-400 hover:text-white hover:bg-white/5'
-                                        }`}
+                                    className={`flex items-center ${isCollapsed ? 'justify-center' : 'gap-3'} px-3 py-2.5 rounded-lg text-[13px] font-medium transition-all ${
+                                        isActive
+                                            ? 'bg-white/10 text-white'
+                                            : 'text-slate-400 hover:text-white hover:bg-white/5'
+                                    }`}
                                 >
                                     <item.icon className={`h-[18px] w-[18px] flex-shrink-0 ${isActive ? 'text-primary' : ''}`} />
                                     {!isCollapsed && item.label}
@@ -146,22 +220,6 @@ export default function AdminLayout({
                         })}
                     </nav>
                 </div>
-
-                {/* <div>
-                    <p className="px-3 text-[10px] font-semibold uppercase tracking-widest text-slate-400 mb-2">Cấu hình</p>
-                    <nav className="space-y-0.5">
-                        <Link
-                            href="/admin/settings"
-                            className={`flex items-center gap-3 px-3 py-2.5 rounded-lg text-[13px] font-medium transition-all ${pathname === '/admin/settings'
-                                ? 'bg-white/10 text-white'
-                                : 'text-slate-400 hover:text-white hover:bg-white/5'
-                                }`}
-                        >
-                            <Settings className="h-[18px] w-[18px]" />
-                            Cài đặt
-                        </Link>
-                    </nav>
-                </div> */}
             </div>
 
             <div className={`${isCollapsed ? 'p-2' : 'p-3'} mt-auto border-t border-white/10 space-y-0.5`}>

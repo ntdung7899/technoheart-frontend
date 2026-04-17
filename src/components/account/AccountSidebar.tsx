@@ -17,13 +17,23 @@ import {
     ChevronsLeft,
     ChevronsRight,
     Store,
+    ChevronDown, // <-- Import thêm ChevronDown
+    Wallet       // <-- Import thêm Wallet
 } from "lucide-react";
 
 const navItems = [
     { label: "Tổng quan", href: "/account", icon: LayoutDashboard },
     { label: "Đơn hàng", href: "/account/orders", icon: ShoppingBag },
     { label: "Yêu thích", href: "/account/wishlist", icon: Heart },
-    { label: "Affiliate", href: "/account/affiliate", icon: TrendingUp },
+    { 
+        label: "Affiliate", 
+        href: "/account/affiliate", 
+        icon: TrendingUp,
+        children: [
+            { label: "Tổng quan", href: "/account/affiliate", icon: LayoutDashboard },
+            { label: "Lịch sử rút tiền", href: "/account/affiliate/withdrawals", icon: Wallet },
+        ]
+    },
     { label: "Hồ sơ", href: "/account/profile", icon: UserCircle },
     { label: "Địa chỉ", href: "/account/addresses", icon: MapPin },
     { label: "Ưu đãi", href: "/account/rewards", icon: Gift },
@@ -35,6 +45,9 @@ export function AccountSidebar() {
     const router = useRouter();
     const [collapsed, setCollapsed] = useState(false);
 
+    // State quản lý việc đóng/mở menu con
+    const [openMenus, setOpenMenus] = useState<Record<string, boolean>>({});
+
     useEffect(() => {
         const saved = localStorage.getItem("account-sidebar-collapsed");
         if (saved === "true") setCollapsed(true);
@@ -45,6 +58,17 @@ export function AccountSidebar() {
             localStorage.setItem("account-sidebar-collapsed", String(!prev));
             return !prev;
         });
+    };
+
+    // Tự động mở menu Affiliate nếu người dùng đang ở trong trang Affiliate
+    useEffect(() => {
+        if (pathname.startsWith('/account/affiliate')) {
+            setOpenMenus(prev => ({ ...prev, 'Affiliate': true }));
+        }
+    }, [pathname]);
+
+    const toggleMenu = (label: string) => {
+        setOpenMenus(prev => ({ ...prev, [label]: !prev[label] }));
     };
 
     const handleLogout = async () => {
@@ -92,10 +116,66 @@ export function AccountSidebar() {
                     <nav className={`flex-1 overflow-y-auto py-1 ${collapsed ? "px-2" : "px-3"}`}>
                         <ul className="space-y-0.5">
                             {navItems.map((item) => {
-                                const isActive =
-                                    pathname === item.href ||
-                                    (item.href !== "/account" && pathname.startsWith(item.href));
+                                const isParentActive = pathname.startsWith(item.href);
                                 const Icon = item.icon;
+
+                                // XỬ LÝ NẾU MENU CÓ ITEM CON (CHILDREN)
+                                if (item.children) {
+                                    const isOpen = openMenus[item.label];
+
+                                    return (
+                                        <li key={item.href} className="space-y-0.5">
+                                            <button
+                                                onClick={() => {
+                                                    if (collapsed) toggleCollapsed();
+                                                    toggleMenu(item.label);
+                                                }}
+                                                className={`flex items-center w-full justify-between gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-all ${collapsed ? "justify-center px-0" : ""} ${
+                                                    isParentActive
+                                                        ? "bg-th-blue/15 text-th-blue-lt"
+                                                        : "text-th-muted hover:text-white hover:bg-white/5"
+                                                }`}
+                                            >
+                                                <div className={`flex items-center ${collapsed ? "justify-center" : "gap-3"}`}>
+                                                    <Icon className="h-4 w-4 shrink-0" />
+                                                    {!collapsed && item.label}
+                                                </div>
+                                                {!collapsed && (
+                                                    <ChevronDown className={`h-4 w-4 shrink-0 transition-transform duration-200 ${isOpen ? "rotate-180" : ""}`} />
+                                                )}
+                                            </button>
+
+                                            {/* Render menu con */}
+                                            {isOpen && !collapsed && (
+                                                <ul className="pl-4 pr-3 py-1 space-y-0.5 border-l border-white/5 ml-5 mt-1">
+                                                    {item.children.map(child => {
+                                                        const isChildActive = pathname === child.href;
+                                                        const ChildIcon = child.icon;
+                                                        return (
+                                                            <li key={child.href}>
+                                                                <Link
+                                                                    href={child.href}
+                                                                    className={`flex items-center gap-3 px-3 py-2 rounded-lg text-xs font-medium transition-all ${
+                                                                        isChildActive
+                                                                            ? "bg-th-blue/10 text-th-blue-lt"
+                                                                            : "text-th-muted hover:text-white hover:bg-white/5"
+                                                                    }`}
+                                                                >
+                                                                    {ChildIcon && <ChildIcon className="h-3.5 w-3.5 shrink-0" />}
+                                                                    {child.label}
+                                                                </Link>
+                                                            </li>
+                                                        )
+                                                    })}
+                                                </ul>
+                                            )}
+                                        </li>
+                                    );
+                                }
+
+                                // XỬ LÝ NẾU LÀ MENU BÌNH THƯỜNG
+                                const isActive = pathname === item.href || (item.href !== "/account" && pathname.startsWith(item.href));
+                                
                                 return (
                                     <li key={item.href}>
                                         <Link
@@ -137,12 +217,10 @@ export function AccountSidebar() {
             </aside>
 
             {/* Mobile Bottom Navigation */}
-            <nav className="lg:hidden fixed bottom-0 left-0 right-0 z-50 border-t border-th-blue/15 bg-th-dark/95 backdrop-blur-xl">
+            <nav className="lg:hidden fixed bottom-0 left-0 right-0 z-50 border-t border-th-blue/15 bg-th-dark/95 backdrop-blur-xl pb-safe">
                 <div className="flex items-center justify-around px-2 py-1.5">
                     {navItems.slice(0, 5).map((item) => {
-                        const isActive =
-                            pathname === item.href ||
-                            (item.href !== "/account" && pathname.startsWith(item.href));
+                        const isActive = pathname === item.href || (item.href !== "/account" && pathname.startsWith(item.href));
                         const Icon = item.icon;
                         return (
                             <Link
