@@ -1,16 +1,21 @@
 "use client";
 
 import { useEffect, useState, useCallback } from "react";
-import { Users, DollarSign, Download } from "lucide-react";
-import { AffiliateProfile, CommissionItem, Overview, STATUS_CONFIG, RANK_LABELS } from "./_components/constants";
+import { Users, DollarSign, Search, Download } from "lucide-react";
+import { 
+    AffiliateProfile, 
+    CommissionItem, 
+    Overview, 
+    RANK_LABELS, 
+    STATUS_CONFIG 
+} from "./_components/constants";
 import OverviewCards from "./_components/OverviewCards";
 import AffiliatesFilter from "./_components/AffiliatesFilter";
 import AffiliatesTable from "./_components/AffiliatesTable";
-import CommissionsFilter from "./_components/CommissionsFilter";
-import BulkActions from "./_components/BulkActions";
 import CommissionsTable from "./_components/CommissionsTable";
 import Pagination from "./_components/Pagination";
 import { useRouter } from "next/navigation";
+import * as XLSX from "xlsx";
 
 export default function AdminAffiliatePage() {
     const [view, setView] = useState<"affiliates" | "commissions">("affiliates");
@@ -20,10 +25,6 @@ export default function AdminAffiliatePage() {
     const [loading, setLoading] = useState(true);
     const [search, setSearch] = useState("");
     const [rankFilter, setRankFilter] = useState("");
-    const [statusFilter, setStatusFilter] = useState("");
-    const [selectedAffiliateId, setSelectedAffiliateId] = useState("");
-    const [selectedCommissions, setSelectedCommissions] = useState<string[]>([]);
-    const [updating, setUpdating] = useState(false);
     const [page, setPage] = useState(1);
     const [totalPages, setTotalPages] = useState(1);
     const router = useRouter();
@@ -53,8 +54,7 @@ export default function AdminAffiliatePage() {
         setLoading(true);
         try {
             const params = new URLSearchParams();
-            if (selectedAffiliateId) params.set("affiliateId", selectedAffiliateId);
-            if (statusFilter) params.set("status", statusFilter);
+            if (search) params.set("search", search);
             params.set("page", String(page));
             const res = await fetch(`/api/affiliate/admin/commissions?${params}`, { cache: "no-store" });
             if (res.ok) {
@@ -67,7 +67,7 @@ export default function AdminAffiliatePage() {
         } finally {
             setLoading(false);
         }
-    }, [selectedAffiliateId, statusFilter, page]);
+    }, [search, page]);
 
     useEffect(() => {
         if (view === "affiliates") {
@@ -76,37 +76,6 @@ export default function AdminAffiliatePage() {
             fetchCommissions();
         }
     }, [view, fetchAffiliates, fetchCommissions]);
-
-    const updateCommissionStatus = async (status: string) => {
-        if (selectedCommissions.length === 0) return;
-        setUpdating(true);
-        try {
-            const res = await fetch("/api/affiliate/admin/commissions", {
-                method: "PATCH",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ commissionIds: selectedCommissions, status }),
-            });
-            if (res.ok) {
-                setCommissions(prev => prev.map(c =>
-                    selectedCommissions.includes(c.id) ? { ...c, status } : c
-                ));
-                setSelectedCommissions([]);
-                fetchCommissions();
-            }
-        } catch (err) {
-            console.error(err);
-        } finally {
-            setUpdating(false);
-        }
-    };
-
-    const viewAffiliateCommissions = (affiliateId: string) => {
-        setSelectedAffiliateId(affiliateId);
-        setPage(1);
-        setStatusFilter("");
-        setSelectedCommissions([]);
-        setView("commissions");
-    };
 
     const handleEditAffiliate = (affiliateId: string) => {
         router.push(`/admin/affiliate/${affiliateId}`);
@@ -124,6 +93,7 @@ export default function AdminAffiliatePage() {
             });
 
             if (res.ok) {
+                // Cập nhật lại danh sách sau khi xóa thành công
                 setProfiles(profiles.filter(p => p.id !== affiliateId));
             } else {
                 const data = await res.json();
@@ -131,68 +101,62 @@ export default function AdminAffiliatePage() {
             }
         } catch (error) {
             console.error("Lỗi khi xóa:", error);
+            alert("Đã xảy ra lỗi khi thực hiện lệnh xóa.");
         } finally {
             setLoading(false);
         }
     };
 
-    const toggleSelectAll = () => {
-        if (selectedCommissions.length === commissions.length) {
-            setSelectedCommissions([]);
-        } else {
-            setSelectedCommissions(commissions.map((c) => c.id));
-        }
-    };
-
     const handleExportExcel = () => {
-        let csvContent = "\uFEFF"; 
+        let dataToExport: any[] = [];
+        let fileName = "";
 
         if (view === "commissions") {
-            csvContent += "Mã HH,Đối tác,Hạng,Mã Đơn hàng,Khách hàng,Loại,Giá trị ĐH,Tỉ lệ,Hoa hồng,Trạng thái,Ngày\n";
-            
-            commissions.forEach((c: any) => {
-                const id = c.id || "";
-                const affiliateName = c.affiliateName || "";
-                const affiliateRank = RANK_LABELS[c.affiliateRank]?.label || c.affiliateRank || ""; 
-                const orderId = c.orderId || "";
-                const orderBuyer = c.orderBuyer || "";
-                const type = c.type === "ACHIEVEMENT" ? "Thưởng" : `F${c.level}`;
-                const orderTotal = c.orderTotal || 0;
-                const rate = c.rate ? `${(c.rate * 100).toFixed(1)}%` : "0%";
-                const amount = c.amount || 0;
-                const statusInfo = STATUS_CONFIG[c.status]?.label || c.status || ""; 
-                const date = c.createdAt ? new Date(c.createdAt).toLocaleDateString("vi-VN") : "";
-                
-                csvContent += `"${id}","${affiliateName}","${affiliateRank}","${orderId}","${orderBuyer}","${type}","${orderTotal}","${rate}","${amount}","${statusInfo}","${date}"\n`;
-            });
+            // Chuẩn bị dữ liệu Hoa hồng
+            dataToExport = commissions.map((c: any) => ({
+                "Mã HH": c.id,
+                "Đối tác": c.affiliateName,
+                "Hạng": RANK_LABELS[c.affiliateRank]?.label || c.affiliateRank || "",
+                "Mã Đơn hàng": c.orderId,
+                "Khách hàng": c.orderBuyer,
+                "Loại": c.type === "ACHIEVEMENT" ? "Thưởng" : `F${c.level}`,
+                "Giá trị ĐH": c.orderTotal, 
+                "Tỉ lệ": `${(c.rate * 100).toFixed(1)}%`,
+                "Hoa hồng": c.amount,
+                "Trạng thái": STATUS_CONFIG[c.status]?.label || c.status || "",
+                "Ngày": c.createdAt ? new Date(c.createdAt).toLocaleDateString("vi-VN") : ""
+            }));
+            fileName = `Bao_cao_Hoa_hong_${new Date().toLocaleDateString('vi-VN').replace(/\//g, '-')}.xlsx`;
         } else {
-            csvContent += "Mã ĐT,Tên đối tác,Email,Mã giới thiệu,Hạng,PV cá nhân,PV nhóm,Tổng thu nhập,Chờ duyệt,Trạng thái\n";
-            
-            profiles.forEach((p: any) => {
-                const id = p.id || "";
-                const name = p.user?.name || "N/A";
-                const email = p.user?.email || "N/A";
-                const code = p.referralCode || ""; 
-                const rank = RANK_LABELS[p.rank]?.label || p.rank || "";      
-                const pv = p.personalPV || 0; 
-                const gv = p.teamPV || 0;
-                const totalEarnings = p.totalEarnings || 0;
-                const pendingEarnings = p.commissionsSummary?.pending || 0;
-                
-                const status = p.status === "INACTIVE" ? "Bị khóa" : "Hoạt động";
-
-                csvContent += `"${id}","${name}","${email}","${code}","${rank}","${pv}","${gv}","${totalEarnings}","${pendingEarnings}","${status}"\n`;
-            });
+            // Chuẩn bị dữ liệu Đối tác
+            dataToExport = profiles.map((p: any) => ({
+                "Mã ĐT": p.id,
+                "Tên đối tác": p.user?.name || "N/A",
+                "Email": p.user?.email || "N/A",
+                "Mã giới thiệu": p.referralCode || "",
+                "Hạng": RANK_LABELS[p.rank]?.label || p.rank || "",
+                "PV cá nhân": p.personalPV || 0,
+                "PV nhóm": p.teamPV || 0,
+                "Tổng thu nhập": p.totalEarnings || 0,
+                "Chờ duyệt": p.commissionsSummary?.pending || 0,
+                "Trạng thái": p.status === "INACTIVE" ? "Bị khóa" : "Hoạt động"
+            }));
+            fileName = rankFilter 
+                ? `Danh_sach_Doi_tac_${rankFilter}_${new Date().toLocaleDateString('vi-VN').replace(/\//g, '-')}.xlsx`
+                : `Danh_sach_Doi_tac_${new Date().toLocaleDateString('vi-VN').replace(/\//g, '-')}.xlsx`;
         }
 
-        const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
-        const url = URL.createObjectURL(blob);
-        const link = document.createElement("a");
-        link.setAttribute("href", url);
-        link.setAttribute("download", `Danh_sach_${view}_${new Date().toLocaleDateString('vi-VN').replace(/\//g, '-')}.csv`);
-        document.body.appendChild(link);
-        link.click();
-        document.body.removeChild(link);
+        // Tạo sheet và thêm dữ liệu
+        const worksheet = XLSX.utils.json_to_sheet(dataToExport);
+
+        // Chỉnh độ rộng cột cho "đẹp" (Khoảng 18 ký tự cho mỗi cột)
+        const colWidths = Object.keys(dataToExport[0] || {}).map(() => ({ wch: 18 }));
+        worksheet['!cols'] = colWidths;
+
+        // Tạo file và tải xuống
+        const workbook = XLSX.utils.book_new();
+        XLSX.utils.book_append_sheet(workbook, worksheet, "Dữ liệu");
+        XLSX.writeFile(workbook, fileName);
     };
 
     return (
@@ -203,24 +167,25 @@ export default function AdminAffiliatePage() {
                     <h1 className="text-2xl font-bold text-slate-900">Quản lý Affiliate</h1>
                     <p className="text-slate-500 text-sm mt-1">Duyệt hoa hồng, theo dõi mạng lưới đối tác.</p>
                 </div>
-                <div className="flex items-center gap-3"> 
+                
+                <div className="flex items-center gap-3">
                     <button 
-                            onClick={handleExportExcel}
-                            className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors text-sm font-medium shadow-sm"
-                        >
-                            <Download className="h-4 w-4" />
-                            Xuất dữ liệu
+                        onClick={handleExportExcel}
+                        className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors text-sm font-medium shadow-sm"
+                    >
+                        <Download className="h-4 w-4" />
+                        Xuất dữ liệu
                     </button>
+
                     <div className="flex gap-1 bg-slate-100 rounded-lg p-1">
-                       
                         <button
-                            onClick={() => { setView("affiliates"); setPage(1); setSelectedAffiliateId(""); }}
+                            onClick={() => { setView("affiliates"); setPage(1); setSearch(""); setRankFilter(""); }}
                             className={`px-4 py-2 rounded-md text-sm font-medium transition-all ${view === "affiliates" ? "bg-white text-slate-900 shadow-sm" : "text-slate-500 hover:text-slate-700"}`}
                         >
                             <Users className="h-4 w-4 inline mr-1.5" />Đối tác
                         </button>
                         <button
-                            onClick={() => { setView("commissions"); setPage(1); setSelectedAffiliateId(""); }}
+                            onClick={() => { setView("commissions"); setPage(1); setSearch(""); }}
                             className={`px-4 py-2 rounded-md text-sm font-medium transition-all ${view === "commissions" ? "bg-white text-slate-900 shadow-sm" : "text-slate-500 hover:text-slate-700"}`}
                         >
                             <DollarSign className="h-4 w-4 inline mr-1.5" />Hoa hồng
@@ -242,7 +207,8 @@ export default function AdminAffiliatePage() {
                     <AffiliatesTable
                         profiles={profiles}
                         loading={loading}
-                        onViewCommissions={viewAffiliateCommissions}
+                        onViewCommissions={(id) => { setView("commissions"); setPage(1); setSearch(id);
+                        }}
                         onEdit={handleEditAffiliate}
                         onDelete={handleDeleteAffiliate}
                     />
@@ -250,30 +216,27 @@ export default function AdminAffiliatePage() {
             )}
 
             {view === "commissions" && (
-                <>
-                    <CommissionsFilter
-                        hasAffiliate={!!selectedAffiliateId}
-                        statusFilter={statusFilter}
-                        onStatusChange={(v) => { setStatusFilter(v); setPage(1); setSelectedCommissions([]); }}
-                        onBack={() => { setSelectedAffiliateId(""); setPage(1); }}
-                    />
-                    <BulkActions
-                        count={selectedCommissions.length}
-                        updating={updating}
-                        onApprove={() => updateCommissionStatus("APPROVED")}
-                        onPay={() => updateCommissionStatus("PAID")}
-                        onCancel={() => updateCommissionStatus("CANCELLED")}
-                    />
+                <div className="space-y-4">
+                    <div className="flex justify-start mb-4">
+                        <div className="relative w-full sm:w-80"> 
+                            <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                <Search className="h-4 w-4 text-slate-400" />
+                            </div>
+                            <input
+                                type="text"
+                                placeholder="Tìm theo đối tác, tên khách..."
+                                value={search}
+                                onChange={(e) => { setSearch(e.target.value); setPage(1); }}
+                                className="block w-full pl-10 pr-4 py-2 bg-white border border-slate-200 rounded-lg focus:ring-2 focus:ring-primary/20 focus:border-primary text-sm outline-none transition-all"
+                            />
+                        </div>
+                    </div>
+                    
                     <CommissionsTable
                         commissions={commissions}
                         loading={loading}
-                        selectedIds={selectedCommissions}
-                        onToggleSelect={(id, checked) =>
-                            setSelectedCommissions((prev) => checked ? [...prev, id] : prev.filter((x) => x !== id))
-                        }
-                        onToggleAll={toggleSelectAll}
                     />
-                </>
+                </div>
             )}
 
             <Pagination page={page} totalPages={totalPages} onPageChange={setPage} />
