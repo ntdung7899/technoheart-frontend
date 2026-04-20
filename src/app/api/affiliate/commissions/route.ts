@@ -28,39 +28,41 @@ export async function GET(req: Request) {
         const page = parseInt(searchParams.get("page") || "1");
         const limit = 20;
 
-        const where: any = { affiliateId: profile.id };
-        if (status && ["PENDING", "APPROVED", "PAID", "CANCELLED"].includes(status)) {
-            where.status = status;
-        }
+
+        const baseWhere: any = { affiliateId: profile.id };
+        
         if (memberId) {
-            where.order = { userId: memberId };
+            baseWhere.order = { userId: memberId };
         }
 
         if (startDate || endDate) {
             const dateFilter: any = {}; 
-
             if (startDate) {
                 const parsedStart = parseISO(startDate);
                 if (isValid(parsedStart)) { 
                     dateFilter.gte = startOfDay(parsedStart);
                 }
             }
-
             if (endDate) {
                 const parsedEnd = parseISO(endDate);
                 if (isValid(parsedEnd)) {
                     dateFilter.lte = endOfDay(parsedEnd);
                 }
             }
-
             if (Object.keys(dateFilter).length > 0) {
-                where.createdAt = dateFilter;
+                baseWhere.createdAt = dateFilter;
             }
         }
 
-        const [commissions, total] = await Promise.all([
+        const listWhere = { ...baseWhere };
+        if (status && ["PENDING", "APPROVED", "PAID", "CANCELLED"].includes(status)) {
+            listWhere.status = status;
+        }
+
+        const [commissions, total, summaryGroup] = await Promise.all([
+  
             prisma.commission.findMany({
-                where,
+                where: listWhere,
                 include: {
                     order: {
                         select: {
@@ -75,28 +77,30 @@ export async function GET(req: Request) {
                 skip: (page - 1) * limit,
                 take: limit,
             }),
-            prisma.commission.count({ where }),
+
+            prisma.commission.count({ where: listWhere }),
+
+            prisma.commission.groupBy({
+                by: ['status'],
+                where: baseWhere,
+                _sum: { amount: true },
+            })
         ]);
 
-        // Aggregate stats
-        const [totalApproved, totalPending, totalPaid, totalCancelled] = await Promise.all([
-            prisma.commission.aggregate({
-                where: { affiliateId: profile.id, status: "APPROVED" },
-                _sum: { amount: true },
-            }),
-            prisma.commission.aggregate({
-                where: { affiliateId: profile.id, status: "PENDING" },
-                _sum: { amount: true },
-            }),
-            prisma.commission.aggregate({
-                where: { affiliateId: profile.id, status: "PAID" },
-                _sum: { amount: true },
-            }),
-            prisma.commission.aggregate({
-                where: { affiliateId: profile.id, status: "CANCELLED" },
-                _sum: { amount: true },
-            }),
-        ]);
+        const summary = {
+            totalApproved: 0,
+            totalPending: 0,
+            totalPaid: 0,
+            totalCancelled: 0,
+        };
+
+        summaryGroup.forEach((group) => {
+            const amount = Number(group._sum.amount || 0);
+            if (group.status === "APPROVED") summary.totalApproved = amount;
+            if (group.status === "PENDING") summary.totalPending = amount;
+            if (group.status === "PAID") summary.totalPaid = amount;
+            if (group.status === "CANCELLED") summary.totalCancelled = amount;
+        });
 
         return NextResponse.json({
             commissions: commissions.map((c) => ({
@@ -114,12 +118,7 @@ export async function GET(req: Request) {
                 total,
                 totalPages: Math.ceil(total / limit),
             },
-            summary: {
-                totalApproved: Number(totalApproved._sum.amount || 0),
-                totalPending: Number(totalPending._sum.amount || 0),
-                totalPaid: Number(totalPaid._sum.amount || 0),
-                totalCancelled: Number(totalCancelled._sum.amount || 0),
-            },
+            summary,
         });
     } catch (error) {
         console.error("Affiliate commissions error:", error);
