@@ -93,7 +93,6 @@ export default function AdminAffiliatePage() {
             });
 
             if (res.ok) {
-                // Cập nhật lại danh sách sau khi xóa thành công
                 setProfiles(profiles.filter(p => p.id !== affiliateId));
             } else {
                 const data = await res.json();
@@ -112,7 +111,6 @@ export default function AdminAffiliatePage() {
         let fileName = "";
 
         if (view === "commissions") {
-            // Chuẩn bị dữ liệu Hoa hồng
             dataToExport = commissions.map((c: any) => ({
                 "Mã HH": c.id,
                 "Đối tác": c.affiliateName,
@@ -128,7 +126,6 @@ export default function AdminAffiliatePage() {
             }));
             fileName = `Bao_cao_Hoa_hong_${new Date().toLocaleDateString('vi-VN').replace(/\//g, '-')}.xlsx`;
         } else {
-            // Chuẩn bị dữ liệu Đối tác
             dataToExport = profiles.map((p: any) => ({
                 "Mã ĐT": p.id,
                 "Tên đối tác": p.user?.name || "N/A",
@@ -146,14 +143,11 @@ export default function AdminAffiliatePage() {
                 : `Danh_sach_Doi_tac_${new Date().toLocaleDateString('vi-VN').replace(/\//g, '-')}.xlsx`;
         }
 
-        // Tạo sheet và thêm dữ liệu
         const worksheet = XLSX.utils.json_to_sheet(dataToExport);
 
-        // Chỉnh độ rộng cột cho "đẹp" (Khoảng 18 ký tự cho mỗi cột)
         const colWidths = Object.keys(dataToExport[0] || {}).map(() => ({ wch: 18 }));
         worksheet['!cols'] = colWidths;
 
-        // Tạo file và tải xuống
         const workbook = XLSX.utils.book_new();
         XLSX.utils.book_append_sheet(workbook, worksheet, "Dữ liệu");
         XLSX.writeFile(workbook, fileName);
