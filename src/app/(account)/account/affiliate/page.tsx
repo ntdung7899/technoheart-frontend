@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { Loader2 } from "lucide-react";
+import { Loader2, ShieldAlert } from "lucide-react"; // THÊM MỚI: Import icon ShieldAlert
 import type { AffiliateData } from "./_components/constants";
 import { RANK_DISPLAY, PV_RATE } from "./_components/constants";
 import { NotRegisteredView } from "./_components/NotRegisteredView";
@@ -109,7 +109,16 @@ export default function AffiliatePage() {
     const { profile, stats } = data;
     const rankDisplay = RANK_DISPLAY[profile!.rank] || RANK_DISPLAY.BA;
     const RankIcon = rankDisplay.icon;
-    const availableBalanceVND = Number(profile!.totalEarnings || 0) - Number(profile!.paidEarnings || 0);
+    
+    const totalEarningsVND = Number(profile!.totalEarnings || 0);
+    const paidEarningsVND = Number(profile!.paidEarnings || 0);
+    
+    // 1. Tính 10% Thuế TNCN
+    const taxAmountVND = totalEarningsVND * 0.1;
+    const taxAmountPV = Math.floor(taxAmountVND / PV_RATE);
+
+    // 2. Tính 90% còn lại cho Ví Khả Dụng (Trừ đi phần đã rút)
+    const availableBalanceVND = (totalEarningsVND * 0.9) - paidEarningsVND;
     const availableBalancePV = Math.floor(availableBalanceVND / PV_RATE);
 
     return (
@@ -130,6 +139,23 @@ export default function AffiliatePage() {
                 loading={withdrawing}
                 lastBankInfo={profile?.lastWithdrawal}
             />
+            {taxAmountVND > 0 && (
+                <div className="bg-orange-50 dark:bg-orange-950/20 border border-orange-200 dark:border-orange-900 rounded-xl p-4 flex items-center justify-between">
+                    <div className="flex items-center gap-3">
+                        <div className="p-2.5 bg-orange-100 dark:bg-orange-900/50 rounded-lg text-orange-600 dark:text-orange-500">
+                            <ShieldAlert className="h-5 w-5" />
+                        </div>
+                        <div>
+                            <h2 className="font-semibold text-orange-800 dark:text-orange-400 text-sm">Ví Thuế TNCN (10%)</h2>
+                            <p className="text-orange-700/80 dark:text-orange-500/80 text-xs mt-0.5">Hệ thống tạm giữ để đóng thuế theo quy định nhà nước</p>
+                        </div>
+                    </div>
+                    <div className="text-right shrink-0">
+                        <p className="font-bold text-orange-700 dark:text-orange-400">{taxAmountPV.toLocaleString()} PV</p>
+                        <p className="text-xs text-orange-600/80 dark:text-orange-500/80 mt-0.5">≈ {taxAmountVND.toLocaleString("vi-VN")} VNĐ</p>
+                    </div>
+                </div>
+            )}
             <StatsCards profile={profile!} stats={stats!} />
             <RankProgression profile={profile!} stats={stats!} rankGradient={rankDisplay.gradient} />
             <ReferralCode referralCode={profile!.referralCode} />
