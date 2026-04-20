@@ -47,7 +47,7 @@ export async function POST(req: Request) {
         });
         if (buyerProfile) {
             const newPersonalPV = buyerProfile.personalPV + orderPV;
-            const newRank = getFullRank(newPersonalPV, buyerProfile.teamPV);
+            const newRank = await getFullRank(buyerProfile.userId, newPersonalPV, buyerProfile.teamPV);
 
             await prisma.affiliateProfile.update({
                 where: { id: buyerProfile.id },
@@ -72,7 +72,7 @@ export async function POST(req: Request) {
             });
 
             if (f1Profile) {
-                const rates = getCommissionRates(f1Profile.rank);
+               const rates = getCommissionRates(f1Profile.personalPV);
                 if (rates.f1Rate > 0) {
                     const f1Amount = orderTotal * rates.f1Rate;
                     commissionsToCreate.push({
@@ -87,7 +87,7 @@ export async function POST(req: Request) {
 
                     // Update F1 earnings & team PV
                     const newTeamPV = f1Profile.teamPV + orderPV;
-                    const newRank = getFullRank(f1Profile.personalPV, newTeamPV);
+                    const newRank = await getFullRank(f1Profile.userId, f1Profile.personalPV, newTeamPV);
                     await prisma.affiliateProfile.update({
                         where: { id: f1Profile.id },
                         data: {
@@ -131,7 +131,7 @@ export async function POST(req: Request) {
                     });
 
                     if (f2Profile) {
-                        const f2Rates = getCommissionRates(f2Profile.rank);
+                        const f2Rates = getCommissionRates(f2Profile.personalPV);
                         if (f2Rates.f2Rate > 0) {
                             const f2Amount = orderTotal * f2Rates.f2Rate;
                             commissionsToCreate.push({
@@ -146,7 +146,7 @@ export async function POST(req: Request) {
 
                             // Update F2 earnings & team PV
                             const newTeamPV = f2Profile.teamPV + orderPV;
-                            const newRank = getFullRank(f2Profile.personalPV, newTeamPV);
+                            const newRank = await getFullRank(f2Profile.userId, f2Profile.personalPV, newTeamPV);
                             await prisma.affiliateProfile.update({
                                 where: { id: f2Profile.id },
                                 data: {

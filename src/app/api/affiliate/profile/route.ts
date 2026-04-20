@@ -18,8 +18,16 @@ export async function GET() {
                 user: { select: { name: true, email: true, avatar: true } },
                 withdrawals: {
                     orderBy: { createdAt: 'desc' },
-                    take: 1,
-                    select: { bankName: true, accountNumber: true, accountName: true }
+                    // XÓA 'take: 1' Ở ĐÂY ĐỂ LẤY TOÀN BỘ LỊCH SỬ
+                    select: { 
+                        id: true, // THÊM CÁC TRƯỜNG NÀY ĐỂ HIỂN THỊ LỊCH SỬ
+                        amount: true,
+                        status: true,
+                        createdAt: true,
+                        bankName: true, 
+                        accountNumber: true, 
+                        accountName: true 
+                    }
                 }
             },
         });
@@ -40,7 +48,7 @@ export async function GET() {
             _sum: { amount: true },
         });
 
-        const rates = getCommissionRates(profile.rank);
+        const rates = getCommissionRates(profile.personalPV);
         const achievement = getAchievementBonus(profile.rank);
         const progression = getPVForNextRank(profile.rank, profile.personalPV, profile.teamPV);
         const rankInfo = RANK_INFO[profile.rank];
@@ -52,7 +60,9 @@ export async function GET() {
                 totalEarnings: Number(profile.totalEarnings),
                 paidEarnings: Number(profile.paidEarnings),
                 availableBalance: Number(profile.totalEarnings) - Number(profile.paidEarnings),
-                lastWithdrawal: profile.withdrawals?.[0] || null,
+                lastWithdrawal: profile.withdrawals?.[0] || null, // Vẫn giữ lại lệnh đầu tiên cho Widget Rút Tiền
+                // TRẢ RA TOÀN BỘ MẢNG WITHDRAWALS ĐỂ DÙNG CHO BẢNG LỊCH SỬ
+                withdrawals: profile.withdrawals 
             },
             stats: {
                 f1Count,

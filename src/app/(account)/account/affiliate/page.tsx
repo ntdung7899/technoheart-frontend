@@ -118,7 +118,7 @@ export default function AffiliatePage() {
     const taxAmountPV = Math.floor(taxAmountVND / PV_RATE);
 
     // 2. Tính 90% còn lại cho Ví Khả Dụng (Trừ đi phần đã rút)
-    const availableBalanceVND = (totalEarningsVND * 0.9) - paidEarningsVND;
+    const availableBalanceVND = Math.max(0, (totalEarningsVND * 0.9) - paidEarningsVND);
     const availableBalancePV = Math.floor(availableBalanceVND / PV_RATE);
 
     return (
