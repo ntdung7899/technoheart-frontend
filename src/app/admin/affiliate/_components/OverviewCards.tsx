@@ -1,33 +1,48 @@
-import { Users, DollarSign, Loader2, Check } from "lucide-react";
+import { Users, DollarSign } from "lucide-react";
 import { Overview, formatPrice } from "./constants";
 
 export default function OverviewCards({ overview }: { overview: Overview }) {
     return (
-        <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-            <div className="rounded-xl bg-white border border-slate-200 p-5 shadow-sm">
-                <div className="flex items-center gap-2 text-slate-400 text-xs font-medium mb-2">
-                    <Users className="h-4 w-4" /> Đối tác
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 lg:gap-6">
+            
+            {/* Thẻ Tổng Đối Tác */}
+            <div className="relative overflow-hidden rounded-2xl bg-white p-6 shadow-sm border border-slate-200 hover:shadow-md hover:border-primary/30 transition-all duration-300 group">
+                <div className="flex items-center justify-between relative z-10">
+                    <div>
+                        <p className="text-sm font-semibold uppercase tracking-wider text-slate-500 mb-2">
+                            Tổng Đối Tác
+                        </p>
+                        <h3 className="text-3xl font-extrabold text-slate-900 tracking-tight">
+                            {overview.totalAffiliates}
+                        </h3>
+                    </div>
+                    <div className="h-14 w-14 rounded-full bg-blue-50 flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
+                        <Users className="h-6 w-6 text-blue-600" />
+                    </div>
                 </div>
-                <p className="text-2xl font-bold text-slate-900">{overview.totalAffiliates}</p>
+                {/* Hiệu ứng ánh sáng nền góc dưới */}
+                <div className="absolute -right-6 -bottom-6 h-32 w-32 bg-gradient-to-br from-blue-100 to-transparent rounded-full opacity-40 blur-2xl pointer-events-none"></div>
             </div>
-            <div className="rounded-xl bg-white border border-slate-200 p-5 shadow-sm">
-                <div className="flex items-center gap-2 text-slate-400 text-xs font-medium mb-2">
-                    <DollarSign className="h-4 w-4" /> Tổng HH
+
+            {/* Thẻ Tổng Hoa Hồng */}
+            <div className="relative overflow-hidden rounded-2xl bg-white p-6 shadow-sm border border-slate-200 hover:shadow-md hover:border-primary/30 transition-all duration-300 group">
+                <div className="flex items-center justify-between relative z-10">
+                    <div>
+                        <p className="text-sm font-semibold uppercase tracking-wider text-slate-500 mb-2">
+                            Tổng Hoa Hồng Phát Sinh
+                        </p>
+                        <h3 className="text-3xl font-extrabold text-slate-900 tracking-tight">
+                            {formatPrice(overview.totalCommissions)}
+                        </h3>
+                    </div>
+                    <div className="h-14 w-14 rounded-full bg-emerald-50 flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
+                        <DollarSign className="h-6 w-6 text-emerald-600" />
+                    </div>
                 </div>
-                <p className="text-2xl font-bold text-slate-900">{formatPrice(overview.totalCommissions)}</p>
+                {/* Hiệu ứng ánh sáng nền góc dưới */}
+                <div className="absolute -right-6 -bottom-6 h-32 w-32 bg-gradient-to-br from-emerald-100 to-transparent rounded-full opacity-40 blur-2xl pointer-events-none"></div>
             </div>
-            <div className="rounded-xl bg-white border border-amber-200 p-5 shadow-sm">
-                <div className="flex items-center gap-2 text-amber-500 text-xs font-medium mb-2">
-                    <Loader2 className="h-4 w-4" /> Chờ duyệt
-                </div>
-                <p className="text-2xl font-bold text-amber-600">{formatPrice(overview.totalPending)}</p>
-            </div>
-            <div className="rounded-xl bg-white border border-blue-200 p-5 shadow-sm">
-                <div className="flex items-center gap-2 text-blue-500 text-xs font-medium mb-2">
-                    <Check className="h-4 w-4" /> Đã duyệt
-                </div>
-                <p className="text-2xl font-bold text-blue-600">{formatPrice(overview.totalApproved)}</p>
-            </div>
+
         </div>
     );
 }
