@@ -27,6 +27,7 @@ export default function CheckoutPage() {
 
     const [selectedProvince, setSelectedProvince] = useState("");
     const [selectedDistrict, setSelectedDistrict] = useState("");
+    const [paymentMethod, setPaymentMethod] = useState("COD");
 
 
     useEffect(() => {
@@ -68,9 +69,7 @@ export default function CheckoutPage() {
         try {
             const response = await fetch("/api/orders", {
                 method: "POST",
-                headers: {
-                    "Content-Type": "application/json",
-                },
+                headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({
                     items,
                     address: {
@@ -82,16 +81,23 @@ export default function CheckoutPage() {
                     },
                     total: total(),
                     referralCode: formData.referralCode || undefined,
+                    paymentMethod, 
                 }),
             });
 
+            const data = await response.json();
+
             if (response.ok) {
                 clearCart();
-                router.push("/checkout/success");
+
+                if (paymentMethod === "BANK" && data.paymentUrl) {
+                    window.location.href = data.paymentUrl;
+                } else {
+                    router.push("/checkout/success");
+                }
             } else {
-                const errorData = await response.json().catch(() => null);
-                if (errorData?.invalidItems) {
-                    alert(`Sản phẩm không còn tồn tại: ${errorData.invalidItems.join(", ")}. Vui lòng xóa giỏ hàng và thêm lại.`);
+                if (data?.invalidItems) {
+                    alert(`Sản phẩm không còn tồn tại: ${data.invalidItems.join(", ")}. Vui lòng xóa giỏ hàng và thêm lại.`);
                 } else {
                     alert("Không thể đặt hàng. Vui lòng thử lại.");
                 }
@@ -104,7 +110,6 @@ export default function CheckoutPage() {
         }
     };
 
-    // PV Exchange Rate (1 PV = 26,000 VND)
     const PV_EXCHANGE_RATE = 26000;
     const pvValue = Math.floor(total() / PV_EXCHANGE_RATE);
 
@@ -258,10 +263,16 @@ export default function CheckoutPage() {
                                 <h2 className="text-2xl font-bold tracking-tight">Phương thức thanh toán</h2>
                             </div>
 
+                            {/* GIAO DIỆN CHỌN PHƯƠNG THỨC THANH TOÁN */}
                             <div className="p-8 rounded-xl border border-border/40 bg-card/50 backdrop-blur-xl shadow-xl space-y-4">
-                                <div className="p-4 rounded-xl border-2 border-primary bg-primary/5 flex items-center justify-between">
+                                
+                                {/* Lựa chọn 1: Thanh toán khi nhận hàng (COD) */}
+                                <div 
+                                    onClick={() => setPaymentMethod("COD")}
+                                    className={`p-4 rounded-xl border-2 flex items-center justify-between cursor-pointer transition-all ${paymentMethod === "COD" ? "border-primary bg-primary/5" : "border-border/50 hover:border-primary/50"}`}
+                                >
                                     <div className="flex items-center gap-4">
-                                        <div className="h-10 w-10 rounded-lg bg-primary flex items-center justify-center text-primary-foreground">
+                                        <div className={`h-10 w-10 rounded-lg flex items-center justify-center ${paymentMethod === "COD" ? "bg-primary text-primary-foreground" : "bg-muted text-muted-foreground"}`}>
                                             <Truck className="h-5 w-5" />
                                         </div>
                                         <div>
@@ -269,11 +280,30 @@ export default function CheckoutPage() {
                                             <p className="text-xs text-muted-foreground uppercase font-semibold tracking-wider">Giao hàng tận nơi mới trả tiền</p>
                                         </div>
                                     </div>
-                                    <div className="h-6 w-6 rounded-full border-4 border-primary flex items-center justify-center">
-                                        <div className="h-2 w-2 rounded-full bg-primary" />
+                                    <div className={`h-6 w-6 rounded-full border-4 flex items-center justify-center ${paymentMethod === "COD" ? "border-primary" : "border-muted"}`}>
+                                        {paymentMethod === "COD" && <div className="h-2 w-2 rounded-full bg-primary" />}
                                     </div>
                                 </div>
-                                <p className="text-xs text-muted-foreground text-center">Các phương thức thanh toán khác đang được phát triển.</p>
+
+                                {/* Lựa chọn 2: Chuyển khoản ngân hàng (QR Code) */}
+                                <div 
+                                    onClick={() => setPaymentMethod("BANK")}
+                                    className={`p-4 rounded-xl border-2 flex items-center justify-between cursor-pointer transition-all ${paymentMethod === "BANK" ? "border-primary bg-primary/5" : "border-border/50 hover:border-primary/50"}`}
+                                >
+                                    <div className="flex items-center gap-4">
+                                        <div className={`h-10 w-10 rounded-lg flex items-center justify-center ${paymentMethod === "BANK" ? "bg-primary text-primary-foreground" : "bg-muted text-muted-foreground"}`}>
+                                            <CreditCard className="h-5 w-5" />
+                                        </div>
+                                        <div>
+                                            <p className="font-semibold text-sm">Chuyển khoản (Quét mã QR)</p>
+                                            <p className="text-xs text-muted-foreground uppercase font-semibold tracking-wider">Thanh toán tự động 24/7, an toàn và bảo mật</p>
+                                        </div>
+                                    </div>
+                                    <div className={`h-6 w-6 rounded-full border-4 flex items-center justify-center ${paymentMethod === "BANK" ? "border-primary" : "border-muted"}`}>
+                                        {paymentMethod === "BANK" && <div className="h-2 w-2 rounded-full bg-primary" />}
+                                    </div>
+                                </div>
+                                
                             </div>
 
                             <div className="pt-8">

@@ -1,4 +1,3 @@
-
 import prisma from "@/lib/prisma";
 import { NextResponse } from "next/server";
 import { getSession } from "@/lib/auth-utils";
@@ -17,15 +16,18 @@ export async function PATCH(
         }
 
         const body = await req.json();
-        const { status } = body;
+        const { status, paymentStatus } = body;
+
+        const updateData: any = {};
+        if (status) updateData.status = status;
+        if (paymentStatus) updateData.paymentStatus = paymentStatus;
 
         const order = await prisma.order.update({
             where: { id },
-            data: { status }
+            data: updateData
         });
 
-        // Trigger commission calculation when order is delivered
-        if (status === "DELIVERED") {
+        if (status === "DELIVERED" || order.status === "DELIVERED") {
             try {
                 await calculateCommissions(id);
             } catch (err) {

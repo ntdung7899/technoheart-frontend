@@ -63,6 +63,9 @@ model Order {
   userId       String
   total        Decimal
   status       OrderStatus  @default(PENDING)
+  paymentStatus PaymentStatus @default(UNPAID)
+  paymentMethod String   @default("COD")
+  transactionId String?
   addressId    String
   referralCode String?
   createdAt    DateTime     @default(now())
@@ -266,6 +269,12 @@ enum OrderStatus {
   SHIPPED
   DELIVERED
   CANCELLED
+}
+
+enum PaymentStatus {
+  UNPAID      
+  PAID    
+  REFUNDED    
 }
 
 model ContactMessage {

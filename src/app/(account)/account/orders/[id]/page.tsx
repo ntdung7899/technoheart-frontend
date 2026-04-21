@@ -14,6 +14,7 @@ interface OrderDetail {
     total: string;
     shippingFee: string;
     status: string;
+    paymentStatus: string;
     createdAt: string;
     updatedAt: string;
     items: {
@@ -221,6 +222,16 @@ export default function OrderDetailPage() {
                         {formatPrice(order.total)}
                     </span>
                 </div>
+            </div>
+            <div className="border-t border-slate-100 pt-3 flex justify-between items-center">
+                    <span className="text-sm font-bold text-slate-600">Trạng thái thanh toán</span>
+                    <span className={`text-xs px-2.5 py-1 rounded-md font-bold uppercase tracking-wider ${
+                        order.paymentStatus === 'PAID' 
+                            ? 'bg-green-100 text-green-700' 
+                            : 'bg-amber-100 text-amber-700'
+                    }`}>
+                        {order.paymentStatus === 'PAID' ? 'Đã thanh toán' : 'Chưa thanh toán'}
+                    </span>
             </div>
         </div>
     );
