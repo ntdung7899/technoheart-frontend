@@ -42,9 +42,9 @@ export default function PayPage() {
         );
     }
 
-    // Tự động tạo mã QR chuẩn của ngân hàng (Số TK của bạn: STK - NGÂN HÀNG)
-    const qrUrl = `https://img.vietqr.io/image/MB-0328858159-compact2.png?amount=${amount}&addInfo=${code}&accountName=LE THANH CHIEN`;
-
+    // Khi deploy thực tế, thay số 0123456789 và NGUYEN VAN A bằng thông tin thật.
+    const qrUrl = `https://img.vietqr.io/image/MB-0123456789-compact2.png?amount=${amount}&addInfo=${code}&accountName=NGUYEN VAN A`;
+    
     return (
         <div className="min-h-screen bg-gray-50 flex flex-col items-center justify-center p-4">
             <div className="bg-white p-8 rounded-3xl shadow-xl max-w-md w-full border border-gray-100 transition-all duration-500">
@@ -63,7 +63,7 @@ export default function PayPage() {
                         <div className="space-y-3 mb-8 bg-gray-50 p-4 rounded-xl text-sm">
                             <div className="flex justify-between">
                                 <span className="text-gray-500">Số tài khoản:</span>
-                                <span className="font-semibold text-blue-600">0328858159 (MBBank)</span>
+                                <span className="font-semibold text-blue-600">0123456789 (MBBank)</span>
                             </div>
                             <div className="flex justify-between">
                                 <span className="text-gray-500">Số tiền:</span>
