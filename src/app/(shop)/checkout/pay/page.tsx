@@ -1,12 +1,13 @@
 "use client";
 
-import { useSearchParams } from "next/navigation";
+import { useSearchParams, useRouter } from "next/navigation";
 import Link from "next/link";
-import { useState, useEffect } from "react";
+import { useState, useEffect, Suspense } from "react";
 import { Loader2, CheckCircle2 } from "lucide-react";
 
-export default function PayPage() {
+function PayContent() {
     const searchParams = useSearchParams();
+    const router = useRouter();
     const code = searchParams.get("code");
     const amount = searchParams.get("amount");
 
@@ -22,9 +23,9 @@ export default function PayPage() {
                 const data = await res.json();
 
                 if (data.paymentStatus === "PAID") {
-                    setIsPaid(true); 
-                    setOrderId(data.orderId); 
-                    clearInterval(interval); 
+                    setIsPaid(true);
+                    setOrderId(data.orderId);
+                    clearInterval(interval);
                 }
             } catch (error) {
                 console.error("Lỗi kiểm tra trạng thái:", error);
@@ -42,13 +43,12 @@ export default function PayPage() {
         );
     }
 
-    // Khi deploy thực tế, thay số 0123456789 và NGUYEN VAN A bằng thông tin thật.
+    // Ghi chú: Đã thay đổi STK và Tên thành ví dụ để bảo mật khi push code.
     const qrUrl = `https://img.vietqr.io/image/MB-0123456789-compact2.png?amount=${amount}&addInfo=${code}&accountName=NGUYEN VAN A`;
-    
+
     return (
         <div className="min-h-screen bg-gray-50 flex flex-col items-center justify-center p-4">
             <div className="bg-white p-8 rounded-3xl shadow-xl max-w-md w-full border border-gray-100 transition-all duration-500">
-
                 {!isPaid ? (
                     <>
                         <div className="text-center mb-8">
@@ -87,7 +87,7 @@ export default function PayPage() {
                         </div>
                         <h1 className="text-3xl font-bold text-gray-900 mb-2">Thanh toán thành công!</h1>
                         <p className="text-gray-500 mb-8">Hệ thống đã xác nhận thanh toán. Cảm ơn bạn đã mua sắm.</p>
-
+                        
                         <Link 
                             href={orderId ? `/account/orders/${orderId}` : "/account/orders"}
                             className="w-full flex items-center justify-center bg-gray-900 text-white h-14 rounded-xl font-bold hover:bg-gray-800 transition-colors shadow-lg shadow-gray-900/20"
@@ -98,5 +98,18 @@ export default function PayPage() {
                 )}
             </div>
         </div>
+    );
+}
+
+// Bọc Component chính trong thẻ Suspense
+export default function PayPage() {
+    return (
+        <Suspense fallback={
+            <div className="min-h-screen flex items-center justify-center">
+                <Loader2 className="h-8 w-8 animate-spin text-primary" />
+            </div>
+        }>
+            <PayContent />
+        </Suspense>
     );
 }
