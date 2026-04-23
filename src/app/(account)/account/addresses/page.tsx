@@ -252,7 +252,7 @@ export default function AddressesPage() {
                         </div>
                     </div>
 
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                    {/* <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                         <div className="space-y-1">
                             <label className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
                                 Vĩ độ (Latitude)
@@ -279,7 +279,7 @@ export default function AddressesPage() {
                                 className="h-10 w-full rounded-xl border border-border/50 bg-secondary/30 px-3 text-sm focus:outline-none focus:ring-2 focus:ring-primary/20 placeholder:text-muted-foreground/50"
                             />
                         </div>
-                    </div>
+                    </div> */}
 
                     <label className="flex items-center gap-2 cursor-pointer">
                         <input

@@ -3,11 +3,13 @@
 
 import Link from 'next/link';
 import { useState } from 'react';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { Mail, Lock, Eye, EyeOff, ArrowRight, Github, Chrome, Heart, Loader2 } from 'lucide-react';
 
 export default function LoginPage() {
     const router = useRouter();
+    const searchParams = useSearchParams();
+    const callbackUrl = searchParams.get('callbackUrl');
     const [showPassword, setShowPassword] = useState(false);
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState('');
@@ -36,7 +38,7 @@ export default function LoginPage() {
             if (data.user?.role === 'ADMIN') {
                 router.push('/admin');
             } else {
-                router.push('/account');
+                router.push(callbackUrl || '/account');
             }
             router.refresh();
         } catch (error) {

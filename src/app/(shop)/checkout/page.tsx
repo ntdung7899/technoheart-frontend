@@ -4,10 +4,22 @@
 import { useCartStore } from "@/store/cart";
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
-import { Loader2, ArrowLeft, ShieldCheck, Truck, CreditCard, MapPin } from "lucide-react";
+import { Loader2, ArrowLeft, ShieldCheck, Truck, CreditCard, MapPin, CheckCircle2, Plus, PenLine } from "lucide-react";
 import Link from "next/link";
 import Image from "next/image";
 import { formatPrice } from "@/lib/utils";
+
+type SavedAddress = {
+    id: string;
+    name: string | null;
+    phone: string | null;
+    ward: string | null;
+    street: string;
+    city: string;
+    state: string | null;
+    label: string | null;
+    isDefault: boolean;
+};
 
 export default function CheckoutPage() {
     const { items, total, clearCart } = useCartStore();
@@ -21,6 +33,10 @@ export default function CheckoutPage() {
         city: "",
         referralCode: "",
     });
+    const [savedAddresses, setSavedAddresses] = useState<SavedAddress[]>([]);
+    const [selectedAddressId, setSelectedAddressId] = useState<string | null>(null);
+    const [useNewAddress, setUseNewAddress] = useState(false);
+
     const [provinces, setProvinces] = useState<any[]>([]);
     const [districts, setDistricts] = useState<any[]>([]);
     const [wards, setWards] = useState<any[]>([]);
@@ -29,6 +45,51 @@ export default function CheckoutPage() {
     const [selectedDistrict, setSelectedDistrict] = useState("");
     const [paymentMethod, setPaymentMethod] = useState("COD");
 
+    const applyAddress = (addr: SavedAddress) => {
+        setSelectedAddressId(addr.id);
+        setUseNewAddress(false);
+        setFormData(prev => ({
+            ...prev,
+            name: addr.name || prev.name,
+            phone: addr.phone || prev.phone,
+            street: addr.street,
+            ward: addr.ward || "",
+            city: [addr.state, addr.city].filter(Boolean).join(", "),
+        }));
+    };
+
+    useEffect(() => {
+        Promise.all([
+            fetch("/api/auth/me").then(r => r.ok ? r.json() : null),
+            fetch("/api/account/addresses").then(r => r.ok ? r.json() : null),
+        ]).then(([userData, addrData]) => {
+            const userName = userData?.user?.name || "";
+            const userPhone = userData?.user?.phone || "";
+
+            if (addrData?.addresses?.length > 0) {
+                setSavedAddresses(addrData.addresses);
+                const def: SavedAddress = addrData.addresses.find((a: SavedAddress) => a.isDefault) ?? addrData.addresses[0];
+                setSelectedAddressId(def.id);
+                setUseNewAddress(false);
+                setFormData(prev => ({
+                    ...prev,
+                    name: def.name || userName,
+                    phone: def.phone || userPhone,
+                    street: def.street,
+                    ward: def.ward || "",
+                    city: [def.state, def.city].filter(Boolean).join(", "),
+                }));
+            } else {
+                setUseNewAddress(true);
+                setFormData(prev => ({
+                    ...prev,
+                    name: prev.name || userName,
+                    phone: prev.phone || userPhone,
+                }));
+            }
+        }).catch(() => setUseNewAddress(true));
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, []);
 
     useEffect(() => {
     fetch("https://provinces.open-api.vn/api/p/")
@@ -159,6 +220,49 @@ export default function CheckoutPage() {
                         </div>
 
                         <form onSubmit={handleSubmit} className="space-y-6">
+
+                            {/* Saved addresses */}
+                            {savedAddresses.length > 0 && (
+                                <div className="space-y-3">
+                                    {savedAddresses.map((addr) => {
+                                        const isSelected = selectedAddressId === addr.id && !useNewAddress;
+                                        return (
+                                            <div
+                                                key={addr.id}
+                                                onClick={() => applyAddress(addr)}
+                                                className={`relative p-4 rounded-xl border-2 cursor-pointer transition-all ${isSelected ? "border-primary bg-primary/5" : "border-border/50 hover:border-primary/40"}`}
+                                            >
+                                                <div className="flex items-start justify-between gap-3">
+                                                    <div className="flex items-start gap-3">
+                                                        <MapPin className={`h-4 w-4 mt-0.5 shrink-0 ${isSelected ? "text-primary" : "text-muted-foreground"}`} />
+                                                        <div>
+                                                            {addr.label && (
+                                                                <span className="text-xs font-bold uppercase tracking-wider text-muted-foreground">{addr.label}</span>
+                                                            )}
+                                                            <p className="text-sm font-semibold">{addr.name || "—"} · {addr.phone || "—"}</p>
+                                                            <p className="text-sm text-muted-foreground">
+                                                                {[addr.street, addr.ward, addr.state, addr.city].filter(Boolean).join(", ")}
+                                                            </p>
+                                                        </div>
+                                                    </div>
+                                                    {isSelected && <CheckCircle2 className="h-5 w-5 text-primary shrink-0" />}
+                                                    {addr.isDefault && !isSelected && (
+                                                        <span className="text-xs font-semibold text-primary bg-primary/10 px-2 py-0.5 rounded-full shrink-0">Mặc định</span>
+                                                    )}
+                                                </div>
+                                            </div>
+                                        );
+                                    })}
+                                    <button
+                                        type="button"
+                                        onClick={() => { setUseNewAddress(true); setSelectedAddressId(null); }}
+                                        className={`w-full p-4 rounded-xl border-2 border-dashed flex items-center justify-center gap-2 text-sm font-semibold transition-all ${useNewAddress ? "border-primary text-primary bg-primary/5" : "border-border/50 text-muted-foreground hover:border-primary/40 hover:text-primary"}`}
+                                    >
+                                        <Plus className="h-4 w-4" /> Dùng địa chỉ khác
+                                    </button>
+                                </div>
+                            )}
+
                             <div className="space-y-4 relative z-10">
                                     {/* Hàng 1: Tên & SĐT */}
                                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -176,71 +280,89 @@ export default function CheckoutPage() {
                                         </div>
                                     </div>
 
-                                    {/* Hàng 2: Địa chỉ cụ thể */}
-                                    <div className="space-y-2">
-                                        <label className="text-xs font-semibold uppercase tracking-wider text-muted-foreground ml-1">Địa chỉ cụ thể (Số nhà, đường)</label>
-                                        <input type="text" name="street" required placeholder="Số nhà, tên đường..."
-                                            className="h-12 w-full rounded-xl border border-border/50 bg-secondary/30 px-4 text-sm focus:outline-none focus:ring-2 focus:ring-primary/20 transition-all"
-                                            value={formData.street} onChange={handleChange} />
-                                    </div>
-
-                                    {/* Hàng 3: Phường & TP */}
-                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                        <div className="space-y-2">
-                                            <label className="text-xs font-semibold uppercase tracking-wider text-muted-foreground ml-1">Tỉnh / Thành phố</label>
-                                            <select 
-                                                required
-                                                className="h-12 w-full rounded-xl border border-border/50 bg-secondary/30 px-4 text-sm focus:outline-none focus:ring-2 focus:ring-primary/20 transition-all appearance-none"
-                                                onChange={(e) => {
-                                                    setSelectedProvince(e.target.value);
-                                                    const name = provinces.find(p => p.code == e.target.value)?.name;
-                                                    setFormData({ ...formData, city: name || "" });
-                                                }}
+                                    {/* Saved address: read-only display */}
+                                    {!useNewAddress && selectedAddressId ? (
+                                        <div className="p-4 rounded-xl bg-secondary/30 border border-border/50 flex items-center gap-3">
+                                            <MapPin className="h-4 w-4 text-muted-foreground shrink-0" />
+                                            <p className="text-sm text-foreground">
+                                                {formData.street}{formData.ward ? `, ${formData.ward}` : ""}{formData.city ? `, ${formData.city}` : ""}
+                                            </p>
+                                            <button
+                                                type="button"
+                                                onClick={() => { setUseNewAddress(true); setSelectedAddressId(null); }}
+                                                className="ml-auto flex items-center gap-1 text-xs font-semibold text-primary hover:underline shrink-0"
                                             >
-                                                <option value="">Chọn Tỉnh/Thành phố</option>
-                                                {provinces.map((p) => (
-                                                    <option key={p.code} value={p.code}>{p.name}</option>
-                                                ))}
-                                            </select>
+                                                <PenLine className="h-3.5 w-3.5" /> Sửa
+                                            </button>
                                         </div>
-                                        <div className="space-y-2">
-                                            <label className="text-xs font-semibold uppercase tracking-wider text-muted-foreground ml-1">Quận / Huyện</label>
-                                            <select 
-                                                required
-                                                disabled={!selectedProvince}
-                                                className="h-12 w-full rounded-xl border border-border/50 bg-secondary/30 px-4 text-sm focus:outline-none focus:ring-2 focus:ring-primary/20 transition-all appearance-none disabled:opacity-50"
-                                                onChange={(e) => {
-                                                    setSelectedDistrict(e.target.value);
-                                                    // Bạn có thể lưu tên quận vào formData nếu DB yêu cầu
-                                                }}
-                                            >
-                                                <option value="">Chọn Quận/Huyện</option>
-                                                {districts.map((d) => (
-                                                    <option key={d.code} value={d.code}>{d.name}</option>
-                                                ))}
-                                            </select>
-                                        </div>
-                                    </div>
+                                    ) : (
+                                        <>
+                                            {/* Hàng 2: Địa chỉ cụ thể */}
+                                            <div className="space-y-2">
+                                                <label className="text-xs font-semibold uppercase tracking-wider text-muted-foreground ml-1">Địa chỉ cụ thể (Số nhà, đường)</label>
+                                                <input type="text" name="street" required placeholder="Số nhà, tên đường..."
+                                                    className="h-12 w-full rounded-xl border border-border/50 bg-secondary/30 px-4 text-sm focus:outline-none focus:ring-2 focus:ring-primary/20 transition-all"
+                                                    value={formData.street} onChange={handleChange} />
+                                            </div>
 
-                                    {/* Hàng 4: Phường/Xã */}
-                                    <div className="space-y-2">
-                                        <label className="text-xs font-semibold uppercase tracking-wider text-muted-foreground ml-1">Phường / Xã</label>
-                                        <select 
-                                            required
-                                            disabled={!selectedDistrict}
-                                            className="h-12 w-full rounded-xl border border-border/50 bg-secondary/30 px-4 text-sm focus:outline-none focus:ring-2 focus:ring-primary/20 transition-all appearance-none disabled:opacity-50"
-                                            onChange={(e) => {
-                                                const name = wards.find(w => w.code == e.target.value)?.name;
-                                                setFormData({ ...formData, ward: name || "" });
-                                            }}
-                                        >
-                                            <option value="">Chọn Phường/Xã</option>
-                                            {wards.map((w) => (
-                                                <option key={w.code} value={w.code}>{w.name}</option>
-                                            ))}
-                                        </select>
-                                    </div>
-                                </div>    
+                                            {/* Hàng 3: Tỉnh & Quận */}
+                                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                                <div className="space-y-2">
+                                                    <label className="text-xs font-semibold uppercase tracking-wider text-muted-foreground ml-1">Tỉnh / Thành phố</label>
+                                                    <select
+                                                        required
+                                                        className="h-12 w-full rounded-xl border border-border/50 bg-secondary/30 px-4 text-sm focus:outline-none focus:ring-2 focus:ring-primary/20 transition-all appearance-none"
+                                                        onChange={(e) => {
+                                                            setSelectedProvince(e.target.value);
+                                                            const name = provinces.find(p => p.code == e.target.value)?.name;
+                                                            setFormData({ ...formData, city: name || "" });
+                                                        }}
+                                                    >
+                                                        <option value="">Chọn Tỉnh/Thành phố</option>
+                                                        {provinces.map((p) => (
+                                                            <option key={p.code} value={p.code}>{p.name}</option>
+                                                        ))}
+                                                    </select>
+                                                </div>
+                                                <div className="space-y-2">
+                                                    <label className="text-xs font-semibold uppercase tracking-wider text-muted-foreground ml-1">Quận / Huyện</label>
+                                                    <select
+                                                        required
+                                                        disabled={!selectedProvince}
+                                                        className="h-12 w-full rounded-xl border border-border/50 bg-secondary/30 px-4 text-sm focus:outline-none focus:ring-2 focus:ring-primary/20 transition-all appearance-none disabled:opacity-50"
+                                                        onChange={(e) => {
+                                                            setSelectedDistrict(e.target.value);
+                                                        }}
+                                                    >
+                                                        <option value="">Chọn Quận/Huyện</option>
+                                                        {districts.map((d) => (
+                                                            <option key={d.code} value={d.code}>{d.name}</option>
+                                                        ))}
+                                                    </select>
+                                                </div>
+                                            </div>
+
+                                            {/* Hàng 4: Phường/Xã */}
+                                            <div className="space-y-2">
+                                                <label className="text-xs font-semibold uppercase tracking-wider text-muted-foreground ml-1">Phường / Xã</label>
+                                                <select
+                                                    required
+                                                    disabled={!selectedDistrict}
+                                                    className="h-12 w-full rounded-xl border border-border/50 bg-secondary/30 px-4 text-sm focus:outline-none focus:ring-2 focus:ring-primary/20 transition-all appearance-none disabled:opacity-50"
+                                                    onChange={(e) => {
+                                                        const name = wards.find(w => w.code == e.target.value)?.name;
+                                                        setFormData({ ...formData, ward: name || "" });
+                                                    }}
+                                                >
+                                                    <option value="">Chọn Phường/Xã</option>
+                                                    {wards.map((w) => (
+                                                        <option key={w.code} value={w.code}>{w.name}</option>
+                                                    ))}
+                                                </select>
+                                            </div>
+                                        </>
+                                    )}
+                                </div>
 
                             {/* Referral Code */}
                             <div className="space-y-2 pt-4">

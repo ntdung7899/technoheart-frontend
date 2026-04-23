@@ -4,6 +4,7 @@
 import { useCartStore } from "@/store/cart";
 import Link from "next/link";
 import Image from "next/image";
+import { useRouter } from "next/navigation";
 import { Trash2, Plus, Minus, ArrowRight, ShoppingBag, Truck, ShieldCheck, RefreshCcw } from "lucide-react";
 import { useEffect, useState } from "react";
 import { formatPrice } from "@/lib/utils";
@@ -12,6 +13,16 @@ import { formatPrice } from "@/lib/utils";
 export function CartClient() {
     const { items, removeItem, updateQuantity, total } = useCartStore();
     const [mounted, setMounted] = useState(false);
+    const router = useRouter();
+
+    const handleCheckout = async () => {
+        const res = await fetch("/api/auth/me");
+        if (res.ok) {
+            router.push("/checkout");
+        } else {
+            router.push("/login?callbackUrl=/checkout");
+        }
+    };
 
     useEffect(() => {
         setMounted(true);
@@ -160,13 +171,13 @@ export function CartClient() {
                             </div>
                         </div>
 
-                        <Link
-                            href="/checkout"
+                        <button
+                            onClick={handleCheckout}
                             className="w-full h-14 mt-4 inline-flex items-center justify-center rounded-xl bg-primary px-8 text-base font-semibold text-primary-foreground shadow-lg shadow-primary/20 transition-all hover:scale-[1.02] active:scale-95 group"
                         >
                             Tiến hành thanh toán
                             <ArrowRight className="ml-2 h-5 w-5 transition-transform group-hover:translate-x-1" />
-                        </Link>
+                        </button>
                     </div>
                 </div>
 
