@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { Wallet, ArrowRightLeft, Loader2, AlertCircle, X, CreditCard, CheckCircle2, PlusCircle } from "lucide-react";
+import { Wallet, ArrowRightLeft, Loader2, AlertCircle, X, CreditCard, CheckCircle2, PlusCircle, Info } from "lucide-react";
 import { PV_RATE } from "./constants"; 
 
 interface WithdrawalCardProps {
@@ -89,6 +89,11 @@ export function WithdrawalCard({ balance, loading, onWithdraw, lastBankInfo }: W
                         </div>
 
                         <div className="p-5 space-y-4">
+                            <div className="flex gap-2 p-3 bg-blue-50 dark:bg-blue-950/30 text-blue-700 dark:text-blue-400 rounded-lg text-xs leading-relaxed">
+                                <Info className="h-4 w-4 shrink-0 mt-0.5" />
+                                <p>Số dư khả dụng này là số tiền thực nhận <strong>sau khi đã khấu trừ 10% Thuế TNCN</strong> từ tổng hoa hồng của bạn.</p>
+                            </div>
+
                             <div className="space-y-1.5">
                                 <label className="text-sm font-medium">Số PV cần rút <span className="text-red-500">*</span></label>
                                 <div className="relative">

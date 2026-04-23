@@ -27,11 +27,6 @@ const REFERRAL_COMMISSION_RATES: Record<string, CommissionRates> = {
     BA: { f1Rate: 0.05, f2Rate: 0 },        // 5% F1
     VIP: { f1Rate: 0.08, f2Rate: 0.03 },    // 8% F1, 3% F2
     VVIP: { f1Rate: 0.10, f2Rate: 0.035 },  // 10% F1, 3.5% F2
-    L1: { f1Rate: 0.10, f2Rate: 0.035 },
-    L2: { f1Rate: 0.10, f2Rate: 0.035 },
-    L3: { f1Rate: 0.10, f2Rate: 0.035 },
-    L4: { f1Rate: 0.10, f2Rate: 0.035 },
-    L5: { f1Rate: 0.10, f2Rate: 0.035 },
 };
 
 // ========== MODULE 2-3: Thưởng thành tích & Cấp cao ==========
@@ -45,12 +40,17 @@ const ACHIEVEMENT_BONUSES: Record<string, AchievementBonus> = {
 };
 
 // Điều kiện thăng hạng L1-L5: cần rank cơ sở + PV nhóm tối thiểu
-const RANK_REQUIREMENTS: Record<string, { baseRank: "VIP" | "VVIP"; minTeamPV: number }> = {
-    L1: { baseRank: "VIP", minTeamPV: 20000 },      // VIP + nhóm ≥ 20.000 PV
-    L2: { baseRank: "VIP", minTeamPV: 60000 },      // VIP + nhóm ≥ 60.000 PV
-    L3: { baseRank: "VVIP", minTeamPV: 170000 },    // VVIP + nhóm ≥ 170.000 PV
-    L4: { baseRank: "VVIP", minTeamPV: 600000 },    // VVIP + nhóm ≥ 600.000 PV
-    L5: { baseRank: "VVIP", minTeamPV: 2000000 },   // VVIP + nhóm ≥ 2.000.000 PV
+const RANK_REQUIREMENTS: Record<string, { 
+    baseRank: "VIP" | "VVIP"; 
+    minTeamPV: number;
+    requiredLegRank?: AffiliateRank; 
+    requiredLegCount?: number;
+}> = {
+    L1: { baseRank: "VIP", minTeamPV: 20000 }, 
+    L2: { baseRank: "VVIP", minTeamPV: 60000, requiredLegRank: "L1", requiredLegCount: 2 },
+    L3: { baseRank: "VVIP", minTeamPV: 170000, requiredLegRank: "L2", requiredLegCount: 3 },
+    L4: { baseRank: "VVIP", minTeamPV: 600000, requiredLegRank: "L3", requiredLegCount: 3 },
+    L5: { baseRank: "VVIP", minTeamPV: 2000000, requiredLegRank: "L4", requiredLegCount: 3 },
 };
 
 // Thu nhập đồng cấp: 20% thu nhập F1 cùng cấp
@@ -70,8 +70,7 @@ export const RANK_INFO: Record<string, {
     VIP: { label: "VIP", minPersonalPV: 500, minTeamPV: 0, baseRank: null, description: "VIP Partner", color: "#3b82f6" },
     VVIP: { label: "VVIP", minPersonalPV: 1000, minTeamPV: 0, baseRank: null, description: "VVIP Partner", color: "#8b5cf6" },
     L1: { label: "L1", minPersonalPV: 500, minTeamPV: 20000, baseRank: "VIP", description: "Đại diện kinh doanh", color: "#10b981" },
-    L2: { label: "L2", minPersonalPV: 500, minTeamPV: 60000, baseRank: "VIP", description: "Giám đốc khu vực", color: "#f59e0b" },
-    L3: { label: "L3", minPersonalPV: 1000, minTeamPV: 170000, baseRank: "VVIP", description: "Giám đốc vùng", color: "#ef4444" },
+    L2: { label: "L2", minPersonalPV: 1000, minTeamPV: 60000, baseRank: "VVIP", description: "Giám đốc khu vực", color: "#f59e0b" },    L3: { label: "L3", minPersonalPV: 1000, minTeamPV: 170000, baseRank: "VVIP", description: "Giám đốc vùng", color: "#ef4444" },
     L4: { label: "L4", minPersonalPV: 1000, minTeamPV: 600000, baseRank: "VVIP", description: "Đại sứ TH quốc gia", color: "#ec4899" },
     L5: { label: "L5", minPersonalPV: 1000, minTeamPV: 2000000, baseRank: "VVIP", description: "Đại sứ TH toàn cầu", color: "#6366f1" },
 };
@@ -89,30 +88,78 @@ export function getBaseRankFromPV(personalPV: number): "BA" | "VIP" | "VVIP" {
  * Determine full rank including L1-L5 (Module 2-3)
  * Checks base rank requirement + team PV threshold
  */
-export function getFullRank(personalPV: number, teamPV: number): AffiliateRank {
+export async function getFullRank(
+    userId: string, 
+    personalPV: number, 
+    teamPV: number
+): Promise<AffiliateRank> {
     const baseRank = getBaseRankFromPV(personalPV);
     const baseRankOrder = { BA: 0, VIP: 1, VVIP: 2 };
 
-    // Check L levels from highest to lowest
     const levels: AffiliateRank[] = ["L5", "L4", "L3", "L2", "L1"];
+
     for (const level of levels) {
         const req = RANK_REQUIREMENTS[level];
-        if (
+        
+        // 1. Kiểm tra PV Cá nhân và PV Nhóm
+        const meetsPVRequirements = 
             baseRankOrder[baseRank] >= baseRankOrder[req.baseRank] &&
-            teamPV >= req.minTeamPV
-        ) {
-            return level;
+            teamPV >= req.minTeamPV;
+
+        if (meetsPVRequirements) {
+            // 2. Nếu cấp này có yêu cầu nhánh, tiến hành đếm F1
+            if (req.requiredLegRank && req.requiredLegCount) {
+                const f1Referrals = await prisma.referral.findMany({
+                    where: {
+                        referrerId: userId,
+                        level: 1, 
+                    },
+                    select: {
+                        refereeId: true,
+                    },
+                });
+
+                // Trích xuất mảng các refereeId (ID của F1)
+                const f1UserIds = f1Referrals.map(r => r.refereeId);
+
+                // Bước 2: Đếm xem trong số các F1 đó, có bao nhiêu người đạt cấp bậc yêu cầu
+                let qualifiedLegsCount = 0;
+                
+                if (f1UserIds.length > 0) {
+                    qualifiedLegsCount = await prisma.affiliateProfile.count({
+                        where: {
+                            userId: { in: f1UserIds },
+                            rank: {
+                                in: getHigherOrEqualRanks(req.requiredLegRank) 
+                            }
+                        }
+                    });
+                }
+                if (qualifiedLegsCount >= req.requiredLegCount) {
+                    return level; // Đủ PV + Đủ nhánh -> Thăng cấp
+                }
+                // Nếu đủ PV nhưng KHÔNG đủ nhánh, vòng lặp sẽ tiếp tục xét cấp thấp hơn (L thấp hơn)
+            } else {
+                return level; // Nếu cấp này (như L1) không yêu cầu nhánh -> Thăng cấp luôn
+            }
         }
     }
 
-    return baseRank;
+    return baseRank; // Nếu rớt hết các cấp L, trả về cấp cơ sở (BA/VIP/VVIP)
+}
+function getHigherOrEqualRanks(minRank: AffiliateRank): AffiliateRank[] {
+    const hierarchy = ["BA", "VIP", "VVIP", "L1", "L2", "L3", "L4", "L5"];
+    const startIndex = hierarchy.indexOf(minRank);
+    if (startIndex === -1) return [];
+    return hierarchy.slice(startIndex) as AffiliateRank[];
 }
 
 /**
  * Get commission rates for referral commissions based on rank
  */
-export function getCommissionRates(rank: string): CommissionRates {
-    return REFERRAL_COMMISSION_RATES[rank] || REFERRAL_COMMISSION_RATES.BA;
+export function getCommissionRates(personalPV: number): CommissionRates {
+    const baseRank = getBaseRankFromPV(personalPV); // Tự quét xem PV này là BA, VIP hay VVIP
+    return REFERRAL_COMMISSION_RATES[baseRank] || REFERRAL_COMMISSION_RATES.BA;
 }
 
 /**
@@ -185,7 +232,7 @@ export async function calculateCommissions(orderId: string): Promise<number> {
     });
     if (buyerProfile) {
         const newPersonalPV = buyerProfile.personalPV + orderPV;
-        const newRank = getFullRank(newPersonalPV, buyerProfile.teamPV);
+        const newRank = await getFullRank(buyerProfile.userId, newPersonalPV, buyerProfile.teamPV); // ĐÃ SỬA
         await prisma.affiliateProfile.update({
             where: { id: buyerProfile.id },
             data: { personalPV: newPersonalPV, rank: newRank },
@@ -205,7 +252,7 @@ export async function calculateCommissions(orderId: string): Promise<number> {
         });
 
         if (f1Profile) {
-            const rates = getCommissionRates(f1Profile.rank);
+            const rates = getCommissionRates(f1Profile.personalPV);
             if (rates.f1Rate > 0) {
                 const f1Amount = orderTotal * rates.f1Rate;
                 commissionsToCreate.push({
@@ -214,7 +261,7 @@ export async function calculateCommissions(orderId: string): Promise<number> {
                 });
 
                 const newTeamPV = f1Profile.teamPV + orderPV;
-                const newRank = getFullRank(f1Profile.personalPV, newTeamPV);
+                const newRank = await getFullRank(f1Profile.userId, f1Profile.personalPV, newTeamPV);
                 await prisma.affiliateProfile.update({
                     where: { id: f1Profile.id },
                     data: {
@@ -249,7 +296,7 @@ export async function calculateCommissions(orderId: string): Promise<number> {
                 });
 
                 if (f2Profile) {
-                    const f2Rates = getCommissionRates(f2Profile.rank);
+                    const f2Rates = getCommissionRates(f2Profile.personalPV);
                     if (f2Rates.f2Rate > 0) {
                         const f2Amount = orderTotal * f2Rates.f2Rate;
                         commissionsToCreate.push({
@@ -258,7 +305,7 @@ export async function calculateCommissions(orderId: string): Promise<number> {
                         });
 
                         const newTeamPV = f2Profile.teamPV + orderPV;
-                        const newRank = getFullRank(f2Profile.personalPV, newTeamPV);
+                        const newRank = await getFullRank(f2Profile.userId, f2Profile.personalPV, newTeamPV); // ĐÃ SỬA
                         await prisma.affiliateProfile.update({
                             where: { id: f2Profile.id },
                             data: {

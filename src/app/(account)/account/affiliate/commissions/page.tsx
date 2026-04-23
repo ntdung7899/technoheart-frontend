@@ -72,6 +72,14 @@ export default function CommissionsPage() {
         );
     }
 
+    const displayTotalApproved = data
+        ? (startDate || endDate)
+            ? data.commissions
+                  .filter((c) => c.status === "APPROVED")
+                  .reduce((sum, c) => sum + c.amount, 0)
+            : data.summary.totalApproved
+        : 0;
+
     return (
         <div className="space-y-6">
             <div className="flex items-center gap-3">
@@ -95,7 +103,8 @@ export default function CommissionsPage() {
                         <p className="text-xs text-muted-foreground mt-1">Đang chờ</p>
                     </div>
                     <div className="rounded-2xl border border-border/40 bg-card/50 p-4 text-center">
-                        <p className="text-lg font-bold text-blue-600">{formatPrice(data.summary.totalApproved)}</p>
+                        {/* THAY ĐỔI Ở ĐÂY: Sử dụng biến displayTotalApproved thay vì data.summary.totalApproved */}
+                        <p className="text-lg font-bold text-blue-600">{formatPrice(displayTotalApproved)}</p>
                         <p className="text-xs text-muted-foreground mt-1">Đã duyệt</p>
                     </div>
                     <div className="rounded-2xl border border-border/40 bg-card/50 p-4 text-center">

@@ -170,12 +170,17 @@ export default async function OrderDetailPage({ params }: { params: Promise<{ id
                                     {new Date(order.createdAt).toLocaleDateString('vi-VN', { day: '2-digit', month: '2-digit', year: 'numeric' })}
                                 </span>
                             </div>
-                            <div className="flex items-center justify-between text-sm">
+                           <div className="flex items-center justify-between text-sm border-t border-slate-100 pt-3 mt-3">
                                 <span className="text-zinc-500 font-medium">Thanh toán</span>
-                                <span className="font-bold text-zinc-900 flex items-center gap-1.5">
-                                    <CreditCard className="h-3.5 w-3.5 text-zinc-400" />
-                                    COD
-                                </span>
+                                <div className="flex flex-col items-end gap-1">
+                                    <span className="font-bold text-zinc-900 flex items-center gap-1.5">
+                                        <CreditCard className="h-3.5 w-3.5 text-zinc-400" />
+                                        {order.transactionId ? 'Chuyển khoản' : 'COD'}
+                                    </span>
+                                    <span className={`text-[10px] px-2 py-0.5 rounded-full font-bold tracking-wide uppercase ${order.paymentStatus === 'PAID' ? 'bg-green-100 text-green-700' : 'bg-amber-100 text-amber-700'}`}>
+                                        {order.paymentStatus === 'PAID' ? 'Đã thanh toán' : 'Chưa thanh toán'}
+                                    </span>
+                                </div>
                             </div>
                         </div>
                     </div>

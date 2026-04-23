@@ -64,6 +64,8 @@ model Order {
   total        Decimal
   status       OrderStatus  @default(PENDING)
   paymentStatus PaymentStatus @default(UNPAID)
+  paymentMethod String   @default("COD")
+  transactionId String?
   addressId    String
   referralCode String?
   createdAt    DateTime     @default(now())
