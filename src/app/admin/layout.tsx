@@ -3,6 +3,7 @@
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
 import { useState, useEffect } from 'react';
+import { getCurrentUser, logout } from "@/lib/api/auth";
 import {
     Package,
     ShoppingBag,
@@ -64,25 +65,71 @@ export default function AdminLayout({
     };
 
     useEffect(() => {
-        fetch('/api/auth/me')
-            .then(res => res.json())
-            .then(data => {
-                if (data.user?.role === 'ADMIN') {
-                    setAuthState('authorized');
-                } else {
-                    setAuthState('unauthorized');
-                    router.replace('/login');
+        let mounted = true;
+
+        async function checkAdmin() {
+            try {
+                const token = localStorage.getItem("technoheart_token");
+
+                if (!token) {
+                    if (mounted) setAuthState("unauthorized");
+                    router.replace("/login");
+                    return;
                 }
-            })
-            .catch(() => {
-                setAuthState('unauthorized');
-                router.replace('/login');
-            });
+
+                const user = await getCurrentUser();
+
+                if (!user) {
+                    if (mounted) setAuthState("unauthorized");
+                    router.replace("/login");
+                    return;
+                }
+
+                const role = String(user.role || "").toUpperCase();
+                const roles = Array.isArray(user.roles)
+                    ? user.roles.map((item) => String(item).toUpperCase())
+                    : [];
+
+                const isAdmin =
+                    role === "ADMIN" ||
+                    role === "OWNER" ||
+                    role === "SUPER_ADMIN" ||
+                    roles.includes("ADMIN") ||
+                    roles.includes("OWNER") ||
+                    roles.includes("SUPER_ADMIN");
+
+                if (!isAdmin) {
+                    if (mounted) setAuthState("unauthorized");
+                    router.replace("/account");
+                    return;
+                }
+
+                if (mounted) {
+                    setAuthState("authorized");
+                }
+            } catch (error) {
+                console.error("CHECK_ADMIN_AUTH_ERROR:", error);
+
+                if (mounted) {
+                    setAuthState("unauthorized");
+                }
+
+                router.replace("/login");
+            }
+        }
+
+        checkAdmin();
+
+        return () => {
+            mounted = false;
+        };
     }, [router]);
 
     const handleLogout = async () => {
-        await fetch('/api/auth/logout', { method: 'POST' });
-        router.replace('/login');
+        await logout();
+
+        router.replace("/login");
+        router.refresh();
     };
 
     useEffect(() => {

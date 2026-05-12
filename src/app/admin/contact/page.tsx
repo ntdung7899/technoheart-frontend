@@ -9,6 +9,13 @@ import {
     MailOpen, MailCheck, ExternalLink, Inbox, Clock,
     ArrowUpRight, Reply
 } from "lucide-react";
+import {
+    getAdminContactInfo,
+    updateAdminContactInfo,
+    getAdminContactMessages,
+    updateAdminContactMessage,
+    deleteAdminContactMessage,
+} from "@/lib/api/admin-contact";
 
 interface ContactInfo {
     id: string;
@@ -42,16 +49,54 @@ export default function AdminContactPage() {
     const [filterRead, setFilterRead] = useState<"all" | "unread" | "read">("all");
 
     useEffect(() => {
-        fetch("/api/contact-info")
-            .then(r => { if (!r.ok) throw new Error(r.statusText); return r.json(); })
-            .then(d => { setInfo(d); })
-            .catch(() => {})
-            .finally(() => setLoadingInfo(false));
-        fetch("/api/contact")
-            .then(r => { if (!r.ok) throw new Error(r.statusText); return r.json(); })
-            .then(d => { setMessages(Array.isArray(d) ? d : []); })
-            .catch(() => {})
-            .finally(() => setLoadingMsg(false));
+        let mounted = true;
+
+        async function loadContactInfo() {
+            try {
+                const data = await getAdminContactInfo();
+
+                if (mounted) {
+                    setInfo(data);
+                }
+            } catch (error) {
+                console.warn("LOAD_ADMIN_CONTACT_INFO_FAILED:", error);
+
+                if (mounted) {
+                    setInfo(null);
+                }
+            } finally {
+                if (mounted) {
+                    setLoadingInfo(false);
+                }
+            }
+        }
+
+        async function loadMessages() {
+            try {
+                const data = await getAdminContactMessages();
+
+                if (mounted) {
+                    setMessages(Array.isArray(data) ? data : []);
+                }
+            } catch (error) {
+                console.warn("LOAD_ADMIN_CONTACT_MESSAGES_FAILED:", error);
+
+                if (mounted) {
+                    setMessages([]);
+                }
+            } finally {
+                if (mounted) {
+                    setLoadingMsg(false);
+                }
+            }
+        }
+
+        loadContactInfo();
+        loadMessages();
+
+        return () => {
+            mounted = false;
+        };
     }, []);
 
     const setField = (key: keyof ContactInfo, val: string) => {
@@ -60,31 +105,75 @@ export default function AdminContactPage() {
 
     const handleSave = async () => {
         if (!info) return;
+
         setSaving(true);
-        await fetch("/api/contact-info", {
-            method: "PATCH",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify(info),
-        });
-        setSaving(false);
-        setSaved(true);
-        setTimeout(() => setSaved(false), 2500);
+
+        try {
+            const updated = await updateAdminContactInfo(info);
+
+            setInfo(updated);
+            setSaved(true);
+            setTimeout(() => setSaved(false), 2500);
+        } catch (error) {
+            console.warn("UPDATE_ADMIN_CONTACT_INFO_FAILED:", error);
+
+            alert(
+                error instanceof Error
+                    ? error.message
+                    : "Không thể lưu thông tin liên hệ"
+            );
+        } finally {
+            setSaving(false);
+        }
     };
 
     const toggleRead = async (msg: Message) => {
-        const updated = { ...msg, read: !msg.read };
-        setMessages(prev => prev.map(m => m.id === msg.id ? updated : m));
-        await fetch(`/api/contact/${msg.id}`, {
-            method: "PATCH",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ read: !msg.read }),
-        });
+        const nextRead = !msg.read;
+        const updated = { ...msg, read: nextRead };
+
+        setMessages((prev) =>
+            prev.map((m) => (m.id === msg.id ? updated : m))
+        );
+
+        try {
+            await updateAdminContactMessage(msg.id, {
+                read: nextRead,
+            });
+        } catch (error) {
+            console.warn("UPDATE_ADMIN_CONTACT_MESSAGE_FAILED:", error);
+
+            setMessages((prev) =>
+                prev.map((m) => (m.id === msg.id ? msg : m))
+            );
+
+            alert(
+                error instanceof Error
+                    ? error.message
+                    : "Không thể cập nhật trạng thái tin nhắn"
+            );
+        }
     };
 
     const deleteMsg = async (id: string) => {
         if (!confirm("Xoá tin nhắn này?")) return;
-        setMessages(prev => prev.filter(m => m.id !== id));
-        await fetch(`/api/contact/${id}`, { method: "DELETE" });
+
+        const oldMessages = messages;
+
+        setMessages((prev) => prev.filter((m) => m.id !== id));
+
+        try {
+            await deleteAdminContactMessage(id);
+        } catch (error) {
+            console.warn("DELETE_ADMIN_CONTACT_MESSAGE_FAILED:", error);
+
+            setMessages(oldMessages);
+
+            alert(
+                error instanceof Error
+                    ? error.message
+                    : "Không thể xoá tin nhắn"
+            );
+        }
     };
 
     const filtered = messages.filter(m => {

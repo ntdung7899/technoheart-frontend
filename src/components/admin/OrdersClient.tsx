@@ -6,6 +6,8 @@ import {
     Eye, Search, ShoppingBag, MoreHorizontal,
     Check, ChevronDown, Loader2, RefreshCw, Truck, Package, Ban, DollarSign
 } from "lucide-react";
+// import { updateOrderStatus } from "@/lib/api/orders";
+import { updateAdminOrder } from "@/lib/api/admin-orders";
 
 const DELIVERY_OPTIONS = [
     { value: 'PENDING', label: 'Chờ xử lý', color: 'orange', icon: Package },
@@ -67,34 +69,47 @@ export default function AdminOrdersClient({ initialOrders }: { initialOrders: Or
         return () => document.removeEventListener("mousedown", handler);
     }, []);
 
-    const handleStatusChange = async (orderId: string, type: 'delivery' | 'payment', newValue: string) => {
+    const handleStatusChange = async (
+        orderId: string,
+        type: "delivery" | "payment",
+        newValue: string
+    ) => {
         setLoading(orderId);
         setMenuOpen(null);
         setStatusMenuMode(null);
-        try {
-            const bodyData = type === 'delivery' 
-                ? { status: newValue } 
-                : { paymentStatus: newValue };
 
-            const res = await fetch(`/api/orders/${orderId}`, {
-                method: "PATCH",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify(bodyData),
-            });
-            if (res.ok) {
-                setOrders(prev => prev.map(o => {
+        try {
+            const bodyData =
+                type === "delivery"
+                    ? { status: newValue }
+                    : { paymentStatus: newValue };
+
+            await updateAdminOrder(orderId, bodyData);
+
+            setOrders((prev) =>
+                prev.map((o) => {
                     if (o.id === orderId) {
-                        return type === 'delivery' ? { ...o, status: newValue } : { ...o, paymentStatus: newValue };
+                        return type === "delivery"
+                            ? { ...o, status: newValue }
+                            : { ...o, paymentStatus: newValue };
                     }
+
                     return o;
-                }));
-            }
-        } catch (e) {
-            console.error(e);
+                })
+            );
+        } catch (error) {
+            console.error("UPDATE_ADMIN_ORDER_ERROR:", error);
+
+            alert(
+                error instanceof Error
+                    ? error.message
+                    : "Không thể cập nhật trạng thái đơn hàng."
+            );
         } finally {
             setLoading(null);
         }
     };
+    
 
     const filtered = orders.filter(o => {
         const query = searchQuery.toLowerCase();

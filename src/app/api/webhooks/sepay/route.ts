@@ -1,50 +1,43 @@
-import prisma from "@/lib/prisma";
 import { NextResponse } from "next/server";
+import { forwardSePayWebhookToBackend } from "@/lib/api/webhooks";
 
 export async function POST(req: Request) {
     try {
-        const authHeader = req.headers.get("Authorization");
-        const mySePaySecret = `Apikey ${process.env.SEPAY_WEBHOOK_SECRET}`;
+        const authorization = req.headers.get("Authorization");
+        const payload = await req.json();
 
-        if (authHeader !== mySePaySecret) {
-            console.error("Lỗi xác thực Webhook SePay!");
-            return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-        }
+        console.log("SEPAY_WEBHOOK_FE_RECEIVED:", {
+            authorization: Boolean(authorization),
+            payload,
+        });
 
-        const body = await req.json();
-        const { transferAmount, content } = body; 
+        const result = await forwardSePayWebhookToBackend(
+            payload,
+            authorization
+        );
 
-        if (content && transferAmount) {
-            const match = content.match(/TH\d{4}/); 
-            
-            if (match) {
-                const orderCode = match[0]; 
+        console.log("SEPAY_WEBHOOK_FE_FORWARDED:", {
+            status: result.status,
+            body: result.body,
+        });
 
-                const order = await prisma.order.findFirst({
-                    where: { transactionId: orderCode }
-                });
-
-                if (order && order.paymentStatus === "UNPAID" && transferAmount >= Number(order.total)) {
-                    
-                    await prisma.order.update({
-                        where: { id: order.id },
-                        data: { 
-                            paymentStatus: "PAID", // Đã thanh toán
-                            status: "PROCESSING"   // Tự động chuyển đơn sang đang xử lý
-                        }
-                    });
-
-                    console.log(`Đã xác nhận thanh toán đơn hàng ${orderCode} qua SePay!`);
-                } else if (order && transferAmount < Number(order.total)) {
-                    console.log(`Đơn ${orderCode} chuyển thiếu tiền: Yêu cầu ${order.total}, Thực nhận ${transferAmount}`);
-                }
-            }
-        }
-
-        return NextResponse.json({ success: true }, { status: 200 });
-
+        return NextResponse.json(result.body || { success: true }, {
+            status: result.status,
+        });
     } catch (error) {
-        console.error("SePay Webhook Error:", error);
-        return NextResponse.json({ error: "Webhook Error" }, { status: 500 });
+        console.error("SEPAY_WEBHOOK_ROUTE_ERROR:", error);
+
+        return NextResponse.json(
+            {
+                success: false,
+                message:
+                    error instanceof Error
+                        ? error.message
+                        : "Webhook proxy error",
+            },
+            {
+                status: 500,
+            }
+        );
     }
 }

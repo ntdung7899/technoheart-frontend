@@ -6,13 +6,18 @@ import { Loader2, ArrowLeft, Image as ImageIcon, Sparkles, Package, DollarSign, 
 import Link from "next/link";
 import Image from "next/image";
 import RichTextEditor from "@/components/admin/RichTextEditor";
+import {
+  getAdminProductById,
+  updateAdminProduct,
+} from "@/lib/api/admin-products";
+import { getCategories, type Category } from "@/lib/api/categories";
 
 export default function EditProductPage() {
     const router = useRouter();
     const { id } = useParams();
     const [fetching, setFetching] = useState(true);
     const [loading, setLoading] = useState(false);
-    const [categories, setCategories] = useState([]);
+    const [categories, setCategories] = useState<Category[]>([]);
     const [formData, setFormData] = useState({
         name: "",
         description: "",
@@ -27,38 +32,40 @@ export default function EditProductPage() {
     });
 
     useEffect(() => {
-        const fetchData = async () => {
-            try {
-                const [catsRes, prodRes] = await Promise.all([
-                    fetch("/api/categories"),
-                    fetch(`/api/products/${id}`)
-                ]);
+    const fetchData = async () => {
+        try {
+        const productId = String(id || "");
 
-                const catsData = await catsRes.json();
-                const prodData = await prodRes.json();
+        const [catsData, prodData] = await Promise.all([
+            getCategories({ take: 100 }),
+            getAdminProductById(productId),
+        ]);
 
-                setCategories(catsData);
-                setFormData({
-                    name: prodData.name,
-                    description: prodData.description,
-                    price: prodData.price.toString(),
-                    stock: prodData.stock.toString(),
-                    categoryId: prodData.categoryId,
-                    imageUrl: prodData.images[0] || "",
-                    warranty: prodData.warranty || "",
-                    shippingInfo: prodData.shippingInfo || "",
-                    returnPolicy: prodData.returnPolicy || "",
-                    origin: prodData.origin || "",
-                });
-            } catch (error) {
-                console.error("Error fetching data:", error);
-                alert("Failed to load product data");
-            } finally {
-                setFetching(false);
-            }
-        };
+        setCategories(catsData);
 
+        setFormData({
+            name: prodData.name || "",
+            description: prodData.description || "",
+            price: String(prodData.price || ""),
+            stock: String(prodData.stock || ""),
+            categoryId: prodData.categoryId || "",
+            imageUrl: prodData.images?.[0] || "",
+            warranty: prodData.warranty || "",
+            shippingInfo: prodData.shippingInfo || "",
+            returnPolicy: prodData.returnPolicy || "",
+            origin: prodData.origin || "",
+        });
+        } catch (error) {
+        console.error("LOAD_ADMIN_PRODUCT_DETAIL_ERROR:", error);
+        alert("Không tải được dữ liệu sản phẩm");
+        } finally {
+        setFetching(false);
+        }
+    };
+
+    if (id) {
         fetchData();
+    }
     }, [id]);
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
@@ -70,22 +77,18 @@ export default function EditProductPage() {
         setLoading(true);
 
         try {
-            const res = await fetch(`/api/products/${id}`, {
-                method: "PATCH",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify(formData)
-            });
+            await updateAdminProduct(String(id), formData);
 
-            if (res.ok) {
-                router.push("/admin/products");
-                router.refresh();
-            } else {
-                const error = await res.json();
-                alert(error.error || "Failed to update product");
-            }
+            router.push("/admin/products");
+            router.refresh();
         } catch (error) {
-            console.error(error);
-            alert("Error updating product");
+            console.error("UPDATE_ADMIN_PRODUCT_ERROR:", error);
+
+            alert(
+            error instanceof Error
+                ? error.message
+                : "Không thể cập nhật sản phẩm"
+            );
         } finally {
             setLoading(false);
         }

@@ -4,49 +4,65 @@ import { useState, useEffect } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { Plus, Edit, Trash2, Search, Filter, MoreHorizontal, Package, Loader2 } from "lucide-react";
+import {
+  getAdminProducts,
+  deleteAdminProduct,
+  type AdminProduct,
+} from "@/lib/api/admin-products";
 
 export default function AdminProductsPage() {
-    const [products, setProducts] = useState<any[]>([]);
     const [loading, setLoading] = useState(true);
     const [searchTerm, setSearchTerm] = useState("");
     const [isFilterOpen, setIsFilterOpen] = useState(false);
     const [tempFilter, setTempFilter] = useState("all");      
     const [appliedFilter, setAppliedFilter] = useState("all"); 
+    const [products, setProducts] = useState<AdminProduct[]>([]);
+
 
     useEffect(() => {
-        fetchProducts();
+        let mounted = true;
+
+        async function loadProducts() {
+            try {
+            const data = await getAdminProducts();
+
+            if (mounted) {
+                setProducts(data);
+            }
+            } catch (error) {
+            console.error("LOAD_ADMIN_PRODUCTS_ERROR:", error);
+            } finally {
+            if (mounted) {
+                setLoading(false);
+            }
+            }
+        }
+
+        loadProducts();
+
+        return () => {
+            mounted = false;
+        };
     }, []);
 
-    const fetchProducts = async () => {
-        try {
-            const res = await fetch("/api/products");
-            if (!res.ok) throw new Error("Failed to fetch");
-            const data = await res.json();
-            setProducts(Array.isArray(data) ? data : []);
-        } catch (error) {
-            console.error("Error fetching products:", error);
-        } finally {
-            setLoading(false);
-        }
-    };
-
     const handleDelete = async (id: string, name: string) => {
-        if (!confirm(`Bạn có chắc chắn muốn xóa sản phẩm "${name}"?`)) return;
+    const confirmDelete = window.confirm(`Bạn có chắc muốn xóa sản phẩm "${name}"?`);
 
-        try {
-            const res = await fetch(`/api/products/${id}`, {
-                method: "DELETE",
-            });
+    if (!confirmDelete) return;
 
-            if (res.ok) {
-                setProducts(products.filter((p: any) => p.id !== id));
-            } else {
-                alert("Xóa sản phẩm thất bại");
-            }
-        } catch (error) {
-            console.error(error);
-            alert("Đã có lỗi xảy ra");
-        }
+    try {
+        await deleteAdminProduct(id);
+
+        setProducts((prev) => prev.filter((item) => item.id !== id));
+    } catch (error) {
+        console.error("DELETE_ADMIN_PRODUCT_ERROR:", error);
+
+        alert(
+        error instanceof Error
+            ? error.message
+            : "Không thể xóa sản phẩm"
+        );
+    }
     };
 
     const getStockFilter = (p: any) => {
@@ -143,13 +159,14 @@ export default function AdminProductsPage() {
                                     <tr key={product.id} className="group hover:bg-slate-50/50 transition-colors">
                                         <td className="px-4 py-3">
                                             <div className="relative h-10 w-10 rounded-lg border border-slate-200 bg-white mx-auto overflow-hidden">
-                                                {product.images.length > 0 && (
-                                                    <Image
-                                                        src={product.images[0]}
-                                                        alt={product.name}
-                                                        fill
-                                                        className="object-contain p-1"
-                                                    />
+                                                {product.images?.length > 0 && (
+                                                <Image
+                                                    src={product.images[0]}
+                                                    alt={product.name}
+                                                    fill
+                                                    className="object-contain p-1"
+                                                    unoptimized
+                                                />
                                                 )}
                                             </div>
                                         </td>

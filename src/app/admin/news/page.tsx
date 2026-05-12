@@ -6,6 +6,12 @@ import {
     Plus, Pencil, Trash2, Newspaper, Eye, EyeOff,
     Star, StarOff, Search, Calendar, Loader2, Tag
 } from "lucide-react";
+import {
+    getAdminNews,
+    deleteAdminNews,
+    updateAdminNews,
+    type AdminNews,
+} from "@/lib/api/admin-news";
 
 interface NewsArticle {
     id: string;
@@ -18,6 +24,22 @@ interface NewsArticle {
     author: { name: string | null; email: string };
 }
 
+function mapAdminNewsToArticle(item: AdminNews): NewsArticle {
+    return {
+        id: item.id,
+        title: item.title,
+        category: item.category || "Tin tức",
+        published: Boolean(item.published),
+        featured: Boolean(item.featured),
+        readTime: item.readTime || "5 phút",
+        createdAt: item.createdAt || new Date().toISOString(),
+        author: {
+            name: null,
+            email: "Admin",
+        },
+    };
+}
+
 export default function AdminNewsPage() {
     const [articles, setArticles] = useState<NewsArticle[]>([]);
     const [loading, setLoading] = useState(true);
@@ -26,36 +48,57 @@ export default function AdminNewsPage() {
 
     const fetchArticles = async () => {
         setLoading(true);
+
         try {
-            const res = await fetch("/api/news?admin=true");
-            if (!res.ok) throw new Error(res.statusText);
-            const data = await res.json();
-            setArticles(data.articles || []);
-        } catch {
+            const data = await getAdminNews();
+            setArticles(data.map(mapAdminNewsToArticle));
+        } catch (error) {
+            console.error("LOAD_ADMIN_NEWS_ERROR:", error);
             setArticles([]);
+        } finally {
+            setLoading(false);
         }
-        setLoading(false);
     };
 
     useEffect(() => { fetchArticles(); }, []);
 
     const handleDelete = async (id: string) => {
         if (!confirm("Bạn chắc chắn muốn xoá bài viết này?")) return;
+
         setDeletingId(id);
-        await fetch(`/api/news/${id}`, { method: "DELETE" });
-        await fetchArticles();
-        setDeletingId(null);
+
+        try {
+            await deleteAdminNews(id);
+            await fetchArticles();
+        } catch (error) {
+            console.error("DELETE_ADMIN_NEWS_ERROR:", error);
+            alert(error instanceof Error ? error.message : "Không thể xoá bài viết");
+        } finally {
+            setDeletingId(null);
+        }
     };
 
-    const handleToggle = async (id: string, field: "published" | "featured", current: boolean) => {
-        await fetch(`/api/news/${id}`, {
-            method: "PATCH",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ [field]: !current }),
-        });
-        setArticles(prev =>
-            prev.map(a => a.id === id ? { ...a, [field]: !current } : a)
-        );
+    const handleToggle = async (
+        id: string,
+        field: "published" | "featured",
+        current: boolean
+    ) => {
+        try {
+            await updateAdminNews(id, {
+                [field]: !current,
+                title: "",
+                content: ""
+            });
+
+            setArticles((prev) =>
+                prev.map((a) =>
+                    a.id === id ? { ...a, [field]: !current } : a
+                )
+            );
+        } catch (error) {
+            console.error("TOGGLE_ADMIN_NEWS_ERROR:", error);
+            alert(error instanceof Error ? error.message : "Không thể cập nhật bài viết");
+        }
     };
 
     const filtered = articles.filter(a =>

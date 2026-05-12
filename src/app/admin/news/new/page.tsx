@@ -8,12 +8,18 @@ import {
     ArrowLeft, Send, Loader2, ImageIcon, Eye, EyeOff, Star
 } from "lucide-react";
 import RichTextEditor from "@/components/admin/RichTextEditor";
+import { createAdminNews } from "@/lib/api/admin-news";
+import {
+    getAdminNewsCategories,
+    type AdminNewsCategory,
+} from "@/lib/api/admin-news-categories";
 
-interface NewsCategory {
-    id: string;
-    name: string;
-    color: string;
-}
+// interface NewsCategory {
+//     id: string;
+//     name: string;
+//     color: string;
+// }
+type NewsCategory = AdminNewsCategory;
 
 export default function NewNewsPage() {
     const router = useRouter();
@@ -23,9 +29,29 @@ export default function NewNewsPage() {
     const [categories, setCategories] = useState<NewsCategory[]>([]);
 
     useEffect(() => {
-        fetch("/api/news-categories")
-            .then(r => r.json())
-            .then(data => setCategories(Array.isArray(data) ? data : []));
+        let mounted = true;
+
+        async function loadCategories() {
+            try {
+                const data = await getAdminNewsCategories();
+
+                if (mounted) {
+                    setCategories(Array.isArray(data) ? data : []);
+                }
+            } catch (error) {
+                console.error("LOAD_ADMIN_NEWS_CATEGORIES_ERROR:", error);
+
+                if (mounted) {
+                    setCategories([]);
+                }
+            }
+        }
+
+        loadCategories();
+
+        return () => {
+            mounted = false;
+        };
     }, []);
 
     const [form, setForm] = useState({
@@ -41,24 +67,62 @@ export default function NewNewsPage() {
 
     const set = (field: string, value: any) => setForm(prev => ({ ...prev, [field]: value }));
 
+    // const handleSubmit = async (e: React.FormEvent) => {
+    //     e.preventDefault();
+    //     setError("");
+    //     if (!form.title.trim() || !form.excerpt.trim() || !form.content.trim()) {
+    //         setError("Vui lòng điền đầy đủ các trường bắt buộc.");
+    //         return;
+    //     }
+    //     setLoading(true);
+    //     const res = await fetch("/api/news", {
+    //         method: "POST",
+    //         headers: { "Content-Type": "application/json" },
+    //         body: JSON.stringify(form),
+    //     });
+    //     if (res.ok) {
+    //         router.push("/admin/news");
+    //     } else {
+    //         const data = await res.json();
+    //         setError(data.error || "Có lỗi xảy ra, vui lòng thử lại.");
+    //         setLoading(false);
+    //     }
+    // };
+
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         setError("");
+
         if (!form.title.trim() || !form.excerpt.trim() || !form.content.trim()) {
             setError("Vui lòng điền đầy đủ các trường bắt buộc.");
             return;
         }
+
         setLoading(true);
-        const res = await fetch("/api/news", {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify(form),
-        });
-        if (res.ok) {
+
+        try {
+            await createAdminNews({
+                title: form.title,
+                excerpt: form.excerpt,
+                content: form.content,
+                category: form.category || "Tin tức",
+                image: form.image,
+                readTime: form.readTime,
+                featured: form.featured,
+                published: form.published,
+            });
+
             router.push("/admin/news");
-        } else {
-            const data = await res.json();
-            setError(data.error || "Có lỗi xảy ra, vui lòng thử lại.");
+            router.refresh();
+        } catch (error) {
+            console.error("CREATE_ADMIN_NEWS_ERROR:", error);
+
+            setError(
+                error instanceof Error
+                    ? error.message
+                    : "Có lỗi xảy ra, vui lòng thử lại."
+            );
+        } finally {
             setLoading(false);
         }
     };

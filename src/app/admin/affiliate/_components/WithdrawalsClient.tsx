@@ -2,6 +2,7 @@
 
 import { useState, useRef, useEffect } from "react";
 import { Search, Wallet, MoreHorizontal, Check, ChevronDown, Loader2, RefreshCw, Ban, CreditCard } from "lucide-react";
+import { updateAdminWithdrawalStatus } from "@/lib/api/admin-affiliate";
 
 const STATUS_OPTIONS = [
     { value: 'PENDING', label: 'Chờ xử lý', color: 'orange', icon: RefreshCw },
@@ -55,27 +56,41 @@ export default function WithdrawalsClient({ initialData }: { initialData: Withdr
     }, []);
 
     const handleStatusChange = async (id: string, newStatus: string) => {
-        const confirmMsg = newStatus === 'REJECTED' 
-            ? "Bạn có chắc muốn TỪ CHỐI lệnh này? Tiền sẽ được hoàn lại vào số dư của đối tác."
-            : "Xác nhận đổi trạng thái?";
-            
+        const confirmMsg =
+            newStatus === "REJECTED"
+                ? "Bạn có chắc muốn TỪ CHỐI lệnh này? Tiền sẽ được hoàn lại vào số dư của đối tác."
+                : "Xác nhận đổi trạng thái?";
+
         if (!window.confirm(confirmMsg)) return;
 
         setLoading(id);
         setMenuOpen(null);
+
         try {
-            const res = await fetch(`/api/affiliate/admin/withdrawals/${id}`, {
-                method: "PATCH",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ status: newStatus }),
+            const nextStatus = String(newStatus || "").toUpperCase();
+
+            await updateAdminWithdrawalStatus(id, {
+                status: nextStatus,
             });
-            if (res.ok) {
-                setData(prev => prev.map(item => item.id === id ? { ...item, status: newStatus } : item));
-            } else {
-                alert("Có lỗi xảy ra khi cập nhật!");
-            }
-        } catch (e) {
-            console.error(e);
+
+            setData((prev) =>
+                prev.map((item) =>
+                    item.id === id
+                        ? {
+                            ...item,
+                            status: nextStatus,
+                        }
+                        : item
+                )
+            );
+        } catch (error) {
+            console.error("UPDATE_ADMIN_WITHDRAWAL_STATUS_ERROR:", error);
+
+            alert(
+                error instanceof Error
+                    ? error.message
+                    : "Có lỗi xảy ra khi cập nhật!"
+            );
         } finally {
             setLoading(null);
         }

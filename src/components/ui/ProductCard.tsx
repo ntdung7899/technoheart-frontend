@@ -1,16 +1,13 @@
 import Link from 'next/link';
 import Image from 'next/image';
 import { ShoppingCart, Star, TrendingUp } from 'lucide-react';
-import { Product, Category } from '@prisma/client';
+// import { Product, Category } from '@prisma/client';
+import type { ProductViewModel } from '@/lib/api/products';
 import { formatPrice } from '@/lib/utils';
 import { WishlistButton } from './WishlistButton';
 
-interface ProductWithCategory extends Product {
-    category: Category;
-}
-
 interface ProductCardProps {
-    product: ProductWithCategory;
+    product: ProductViewModel;
     featured?: boolean;
 }
 
@@ -18,6 +15,9 @@ export function ProductCard({ product, featured = false }: ProductCardProps) {
     // Fake rating for demo, seeded by product id hash
     const rating = 4.2 + (product.id.charCodeAt(0) % 10) / 14;
     const reviews = 100 + (product.id.charCodeAt(1) % 900);
+
+    const imageUrl = product.imageUrl || "/placeholder.png";
+    const categoryName = product.categoryName || product.category?.name || "Sản phẩm";
 
     return (
         <Link href={`/products/${product.id}`} className="group block h-full">
@@ -29,24 +29,23 @@ export function ProductCard({ product, featured = false }: ProductCardProps) {
                     {/* Subtle background glow */}
                     <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500 bg-[radial-gradient(circle_at_center,rgba(37,99,235,0.06)_0%,transparent_70%)]" />
 
-                    {product.images.length > 0 ? (
+                    {imageUrl ? (
                         <Image
-                            src={product.images[0]}
+                            src={imageUrl}
                             alt={product.name}
                             fill
                             className="object-contain p-6 transition-transform duration-500 group-hover:scale-110"
                             sizes="(max-width: 640px) 50vw, (max-width: 1200px) 33vw, 25vw"
                         />
-                    ) : (
+                        ) : (
                         <div className="flex h-full w-full items-center justify-center text-muted-foreground/20">
                             <ShoppingCart className="h-14 w-14" strokeWidth={1} />
                         </div>
                     )}
-
                     {/* Top-left: Category badge */}
                     <div className="absolute left-3 top-3 z-20">
                         <span className="inline-flex items-center rounded-lg bg-background/80 backdrop-blur-md px-2.5 py-1 text-xs font-semibold uppercase tracking-wider border border-border/30 text-muted-foreground shadow-sm">
-                            {product.category.name}
+                            {product.category?.name || product.categoryName || "Sản phẩm"}
                         </span>
                     </div>
 

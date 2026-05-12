@@ -1,73 +1,106 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { Shield, Lock, Smartphone, Globe, Loader2, Eye, EyeOff, CheckCircle2 } from "lucide-react";
-
-interface LoginEntry {
-    id: string;
-    ip: string | null;
-    userAgent: string | null;
-    createdAt: string;
-}
+import {
+    Lock,
+    Globe,
+    Loader2,
+    Eye,
+    EyeOff,
+    CheckCircle2,
+} from "lucide-react";
+import {
+    changeAccountPassword,
+    getAccountSecurityHistory,
+    type LoginHistoryItem,
+} from "@/lib/api/account";
 
 export default function SecurityPage() {
-    const [history, setHistory] = useState<LoginEntry[]>([]);
+    const [history, setHistory] = useState<LoginHistoryItem[]>([]);
     const [loading, setLoading] = useState(true);
 
-    // Change password
     const [showPassword, setShowPassword] = useState(false);
     const [pwLoading, setPwLoading] = useState(false);
     const [pwMsg, setPwMsg] = useState("");
     const [pwErr, setPwErr] = useState("");
+
     const [passwords, setPasswords] = useState({
         currentPassword: "",
         newPassword: "",
         confirmPassword: "",
     });
 
-    // 2FA
-    // const [twoFAEnabled, setTwoFAEnabled] = useState(false);
-
     useEffect(() => {
-        fetch("/api/account/security/history")
-            .then((r) => r.json())
-            .then((data) => setHistory(data.history || []))
-            .catch(console.error)
-            .finally(() => setLoading(false));
+        let mounted = true;
+
+        async function loadHistory() {
+            try {
+                const data = await getAccountSecurityHistory();
+
+                if (mounted) {
+                    setHistory(Array.isArray(data) ? data : []);
+                }
+            } catch (error) {
+                console.error("LOAD_SECURITY_HISTORY_ERROR:", error);
+
+                if (mounted) {
+                    setHistory([]);
+                }
+            } finally {
+                if (mounted) {
+                    setLoading(false);
+                }
+            }
+        }
+
+        loadHistory();
+
+        return () => {
+            mounted = false;
+        };
     }, []);
 
     const handleChangePassword = async () => {
         setPwMsg("");
         setPwErr("");
 
-        if (passwords.newPassword.length < 6) {
+        if (!passwords.currentPassword) {
+            setPwErr("Vui lòng nhập mật khẩu hiện tại");
+            return;
+        }
+
+        if (!passwords.newPassword || passwords.newPassword.length < 6) {
             setPwErr("Mật khẩu mới phải có ít nhất 6 ký tự");
             return;
         }
+
         if (passwords.newPassword !== passwords.confirmPassword) {
             setPwErr("Mật khẩu xác nhận không khớp");
             return;
         }
 
         setPwLoading(true);
+
         try {
-            const res = await fetch("/api/account/password", {
-                method: "PUT",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({
-                    currentPassword: passwords.currentPassword,
-                    newPassword: passwords.newPassword,
-                }),
+            await changeAccountPassword({
+                currentPassword: passwords.currentPassword,
+                newPassword: passwords.newPassword,
             });
-            const data = await res.json();
-            if (!res.ok) {
-                setPwErr(data.error);
-                return;
-            }
+
             setPwMsg("Đổi mật khẩu thành công!");
-            setPasswords({ currentPassword: "", newPassword: "", confirmPassword: "" });
-        } catch {
-            setPwErr("Có lỗi xảy ra");
+            setPasswords({
+                currentPassword: "",
+                newPassword: "",
+                confirmPassword: "",
+            });
+        } catch (error) {
+            console.error("CHANGE_PASSWORD_ERROR:", error);
+
+            setPwErr(
+                error instanceof Error
+                    ? error.message
+                    : "Có lỗi xảy ra khi đổi mật khẩu"
+            );
         } finally {
             setPwLoading(false);
         }
@@ -75,10 +108,10 @@ export default function SecurityPage() {
 
     const getBrowserName = (ua: string | null) => {
         if (!ua) return "Không rõ";
+        if (ua.includes("Edg")) return "Edge";
         if (ua.includes("Chrome")) return "Chrome";
         if (ua.includes("Firefox")) return "Firefox";
         if (ua.includes("Safari")) return "Safari";
-        if (ua.includes("Edge")) return "Edge";
         return "Khác";
     };
 
@@ -86,7 +119,6 @@ export default function SecurityPage() {
         <div className="space-y-8 max-w-xl">
             <h1 className="text-2xl font-bold tracking-tight">Bảo mật</h1>
 
-            {/* Change Password */}
             <div className="rounded-2xl border border-border/40 bg-card/50 p-6 space-y-4">
                 <div className="flex items-center gap-2">
                     <Lock className="h-4 w-4" />
@@ -99,6 +131,7 @@ export default function SecurityPage() {
                         {pwMsg}
                     </div>
                 )}
+
                 {pwErr && (
                     <div className="rounded-xl bg-red-500/10 border border-red-500/20 px-4 py-2.5 text-sm text-red-500">
                         {pwErr}
@@ -110,21 +143,30 @@ export default function SecurityPage() {
                         <label className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
                             Mật khẩu hiện tại
                         </label>
+
                         <div className="relative">
                             <input
                                 type={showPassword ? "text" : "password"}
                                 value={passwords.currentPassword}
-                                onChange={(e) =>
-                                    setPasswords((p) => ({ ...p, currentPassword: e.target.value }))
+                                onChange={(event) =>
+                                    setPasswords((current) => ({
+                                        ...current,
+                                        currentPassword: event.target.value,
+                                    }))
                                 }
                                 className="h-10 w-full rounded-xl border border-border/50 bg-secondary/30 px-4 pr-10 text-sm focus:outline-none focus:ring-2 focus:ring-primary/20"
                             />
+
                             <button
                                 type="button"
                                 onClick={() => setShowPassword(!showPassword)}
                                 className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground"
                             >
-                                {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                                {showPassword ? (
+                                    <EyeOff className="h-4 w-4" />
+                                ) : (
+                                    <Eye className="h-4 w-4" />
+                                )}
                             </button>
                         </div>
                     </div>
@@ -133,11 +175,15 @@ export default function SecurityPage() {
                         <label className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
                             Mật khẩu mới
                         </label>
+
                         <input
                             type={showPassword ? "text" : "password"}
                             value={passwords.newPassword}
-                            onChange={(e) =>
-                                setPasswords((p) => ({ ...p, newPassword: e.target.value }))
+                            onChange={(event) =>
+                                setPasswords((current) => ({
+                                    ...current,
+                                    newPassword: event.target.value,
+                                }))
                             }
                             className="h-10 w-full rounded-xl border border-border/50 bg-secondary/30 px-4 text-sm focus:outline-none focus:ring-2 focus:ring-primary/20"
                         />
@@ -147,11 +193,15 @@ export default function SecurityPage() {
                         <label className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
                             Xác nhận mật khẩu mới
                         </label>
+
                         <input
                             type={showPassword ? "text" : "password"}
                             value={passwords.confirmPassword}
-                            onChange={(e) =>
-                                setPasswords((p) => ({ ...p, confirmPassword: e.target.value }))
+                            onChange={(event) =>
+                                setPasswords((current) => ({
+                                    ...current,
+                                    confirmPassword: event.target.value,
+                                }))
                             }
                             className="h-10 w-full rounded-xl border border-border/50 bg-secondary/30 px-4 text-sm focus:outline-none focus:ring-2 focus:ring-primary/20"
                         />
@@ -159,50 +209,20 @@ export default function SecurityPage() {
                 </div>
 
                 <button
+                    type="button"
                     onClick={handleChangePassword}
                     disabled={pwLoading}
                     className="h-10 px-5 rounded-xl bg-primary text-primary-foreground text-sm font-bold hover:opacity-90 transition-all flex items-center gap-2 disabled:opacity-50"
                 >
-                    {pwLoading ? <Loader2 className="h-4 w-4 animate-spin" /> : <Lock className="h-4 w-4" />}
+                    {pwLoading ? (
+                        <Loader2 className="h-4 w-4 animate-spin" />
+                    ) : (
+                        <Lock className="h-4 w-4" />
+                    )}
                     Đổi mật khẩu
                 </button>
             </div>
 
-            {/* 2FA Toggle (UI Only) */}
-            {/* <div className="rounded-2xl border border-border/40 bg-card/50 p-6">
-                <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-3">
-                        <div className="h-10 w-10 rounded-xl bg-secondary/50 flex items-center justify-center">
-                            <Smartphone className="h-4 w-4 text-muted-foreground" />
-                        </div>
-                        <div>
-                            <p className="text-sm font-bold">Xác thực 2 bước (2FA)</p>
-                            <p className="text-xs text-muted-foreground">
-                                Tăng cường bảo mật cho tài khoản
-                            </p>
-                        </div>
-                    </div>
-                    <button
-                        onClick={() => setTwoFAEnabled(!twoFAEnabled)}
-                        className={`relative w-12 h-7 rounded-full transition-colors ${twoFAEnabled ? "bg-primary" : "bg-secondary"
-                            }`}
-                    >
-                        <span
-                            className={`absolute top-0.5 h-6 w-6 rounded-full bg-white shadow-md transition-transform ${twoFAEnabled ? "translate-x-5.5" : "translate-x-0.5"
-                                }`}
-                        />
-                    </button>
-                </div>
-                {twoFAEnabled && (
-                    <div className="mt-4 rounded-xl bg-primary/5 border border-primary/10 p-4">
-                        <p className="text-xs text-muted-foreground">
-                            Tính năng xác thực 2 bước sẽ được cài đặt trong phiên bản tiếp theo.
-                        </p>
-                    </div>
-                )}
-            </div> */}
-
-            {/* Login History */}
             <div className="rounded-2xl border border-border/40 bg-card/50 p-6 space-y-4">
                 <div className="flex items-center gap-2">
                     <Globe className="h-4 w-4" />
@@ -222,18 +242,24 @@ export default function SecurityPage() {
                         {history.map((entry) => (
                             <div
                                 key={entry.id}
-                                className="rounded-xl bg-secondary/30 px-4 py-3 flex items-center justify-between"
+                                className="rounded-xl bg-secondary/30 px-4 py-3 flex items-center justify-between gap-4"
                             >
                                 <div>
                                     <p className="text-sm font-medium">
                                         {getBrowserName(entry.userAgent)}
                                     </p>
+
                                     <p className="text-xs text-muted-foreground">
                                         IP: {entry.ip || "Không rõ"}
                                     </p>
                                 </div>
-                                <p className="text-xs text-muted-foreground">
-                                    {new Date(entry.createdAt).toLocaleString("vi-VN")}
+
+                                <p className="text-xs text-muted-foreground text-right">
+                                    {entry.createdAt
+                                        ? new Date(entry.createdAt).toLocaleString(
+                                              "vi-VN"
+                                          )
+                                        : "Đang cập nhật"}
                                 </p>
                             </div>
                         ))}

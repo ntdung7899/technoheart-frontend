@@ -8,6 +8,16 @@ import {
     ArrowLeft, Save, Loader2, ImageIcon, Eye, EyeOff, Star, Trash2
 } from "lucide-react";
 import RichTextEditor from "@/components/admin/RichTextEditor";
+import {
+    getAdminNewsById,
+    updateAdminNews,
+    deleteAdminNews,
+} from "@/lib/api/admin-news";
+
+import {
+    getAdminNewsCategories,
+    type AdminNewsCategory,
+} from "@/lib/api/admin-news-categories";
 
 export default function EditNewsPage({ params }: { params: Promise<{ id: string }> }) {
     const { id } = use(params);
@@ -16,7 +26,7 @@ export default function EditNewsPage({ params }: { params: Promise<{ id: string 
     const [fetching, setFetching] = useState(true);
     const [error, setError] = useState("");
     const [preview, setPreview] = useState(false);
-    const [categories, setCategories] = useState<any[]>([]);
+    const [categories, setCategories] = useState<AdminNewsCategory[]>([]);
     const [fallbackCategoryName, setFallbackCategoryName] = useState("");
 
     const [form, setForm] = useState({
@@ -33,32 +43,69 @@ export default function EditNewsPage({ params }: { params: Promise<{ id: string 
     const set = (field: string, value: any) => setForm(prev => ({ ...prev, [field]: value }));
 
     useEffect(() => {
-        fetch(`/api/news/${id}`)
-            .then(res => res.json())
-            .then(data => {
-                if (data.id) {
-                    setForm({
-                        title: data.title,
-                        excerpt: data.excerpt,
-                        content: data.content,
-                        categoryId: data.newsCategoryId || "",
-                        image: data.image || "",
-                        readTime: data.readTime,
-                        featured: data.featured,
-                        published: data.published,
-                    });
-                    if (!data.newsCategoryId && data.category) {
-                        setFallbackCategoryName(data.category);
-                    }
+        let mounted = true;
+
+        async function loadNewsDetail() {
+            try {
+                const data = await getAdminNewsById(id);
+
+                if (!mounted) return;
+
+                setForm({
+                    title: data.title || "",
+                    excerpt: data.excerpt || "",
+                    content: data.content || "",
+                    categoryId: data.newsCategoryId || "",
+                    image: data.image || "",
+                    readTime: data.readTime || "5 phút",
+                    featured: Boolean(data.featured),
+                    published: Boolean(data.published),
+                });
+
+                if (!data.newsCategoryId && data.category) {
+                    setFallbackCategoryName(data.category);
                 }
-                setFetching(false);
-            });
+            } catch (error) {
+                console.error("LOAD_ADMIN_NEWS_DETAIL_ERROR:", error);
+                setError("Không tải được dữ liệu bài viết.");
+            } finally {
+                if (mounted) {
+                    setFetching(false);
+                }
+            }
+        }
+
+        loadNewsDetail();
+
+        return () => {
+            mounted = false;
+        };
     }, [id]);
 
     useEffect(() => {
-        fetch("/api/news-categories")
-            .then(res => res.json())
-            .then(setCategories);
+        let mounted = true;
+
+        async function loadCategories() {
+            try {
+                const data = await getAdminNewsCategories();
+
+                if (mounted) {
+                    setCategories(data);
+                }
+            } catch (error) {
+                console.error("LOAD_ADMIN_NEWS_CATEGORIES_ERROR:", error);
+
+                if (mounted) {
+                    setCategories([]);
+                }
+            }
+        }
+
+        loadCategories();
+
+        return () => {
+            mounted = false;
+        };
     }, []);
 
     useEffect(() => {
@@ -72,26 +119,63 @@ export default function EditNewsPage({ params }: { params: Promise<{ id: string 
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
+
         setError("");
         setLoading(true);
-        const res = await fetch(`/api/news/${id}`, {
-            method: "PATCH",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify(form),
-        });
-        if (res.ok) {
+
+        try {
+            const selectedCategory = categories.find(
+                (item) => item.id === form.categoryId
+            );
+
+            await updateAdminNews(id, {
+                title: form.title,
+                excerpt: form.excerpt,
+                content: form.content,
+                image: form.image,
+                readTime: form.readTime,
+                featured: form.featured,
+                published: form.published,
+
+                // BE nhận newsCategoryId
+                newsCategoryId: form.categoryId || null,
+
+                // Giữ fallback category name để public news vẫn hiển thị được
+                category: selectedCategory?.name || fallbackCategoryName || "Tin tức",
+            });
+
             router.push("/admin/news");
-        } else {
-            const data = await res.json();
-            setError(data.error || "Có lỗi xảy ra, vui lòng thử lại.");
+            router.refresh();
+        } catch (error) {
+            console.error("UPDATE_ADMIN_NEWS_ERROR:", error);
+
+            setError(
+                error instanceof Error
+                    ? error.message
+                    : "Có lỗi xảy ra, vui lòng thử lại."
+            );
+        } finally {
             setLoading(false);
         }
     };
 
     const handleDelete = async () => {
         if (!confirm("Bạn chắc chắn muốn xoá bài viết này?")) return;
-        await fetch(`/api/news/${id}`, { method: "DELETE" });
-        router.push("/admin/news");
+
+        try {
+            await deleteAdminNews(id);
+
+            router.push("/admin/news");
+            router.refresh();
+        } catch (error) {
+            console.error("DELETE_ADMIN_NEWS_ERROR:", error);
+
+            setError(
+                error instanceof Error
+                    ? error.message
+                    : "Không thể xoá bài viết."
+            );
+        }
     };
 
     if (fetching) {
