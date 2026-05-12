@@ -6,6 +6,10 @@ import {
     DollarSign, ShoppingBag, Calendar, Download,
     Layers, PieChart, Loader2, Package
 } from "lucide-react";
+import {
+    getAdminAnalytics,
+    exportAdminAnalytics,
+} from "@/lib/api/admin-analytics";
 
 interface TopProduct {
     name: string;
@@ -53,39 +57,71 @@ export default function AdminAnalyticsClient() {
 
     const fetchData = async () => {
         setLoading(true);
-        const range = from ? { from, to } : getDateRange();
-        const params = new URLSearchParams();
-        if (range.from) params.set("from", range.from);
-        if (range.to) params.set("to", range.to);
 
-        const res = await fetch(`/api/analytics?${params}`);
-        const json = await res.json();
-        setData(json);
-        setLoading(false);
+        try {
+            const range = from ? { from, to } : getDateRange();
+
+            const result = await getAdminAnalytics({
+                from: range.from,
+                to: range.to,
+            });
+
+            setData(result);
+        } catch (error) {
+            console.error("LOAD_ADMIN_ANALYTICS_ERROR:", error);
+
+            setData({
+                totalRevenue: 0,
+                deliveredRevenue: 0,
+                totalOrders: 0,
+                deliveredOrders: 0,
+                avgOrderValue: 0,
+                topProducts: [],
+            });
+        } finally {
+            setLoading(false);
+        }
     };
 
     useEffect(() => { fetchData(); }, [selectedPreset]);
 
     const handleExport = async () => {
         setExporting(true);
-        const range = from ? { from, to } : getDateRange();
-        const params = new URLSearchParams();
-        if (range.from) params.set("from", range.from);
-        if (range.to) params.set("to", range.to);
 
-        const res = await fetch(`/api/analytics/export?${params}`);
-        const blob = await res.blob();
-        const url = URL.createObjectURL(blob);
-        const a = document.createElement("a");
-        a.href = url;
-        a.download = `bao-cao-${new Date().toISOString().slice(0, 10)}.xlsx`;
-        a.click();
-        URL.revokeObjectURL(url);
-        setExporting(false);
+        try {
+            const range = from ? { from, to } : getDateRange();
+
+            const blob = await exportAdminAnalytics({
+                from: range.from,
+                to: range.to,
+            });
+
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement("a");
+
+            a.href = url;
+            a.download = `bao-cao-${new Date().toISOString().slice(0, 10)}.csv`;
+            a.click();
+
+            URL.revokeObjectURL(url);
+        } catch (error) {
+            console.error("EXPORT_ADMIN_ANALYTICS_ERROR:", error);
+
+            alert(
+                error instanceof Error
+                    ? error.message
+                    : "Không thể xuất báo cáo Excel"
+            );
+        } finally {
+            setExporting(false);
+        }
     };
 
     const handleCustomFilter = () => {
-        if (from) fetchData();
+        if (!from && !to) return;
+
+        setSelectedPreset(-1);
+        fetchData();
     };
 
     const fmtVnd = (n: number) => n.toLocaleString('vi-VN', { style: 'currency', currency: 'VND' });

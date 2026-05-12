@@ -1,13 +1,13 @@
 "use client";
 
-import { useSearchParams, useRouter } from "next/navigation";
+import { useSearchParams } from "next/navigation";
 import Link from "next/link";
 import { useState, useEffect, Suspense } from "react";
 import { Loader2, CheckCircle2 } from "lucide-react";
+import { checkOrderStatus } from "@/lib/api/orders";
 
 function PayContent() {
     const searchParams = useSearchParams();
-    const router = useRouter();
     const code = searchParams.get("code");
     const amount = searchParams.get("amount");
 
@@ -17,22 +17,43 @@ function PayContent() {
     useEffect(() => {
         if (!code || isPaid) return;
 
-        const interval = setInterval(async () => {
-            try {
-                const res = await fetch(`/api/orders/check-status?code=${code}`);
-                const data = await res.json();
+        let mounted = true;
+        let interval: ReturnType<typeof setInterval> | null = null;
 
-                if (data.paymentStatus === "PAID") {
-                    setIsPaid(true);
-                    setOrderId(data.orderId);
-                    clearInterval(interval);
+        const checkStatus = async () => {
+            try {
+                const data = await checkOrderStatus(code);
+
+                const paymentStatus = String(
+                    data.paymentStatus || data.payment_status || ""
+                ).toUpperCase();
+
+                if (paymentStatus === "PAID") {
+                    if (mounted) {
+                        setIsPaid(true);
+                        setOrderId(data.id || data.orderId || "");
+                    }
+
+                    if (interval) {
+                        clearInterval(interval);
+                    }
                 }
             } catch (error) {
-                console.error("Lỗi kiểm tra trạng thái:", error);
+                console.error("CHECK_ORDER_STATUS_ERROR:", error);
             }
-        }, 3000);
+        };
 
-        return () => clearInterval(interval);
+        checkStatus();
+
+        interval = setInterval(checkStatus, 3000);
+
+        return () => {
+            mounted = false;
+
+            if (interval) {
+                clearInterval(interval);
+            }
+        };
     }, [code, isPaid]);
 
     if (!code || !amount) {
@@ -42,7 +63,12 @@ function PayContent() {
             </div>
         );
     }
-    const qrUrl = `https://img.vietqr.io/image/MB-0328858159-compact2.png?amount=${amount}&addInfo=${code}&accountName=LE THANH CHIEN`;
+
+    const qrUrl = `https://img.vietqr.io/image/MB-0328858159-compact2.png?amount=${encodeURIComponent(
+        amount
+    )}&addInfo=${encodeURIComponent(
+        code
+    )}&accountName=${encodeURIComponent("LE THANH CHIEN")}`;
 
     return (
         <div className="min-h-screen bg-gray-50 flex flex-col items-center justify-center p-4">
@@ -50,26 +76,47 @@ function PayContent() {
                 {!isPaid ? (
                     <>
                         <div className="text-center mb-8">
-                            <h1 className="text-2xl font-bold text-gray-900 mb-2">Thanh toán đơn hàng</h1>
-                            <p className="text-gray-500 text-sm">Vui lòng quét mã QR bằng ứng dụng ngân hàng. Trang sẽ tự động chuyển khi thanh toán thành công.</p>
+                            <h1 className="text-2xl font-bold text-gray-900 mb-2">
+                                Thanh toán đơn hàng
+                            </h1>
+                            <p className="text-gray-500 text-sm">
+                                Vui lòng quét mã QR bằng ứng dụng ngân hàng.
+                                Trang sẽ tự động chuyển khi thanh toán thành công.
+                            </p>
                         </div>
 
                         <div className="bg-blue-50/50 p-4 rounded-2xl border-2 border-dashed border-blue-200 mb-6 flex justify-center relative">
-                            <img src={qrUrl} alt="Mã QR Thanh Toán" className="w-64 h-64 object-contain mix-blend-multiply" />
+                            <img
+                                src={qrUrl}
+                                alt="Mã QR Thanh Toán"
+                                className="w-64 h-64 object-contain mix-blend-multiply"
+                            />
                         </div>
 
                         <div className="space-y-3 mb-8 bg-gray-50 p-4 rounded-xl text-sm">
                             <div className="flex justify-between">
-                                <span className="text-gray-500">Số tài khoản:</span>
-                                <span className="font-semibold text-blue-600">0328858159 (MBBank)</span>
+                                <span className="text-gray-500">
+                                    Số tài khoản:
+                                </span>
+                                <span className="font-semibold text-blue-600">
+                                    0328858159 (MBBank)
+                                </span>
                             </div>
+
                             <div className="flex justify-between">
                                 <span className="text-gray-500">Số tiền:</span>
-                                <span className="font-bold text-red-500">{Number(amount).toLocaleString('vi-VN')} VNĐ</span>
+                                <span className="font-bold text-red-500">
+                                    {Number(amount).toLocaleString("vi-VN")} VNĐ
+                                </span>
                             </div>
+
                             <div className="flex justify-between pt-2 border-t border-gray-200">
-                                <span className="text-gray-500">Nội dung CK:</span>
-                                <span className="font-bold text-gray-900 bg-yellow-100 px-2 rounded">{code}</span>
+                                <span className="text-gray-500">
+                                    Nội dung CK:
+                                </span>
+                                <span className="font-bold text-gray-900 bg-yellow-100 px-2 rounded">
+                                    {code}
+                                </span>
                             </div>
                         </div>
 
@@ -83,11 +130,21 @@ function PayContent() {
                         <div className="mx-auto w-20 h-20 bg-green-100 rounded-full flex items-center justify-center mb-6">
                             <CheckCircle2 className="h-10 w-10 text-green-600" />
                         </div>
-                        <h1 className="text-3xl font-bold text-gray-900 mb-2">Thanh toán thành công!</h1>
-                        <p className="text-gray-500 mb-8">Hệ thống đã xác nhận thanh toán. Cảm ơn bạn đã mua sắm.</p>
-                        
-                        <Link 
-                            href={orderId ? `/account/orders/${orderId}` : "/account/orders"}
+
+                        <h1 className="text-3xl font-bold text-gray-900 mb-2">
+                            Thanh toán thành công!
+                        </h1>
+
+                        <p className="text-gray-500 mb-8">
+                            Hệ thống đã xác nhận thanh toán. Cảm ơn bạn đã mua sắm.
+                        </p>
+
+                        <Link
+                            href={
+                                orderId
+                                    ? `/account/orders/${orderId}`
+                                    : "/account/orders"
+                            }
                             className="w-full flex items-center justify-center bg-gray-900 text-white h-14 rounded-xl font-bold hover:bg-gray-800 transition-colors shadow-lg shadow-gray-900/20"
                         >
                             Xem chi tiết đơn hàng
@@ -99,14 +156,15 @@ function PayContent() {
     );
 }
 
-// Bọc Component chính trong thẻ Suspense
 export default function PayPage() {
     return (
-        <Suspense fallback={
-            <div className="min-h-screen flex items-center justify-center">
-                <Loader2 className="h-8 w-8 animate-spin text-primary" />
-            </div>
-        }>
+        <Suspense
+            fallback={
+                <div className="min-h-screen flex items-center justify-center">
+                    <Loader2 className="h-8 w-8 animate-spin text-primary" />
+                </div>
+            }
+        >
             <PayContent />
         </Suspense>
     );

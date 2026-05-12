@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { usePathname, useRouter } from "next/navigation";
+import { logout } from "@/lib/api/auth";
 import {
     LayoutDashboard,
     ShoppingBag,
@@ -17,8 +18,8 @@ import {
     ChevronsLeft,
     ChevronsRight,
     Store,
-    ChevronDown, // <-- Import thêm ChevronDown
-    Wallet       // <-- Import thêm Wallet
+    ChevronDown,
+    Wallet       
 } from "lucide-react";
 
 const navItems = [
@@ -36,7 +37,7 @@ const navItems = [
     },
     { label: "Hồ sơ", href: "/account/profile", icon: UserCircle },
     { label: "Địa chỉ", href: "/account/addresses", icon: MapPin },
-    { label: "Ưu đãi", href: "/account/rewards", icon: Gift },
+    // { label: "Ưu đãi", href: "/account/rewards", icon: Gift },
     { label: "Bảo mật", href: "/account/security", icon: Shield },
 ];
 
@@ -72,8 +73,9 @@ export function AccountSidebar() {
     };
 
     const handleLogout = async () => {
-        await fetch("/api/auth/logout", { method: "POST" });
-        router.push("/login");
+        await logout();
+
+        router.replace("/login");
         router.refresh();
     };
 

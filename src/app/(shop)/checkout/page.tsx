@@ -1,4 +1,3 @@
-
 "use client";
 
 import { useCartStore } from "@/store/cart";
@@ -8,6 +7,7 @@ import { Loader2, ArrowLeft, ShieldCheck, Truck, CreditCard, MapPin } from "luci
 import Link from "next/link";
 import Image from "next/image";
 import { formatPrice } from "@/lib/utils";
+import { createOrder } from "@/lib/api/orders";
 
 export default function CheckoutPage() {
     const { items, total, clearCart } = useCartStore();
@@ -18,6 +18,7 @@ export default function CheckoutPage() {
         phone: "",
         street: "",
         ward: "",
+        district: "",
         city: "",
         referralCode: "",
     });
@@ -67,44 +68,50 @@ export default function CheckoutPage() {
         setLoading(true);
 
         try {
-            const response = await fetch("/api/orders", {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({
-                    items,
-                    address: {
-                        name: formData.name,
-                        phone: formData.phone,
-                        street: formData.street,
-                        ward: formData.ward,
-                        city: formData.city,
-                    },
-                    total: total(),
-                    referralCode: formData.referralCode || undefined,
-                    paymentMethod, 
-                }),
+            const result = await createOrder({
+                customerName: formData.name,
+                customerPhone: formData.phone,
+                paymentMethod,
+                referralCode: formData.referralCode || undefined,
+                shippingFee: 0,
+                address: {
+                    fullName: formData.name,
+                    phone: formData.phone,
+                    street: `${formData.street}, ${formData.ward}, ${formData.district}, ${formData.city}`,
+                    city: formData.city,
+                    state: formData.district,
+                    zip: "",
+                    country: "Việt Nam",
+                },
+                items: items.map((item) => ({
+                    productId: item.id,
+                    quantity: item.quantity,
+                })),
             });
 
-            const data = await response.json();
+            clearCart();
 
-            if (response.ok) {
-                clearCart();
-
-                if (paymentMethod === "BANK" && data.paymentUrl) {
-                    window.location.href = data.paymentUrl;
-                } else {
-                    router.push("/checkout/success");
-                }
+            if (paymentMethod === "BANK") {
+                router.push(
+                    `/checkout/pay?code=${encodeURIComponent(
+                        result.code || result.transactionId
+                    )}&amount=${encodeURIComponent(String(result.total))}`
+                );
             } else {
-                if (data?.invalidItems) {
-                    alert(`Sản phẩm không còn tồn tại: ${data.invalidItems.join(", ")}. Vui lòng xóa giỏ hàng và thêm lại.`);
-                } else {
-                    alert("Không thể đặt hàng. Vui lòng thử lại.");
-                }
+                router.push(
+                    `/checkout/success?code=${encodeURIComponent(
+                        result.code || result.transactionId
+                    )}`
+                );
             }
         } catch (error) {
             console.error("Lỗi thanh toán:", error);
-            alert("Đã xảy ra lỗi.");
+
+            alert(
+                error instanceof Error
+                    ? error.message
+                    : "Không thể đặt hàng. Vui lòng thử lại."
+            );
         } finally {
             setLoading(false);
         }

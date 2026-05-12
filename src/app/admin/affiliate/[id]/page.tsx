@@ -2,7 +2,11 @@
 
 import { useEffect, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
-import { ArrowLeft, Loader2, Save, User, Mail, ShieldAlert, Target, Users, ShieldCheck, Lock } from "lucide-react";
+import { ArrowLeft, Loader2, Save, User, Mail, ShieldAlert, Target, Users, Lock } from "lucide-react";
+import {
+    getAdminAffiliateById,
+    updateAdminAffiliate,
+} from "@/lib/api/admin-affiliate";
 
 export default function EditAffiliatePage() {
     const params = useParams();
@@ -26,35 +30,43 @@ export default function EditAffiliatePage() {
     });
 
     useEffect(() => {
+        let mounted = true;
+
         const fetchProfile = async () => {
             try {
-                const res = await fetch(`/api/affiliate/admin/${affiliateId}`);
-                if (res.ok) {
-                    const profile = await res.json();
-                    
-                    // Nạp dữ liệu có thể sửa
-                    setFormData({
-                        name: profile.user?.name || "",
-                        email: profile.user?.email || ""
-                    });
-
-                    // Nạp dữ liệu chỉ xem
-                    setStats({
-                        rank: profile.rank || "BA",
-                        personalPV: profile.personalPV || 0,
-                        teamPV: profile.teamPV || 0,
-                    });
-                } else {
-                    console.error("Không tìm thấy dữ liệu đối tác");
+                if (!affiliateId) {
+                    setLoading(false);
+                    return;
                 }
+
+                const profile = await getAdminAffiliateById(affiliateId);
+
+                if (!mounted) return;
+
+                setFormData({
+                    name: profile.user?.name || "",
+                    email: profile.user?.email || "",
+                });
+
+                setStats({
+                    rank: profile.rank || "BA",
+                    personalPV: Number(profile.personalPV || 0),
+                    teamPV: Number(profile.teamPV || 0),
+                });
             } catch (error) {
-                console.error("Lỗi khi tải dữ liệu:", error);
+                console.warn("LOAD_ADMIN_AFFILIATE_DETAIL_FAILED:", error);
             } finally {
-                setLoading(false);
+                if (mounted) {
+                    setLoading(false);
+                }
             }
         };
-        
-        if (affiliateId) fetchProfile();
+
+        fetchProfile();
+
+        return () => {
+            mounted = false;
+        };
     }, [affiliateId]);
 
     const handleSubmit = async (e: React.FormEvent) => {
@@ -62,27 +74,22 @@ export default function EditAffiliatePage() {
         setSaving(true);
 
         try {
-            // Chỉ gửi name và email lên server
-            const res = await fetch(`/api/affiliate/admin/${affiliateId}`, {
-                method: "PATCH",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({
-                    name: formData.name,
-                    email: formData.email
-                }),
+            await updateAdminAffiliate(affiliateId, {
+                name: formData.name.trim(),
+                email: formData.email.trim(),
             });
 
-            if (res.ok) {
-                alert("Cập nhật thông tin thành công!");
-                router.push("/admin/affiliate"); 
-                router.refresh(); 
-            } else {
-                const errorData = await res.json();
-                alert(errorData.error || "Có lỗi xảy ra khi lưu.");
-            }
+            alert("Cập nhật thông tin thành công!");
+            router.push("/admin/affiliate");
+            router.refresh();
         } catch (error) {
-            console.error("Lỗi khi lưu:", error);
-            alert("Lỗi kết nối máy chủ.");
+            console.warn("UPDATE_ADMIN_AFFILIATE_FAILED:", error);
+
+            alert(
+                error instanceof Error
+                    ? error.message
+                    : "Có lỗi xảy ra khi lưu."
+            );
         } finally {
             setSaving(false);
         }

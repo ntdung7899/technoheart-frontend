@@ -6,6 +6,13 @@ import {
     Tag, Plus, Trash2, Edit2, Check, X, Loader2,
     ArrowLeft, Newspaper, Hash
 } from "lucide-react";
+import {
+    getAdminNewsCategories,
+    createAdminNewsCategory,
+    updateAdminNewsCategory,
+    deleteAdminNewsCategory,
+    type AdminNewsCategory,
+} from "@/lib/api/admin-news-categories";
 
 const PRESET_COLORS = [
     "#3b82f6", "#8b5cf6", "#ec4899", "#f97316",
@@ -13,14 +20,7 @@ const PRESET_COLORS = [
     "#6366f1", "#14b8a6",
 ];
 
-interface Category {
-    id: string;
-    name: string;
-    slug: string;
-    description: string | null;
-    color: string;
-    _count: { news: number };
-}
+type Category = AdminNewsCategory;
 
 export default function NewsCategoriesPage() {
     const [categories, setCategories] = useState<Category[]>([]);
@@ -34,55 +34,96 @@ export default function NewsCategoriesPage() {
     const [showAdd, setShowAdd] = useState(false);
 
     const fetchCategories = async () => {
-        const res = await fetch("/api/news-categories");
-        const data = await res.json();
-        setCategories(data);
-        setLoading(false);
+        try {
+            setLoading(true);
+
+            const data = await getAdminNewsCategories();
+
+            setCategories(data);
+        } catch (error) {
+            console.error("LOAD_ADMIN_NEWS_CATEGORIES_ERROR:", error);
+
+            setError(
+                error instanceof Error
+                    ? error.message
+                    : "Không tải được danh mục."
+            );
+        } finally {
+            setLoading(false);
+        }
     };
 
     useEffect(() => { fetchCategories(); }, []);
 
     const handleCreate = async (e: React.FormEvent) => {
         e.preventDefault();
+
         setError("");
         setSaving(true);
-        const res = await fetch("/api/news-categories", {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify(newForm),
-        });
-        const data = await res.json();
-        if (res.ok) {
-            setNewForm({ name: "", description: "", color: "#3b82f6" });
+
+        try {
+            await createAdminNewsCategory(newForm);
+
+            setNewForm({
+                name: "",
+                description: "",
+                color: "#3b82f6",
+            });
+
             setShowAdd(false);
-            fetchCategories();
-        } else {
-            setError(data.error || "Có lỗi xảy ra");
+            await fetchCategories();
+        } catch (error) {
+            console.error("CREATE_ADMIN_NEWS_CATEGORY_ERROR:", error);
+
+            setError(
+                error instanceof Error
+                    ? error.message
+                    : "Có lỗi xảy ra"
+            );
+        } finally {
+            setSaving(false);
         }
-        setSaving(false);
     };
 
     const handleUpdate = async (id: string) => {
+        setError("");
         setSaving(true);
-        const res = await fetch(`/api/news-categories/${id}`, {
-            method: "PATCH",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify(editForm),
-        });
-        const data = await res.json();
-        if (res.ok) {
+
+        try {
+            await updateAdminNewsCategory(id, editForm);
+
             setEditingId(null);
-            fetchCategories();
-        } else {
-            setError(data.error || "Có lỗi xảy ra");
+            await fetchCategories();
+        } catch (error) {
+            console.error("UPDATE_ADMIN_NEWS_CATEGORY_ERROR:", error);
+
+            setError(
+                error instanceof Error
+                    ? error.message
+                    : "Có lỗi xảy ra"
+            );
+        } finally {
+            setSaving(false);
         }
-        setSaving(false);
     };
 
     const handleDelete = async (id: string, name: string) => {
-        if (!confirm(`Xoá danh mục "${name}"? Các bài viết trong danh mục này sẽ không bị xoá.`)) return;
-        await fetch(`/api/news-categories/${id}`, { method: "DELETE" });
-        fetchCategories();
+        if (!confirm(`Xoá danh mục "${name}"? Các bài viết trong danh mục này sẽ không bị xoá.`)) {
+            return;
+        }
+
+        try {
+            await deleteAdminNewsCategory(id);
+            await fetchCategories();
+        } catch (error) {
+            console.error("DELETE_ADMIN_NEWS_CATEGORY_ERROR:", error);
+
+            setError(
+                error instanceof Error
+                    ? error.message
+                    : "Không thể xoá danh mục."
+            );
+        }
     };
 
     const startEdit = (cat: Category) => {

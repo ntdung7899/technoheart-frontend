@@ -1,31 +1,43 @@
-
 import Link from 'next/link';
 import Image from 'next/image';
 import { ArrowLeft, Calendar, Clock, User, Share2, Tag } from 'lucide-react';
 import { notFound } from 'next/navigation';
-import prisma from '@/lib/prisma';
+import { getNewsById } from '@/lib/api/news';
 
 export const dynamic = 'force-dynamic';
 
 export default async function NewsDetailPage({ params }: { params: Promise<{ id: string }> }) {
     const { id } = await params;
 
-    const article = await prisma.news.findUnique({
-        where: { id },
-        include: { author: { select: { name: true, email: true } } },
-    });
+    let article;
+    let related = [];
+
+    try {
+        const result = await getNewsById(id);
+        article = result.article;
+        related = result.related;
+    } catch (error) {
+        console.error("Cannot load news detail:", error);
+        notFound();
+    }
 
     if (!article || !article.published) notFound();
 
-    // Related articles (same category, exclude current)
-    const related = await prisma.news.findMany({
-        where: { published: true, category: article.category, id: { not: article.id } },
-        take: 2,
-        orderBy: { createdAt: 'desc' },
-    });
+    const formatDate = (date?: string | Date) => {
+        if (!date) return "Đang cập nhật";
 
-    const formatDate = (date: Date) =>
-        new Date(date).toLocaleDateString('vi-VN', { day: 'numeric', month: 'long', year: 'numeric' });
+        return new Date(date).toLocaleDateString('vi-VN', {
+            day: 'numeric',
+            month: 'long',
+            year: 'numeric',
+        });
+    };
+
+    const hasValidImage = (imageUrl?: string) => {
+        return Boolean(imageUrl && imageUrl !== "/placeholder.png");
+    };
+
+    const authorName = article.authorName || article.authorId || "Technoheart";
 
     return (
         <div className="min-h-screen bg-background">
@@ -39,7 +51,7 @@ export default async function NewsDetailPage({ params }: { params: Promise<{ id:
                 <div className="mb-10 text-center">
                     <div className="flex items-center justify-center gap-3 mb-6">
                         <span className="bg-primary/10 text-primary px-3 py-1 rounded-full text-xs font-semibold uppercase tracking-wider">
-                            {article.category}
+                            {article.category || "Tin tức"}
                         </span>
                     </div>
                     <h1 className="text-3xl md:text-5xl font-bold tracking-tight mb-8 leading-tight">
@@ -48,7 +60,7 @@ export default async function NewsDetailPage({ params }: { params: Promise<{ id:
                     <div className="flex flex-wrap items-center justify-center gap-6 text-sm text-muted-foreground border-y border-border/40 py-4 font-medium">
                         <span className="flex items-center gap-1.5">
                             <User className="w-4 h-4" />
-                            {article.author.name || article.author.email}
+                            {authorName}
                         </span>
                         <span className="flex items-center gap-1.5">
                             <Calendar className="w-4 h-4" />
@@ -56,18 +68,19 @@ export default async function NewsDetailPage({ params }: { params: Promise<{ id:
                         </span>
                         <span className="flex items-center gap-1.5">
                             <Clock className="w-4 h-4" />
-                            {article.readTime}
+                            {article.readTime || "5 phút đọc"}
                         </span>
                     </div>
                 </div>
 
                 {/* Feature Image */}
-                {article.image && (
+                {hasValidImage(article.imageUrl) && (
                     <div className="relative aspect-[16/9] mb-12 rounded-2xl overflow-hidden shadow-xl">
                         <Image
-                            src={article.image}
+                            src={article.imageUrl}
                             alt={article.title}
                             fill
+                            unoptimized
                             className="object-cover"
                         />
                     </div>
@@ -84,7 +97,7 @@ export default async function NewsDetailPage({ params }: { params: Promise<{ id:
 
                     {/* Main Content */}
                     <article className="flex-1 prose prose-slate prose-lg dark:prose-invert max-w-none prose-headings:font-bold prose-headings:tracking-tight prose-p:text-muted-foreground prose-p:leading-relaxed prose-a:text-primary prose-img:rounded-2xl">
-                        <div dangerouslySetInnerHTML={{ __html: article.content.replace(/\n/g, '<br/>') }} />
+                        <div dangerouslySetInnerHTML={{ __html: (article.content || "").replace(/\n/g, '<br/>') }} />
                     </article>
                 </div>
 
@@ -93,10 +106,14 @@ export default async function NewsDetailPage({ params }: { params: Promise<{ id:
                     <h4 className="text-xl font-bold mb-8">Có thể bạn quan tâm</h4>
                     {related.length > 0 ? (
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                            {related.map(r => (
+                            {related.map((r) => (
                                 <Link key={r.id} href={`/news/${r.id}`} className="p-6 rounded-xl bg-secondary/20 border border-border/40 hover:bg-secondary/30 hover:border-primary/30 transition-all group">
-                                    <span className="text-xs font-semibold text-primary uppercase tracking-wider mb-2 block">{r.category}</span>
-                                    <h3 className="font-semibold mb-2 group-hover:text-primary transition-colors line-clamp-2">{r.title}</h3>
+                                    <span className="text-xs font-semibold text-primary uppercase tracking-wider mb-2 block">
+                                        {r.category || "Tin tức"}
+                                    </span>
+                                    <h3 className="font-semibold mb-2 group-hover:text-primary transition-colors line-clamp-2">
+                                        {r.title}
+                                    </h3>
                                     <span className="text-xs font-semibold text-muted-foreground">Xem thêm →</span>
                                 </Link>
                             ))}

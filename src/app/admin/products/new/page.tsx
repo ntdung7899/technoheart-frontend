@@ -5,11 +5,13 @@ import { useRouter } from "next/navigation";
 import { Loader2, ArrowLeft, Image as ImageIcon, Sparkles, Package, DollarSign, Tag, ChevronDown, ShieldCheck } from "lucide-react";
 import Link from "next/link";
 import RichTextEditor from "@/components/admin/RichTextEditor";
+import { createAdminProduct } from "@/lib/api/admin-products";
+import { getCategories, type Category } from "@/lib/api/categories";
 
 export default function NewProductPage() {
     const router = useRouter();
     const [loading, setLoading] = useState(false);
-    const [categories, setCategories] = useState([]);
+const [categories, setCategories] = useState<Category[]>([]);
     const [formData, setFormData] = useState({
         name: "",
         description: "",
@@ -24,15 +26,24 @@ export default function NewProductPage() {
     });
 
     useEffect(() => {
-        fetch("/api/categories")
-            .then(res => res.json())
-            .then(data => {
-                setCategories(data);
-                if (data.length > 0) {
-                    setFormData(prev => ({ ...prev, categoryId: data[0].id }));
-                }
-            })
-            .catch(err => console.error("Error fetching categories:", err));
+        async function loadCategories() {
+            try {
+            const data = await getCategories({ take: 100 });
+
+            setCategories(data);
+
+            if (data.length > 0) {
+                setFormData((prev) => ({
+                ...prev,
+                categoryId: data[0].id,
+                }));
+            }
+            } catch (error) {
+            console.error("LOAD_CATEGORIES_ERROR:", error);
+            }
+        }
+
+        loadCategories();
     }, []);
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
@@ -44,27 +55,22 @@ export default function NewProductPage() {
         setLoading(true);
 
         try {
-            const res = await fetch("/api/products", {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify(formData)
-            });
+            await createAdminProduct(formData);
 
-            if (res.ok) {
-                router.push("/admin/products");
-                router.refresh();
-            } else {
-                const error = await res.json();
-                alert(error.error || "Failed to create product");
-            }
+            router.push("/admin/products");
+            router.refresh();
         } catch (error) {
-            console.error(error);
-            alert("Error creating product");
+            console.error("CREATE_ADMIN_PRODUCT_ERROR:", error);
+
+            alert(
+            error instanceof Error
+                ? error.message
+                : "Không thể tạo sản phẩm"
+            );
         } finally {
             setLoading(false);
         }
-    };
-
+        };
     return (
         <div className="w-full mx-auto pb-12 text-slate-900">
             <div className="mb-6">

@@ -7,6 +7,55 @@ import { SummaryCards } from "./_components/SummaryCards";
 import { TabSelector } from "./_components/TabSelector";
 import { MemberList } from "./_components/MemberList";
 import { TreeModal } from "./_components/TreeModal";
+import {
+    getAffiliateTeam,
+    type AffiliateTeamMember,
+} from "@/lib/api/affiliate";
+
+function mapToTeamMember(member: AffiliateTeamMember): TeamMember {
+    return {
+        id: member.id,
+        joinedAt: member.joinedAt || new Date().toISOString(),
+        user: {
+            id: member.user?.id || member.userId || member.id,
+            name: member.user?.name || member.name || "Người dùng",
+            email: member.user?.email || member.email || "",
+            avatar: member.user?.avatar || null,
+            createdAt:
+                member.user?.createdAt ||
+                member.joinedAt ||
+                new Date().toISOString(),
+            affiliate: {
+                rank: member.rank || "BA",
+                personalPV: Number(member.personalPV || 0),
+                teamPV: Number(member.teamPV || 0),
+            },
+        },
+    };
+}
+
+function mapToF2Member(member: AffiliateTeamMember): F2Member {
+    return {
+        id: member.id,
+        parentUserId: member.parentUserId || null,
+        joinedAt: member.joinedAt || new Date().toISOString(),
+        user: {
+            id: member.user?.id || member.userId || member.id,
+            name: member.user?.name || member.name || "Người dùng",
+            email: member.user?.email || member.email || "",
+            avatar: member.user?.avatar || null,
+            createdAt:
+                member.user?.createdAt ||
+                member.joinedAt ||
+                new Date().toISOString(),
+            affiliate: {
+                rank: member.rank || "BA",
+                personalPV: Number(member.personalPV || 0),
+                teamPV: Number(member.teamPV || 0),
+            },
+        },
+    };
+}
 
 export default function TeamPage() {
     const [f1, setF1] = useState<TeamMember[]>([]);
@@ -16,21 +65,42 @@ export default function TeamPage() {
     const [treeOpen, setTreeOpen] = useState(false);
 
     useEffect(() => {
-        const fetchTeam = async () => {
+        let mounted = true;
+
+        async function loadTeam() {
             try {
-                const res = await fetch("/api/affiliate/team");
-                if (res.ok) {
-                    const data = await res.json();
-                    setF1(data.f1);
-                    setF2(data.f2);
+                const data = await getAffiliateTeam();
+
+                const members = Array.isArray(data.members)
+                    ? data.members
+                    : [];
+
+                const f1Members = members
+                    .filter((member) => Number(member.level) === 1)
+                    .map(mapToTeamMember);
+
+                const f2Members = members
+                    .filter((member) => Number(member.level) === 2)
+                    .map(mapToF2Member);
+
+                if (mounted) {
+                    setF1(f1Members);
+                    setF2(f2Members);
                 }
-            } catch (err) {
-                console.error(err);
+            } catch (error) {
+                console.error("LOAD_AFFILIATE_TEAM_ERROR:", error);
             } finally {
-                setLoading(false);
+                if (mounted) {
+                    setLoading(false);
+                }
             }
+        }
+
+        loadTeam();
+
+        return () => {
+            mounted = false;
         };
-        fetchTeam();
     }, []);
 
     if (loading) {
@@ -46,12 +116,16 @@ export default function TeamPage() {
             <div className="space-y-6">
                 <div className="flex items-start justify-between gap-4">
                     <div>
-                        <h1 className="text-2xl font-bold tracking-tight">Mạng lưới</h1>
+                        <h1 className="text-2xl font-bold tracking-tight">
+                            Mạng lưới
+                        </h1>
                         <p className="text-muted-foreground text-sm mt-1">
                             Danh sách thành viên bạn đã giới thiệu
                         </p>
                     </div>
+
                     <button
+                        type="button"
                         onClick={() => setTreeOpen(true)}
                         className="inline-flex items-center gap-2 rounded-xl border border-border/40 bg-card/50 px-4 py-2 text-sm font-bold hover:border-primary/40 hover:text-primary transition-all shrink-0"
                     >
@@ -61,7 +135,14 @@ export default function TeamPage() {
                 </div>
 
                 <SummaryCards f1Count={f1.length} f2Count={f2.length} />
-                <TabSelector tab={tab} f1Count={f1.length} f2Count={f2.length} onTabChange={setTab} />
+
+                <TabSelector
+                    tab={tab}
+                    f1Count={f1.length}
+                    f2Count={f2.length}
+                    onTabChange={setTab}
+                />
+
                 <MemberList members={tab === "f1" ? f1 : f2} tab={tab} />
             </div>
 

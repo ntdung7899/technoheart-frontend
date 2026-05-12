@@ -1,10 +1,19 @@
-
 "use client";
 
-import Link from 'next/link';
-import { useState } from 'react';
-import { useRouter } from 'next/navigation';
-import { Mail, Lock, Eye, EyeOff, ArrowRight, Github, Chrome, Heart, Loader2 } from 'lucide-react';
+import Link from "next/link";
+import { useState } from "react";
+import { useRouter } from "next/navigation";
+import {
+  Mail,
+  Lock,
+  Eye,
+  EyeOff,
+  ArrowRight,
+  Chrome,
+  Heart,
+  Loader2,
+} from "lucide-react";
+import { login, getCurrentUser } from "@/lib/api/auth";
 
 export default function LoginPage() {
     const router = useRouter();
@@ -14,38 +23,82 @@ export default function LoginPage() {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
 
+    // const handleSubmit = async (e: React.FormEvent) => {
+    //     e.preventDefault();
+    //     setLoading(true);
+    //     setError('');
+
+    //     try {
+    //         const res = await fetch('/api/auth/login', {
+    //             method: 'POST',
+    //             headers: { 'Content-Type': 'application/json' },
+    //             body: JSON.stringify({ email, password }),
+    //         });
+
+    //         const data = await res.json();
+
+    //         if (!res.ok) {
+    //             setError(data.error || 'Đăng nhập thất bại');
+    //             return;
+    //         }
+
+    //         if (data.user?.role === 'ADMIN') {
+    //             router.push('/admin');
+    //         } else {
+    //             router.push('/account');
+    //         }
+    //         router.refresh();
+    //     } catch (error) {
+    //         setError('Không thể kết nối đến máy chủ. Vui lòng thử lại.');
+    //     } finally {
+    //         setLoading(false);
+    //     }
+    // };
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         setLoading(true);
-        setError('');
+        setError("");
 
         try {
-            const res = await fetch('/api/auth/login', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ email, password }),
+            await login({
+                email,
+                password,
             });
 
-            const data = await res.json();
+            const currentUser = await getCurrentUser();
 
-            if (!res.ok) {
-                setError(data.error || 'Đăng nhập thất bại');
-                return;
-            }
+            const role = String(currentUser?.role || "").toUpperCase();
 
-            if (data.user?.role === 'ADMIN') {
-                router.push('/admin');
+            const roles = Array.isArray(currentUser?.roles)
+                ? currentUser.roles.map((item) => String(item).toUpperCase())
+                : [];
+
+            const isAdmin =
+                role === "ADMIN" ||
+                role === "OWNER" ||
+                role === "SUPER_ADMIN" ||
+                roles.includes("ADMIN") ||
+                roles.includes("OWNER") ||
+                roles.includes("SUPER_ADMIN");
+
+            if (isAdmin) {
+                router.replace("/admin");
             } else {
-                router.push('/account');
+                router.replace("/account");
             }
+
             router.refresh();
         } catch (error) {
-            setError('Không thể kết nối đến máy chủ. Vui lòng thử lại.');
+            setError(
+                error instanceof Error
+                    ? error.message
+                    : "Không thể kết nối đến máy chủ. Vui lòng thử lại."
+            );
         } finally {
             setLoading(false);
         }
     };
-
+    
     return (
         <div className="min-h-[calc(100vh-4rem)] flex relative overflow-hidden bg-background">
             {/* Left: Visual Panel (desktop only) */}

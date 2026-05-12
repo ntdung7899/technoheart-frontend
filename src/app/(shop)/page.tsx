@@ -24,16 +24,18 @@ import {
 } from "lucide-react";
 import { ProductCard } from "@/components/ui/ProductCard";
 import { ContactForm } from "@/components/ui/ContactForm";
-import prisma from "@/lib/prisma";
+// import prisma from "@/lib/prisma";
+import { getFeaturedProducts } from "@/lib/api/products";
 import { formatPrice } from "@/lib/utils";
 
-async function getFeaturedProducts() {
-  return await prisma.product.findMany({
-    take: 8,
-    include: { category: true },
-    orderBy: { createdAt: "desc" },
-  });
-}
+// async function getFeaturedProducts() {
+//   return await prisma.product.findMany({
+//     take: 8,
+//     include: { category: true },
+//     orderBy: { createdAt: "desc" },
+//   });
+// }
+const featuredProducts = await getFeaturedProducts();
 
 // ─── Static content ───────────────────────────────────────────────────────────
 

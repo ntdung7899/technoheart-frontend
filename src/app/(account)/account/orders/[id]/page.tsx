@@ -7,30 +7,13 @@ import Image from "next/image";
 import { StatusBadge } from "@/components/account/StatusBadge";
 import { ArrowLeft, Loader2, Package, MapPin, Truck, CheckCircle2, XCircle } from "lucide-react";
 import { formatPrice } from "@/lib/utils";
+import {
+  getAccountOrderById,
+  type AccountOrder,
+} from "@/lib/api/account";
 
 
-interface OrderDetail {
-    id: string;
-    total: string;
-    shippingFee: string;
-    status: string;
-    paymentStatus: string;
-    createdAt: string;
-    updatedAt: string;
-    items: {
-        id: string;
-        quantity: number;
-        price: string;
-        product: { name: string; images: string[]; price: string };
-    }[];
-    address: {
-        street: string;
-        city: string;
-        state: string;
-        zip: string;
-        country: string;
-    };
-}
+type OrderDetail = AccountOrder;
 
 const trackingSteps = [
     { status: "PENDING", label: "Đặt hàng", icon: Package },
@@ -51,14 +34,25 @@ export default function OrderDetailPage() {
     const [error, setError] = useState("");
 
     useEffect(() => {
-        fetch(`/api/account/orders/${id}`)
-            .then((r) => r.json())
-            .then((data) => {
-                if (data.error) setError(data.error);
-                else setOrder(data.order);
-            })
-            .catch(() => setError("Không thể tải đơn hàng"))
-            .finally(() => setLoading(false));
+        async function loadOrder() {
+            try {
+                const data = await getAccountOrderById(String(id));
+                setOrder(data);
+            } catch (error) {
+                console.error("LOAD_ACCOUNT_ORDER_DETAIL_ERROR:", error);
+                setError(
+                    error instanceof Error
+                        ? error.message
+                        : "Không thể tải đơn hàng"
+                );
+            } finally {
+                setLoading(false);
+            }
+        }
+
+        if (id) {
+            loadOrder();
+        }
     }, [id]);
 
     if (loading) {
@@ -176,9 +170,9 @@ export default function OrderDetailPage() {
                                         className="h-full w-full object-cover"
                                         unoptimized
                                     />
-                                ) : (
+                                    ) : (
                                     <Package className="h-5 w-5 text-slate-400" />
-                                )}
+                                    )}
                             </div>
                             <div className="flex-1 min-w-0">
                                 <p className="text-sm font-medium text-slate-700 truncate">{item.product.name}</p>
@@ -200,9 +194,9 @@ export default function OrderDetailPage() {
                     <MapPin className="h-4 w-4 text-slate-400" />
                     <h2 className="text-sm font-semibold text-slate-700">Địa chỉ giao hàng</h2>
                 </div>
-                <p className="text-sm text-slate-700">{order.address.street}</p>
+                <p className="text-sm text-slate-700">{order.address?.street || "Đang cập nhật"}</p>
                 <p className="text-xs text-slate-400 mt-0.5">
-                    {order.address.city}, {order.address.state} {order.address.zip}
+                    {order.address?.city || ""}, {order.address?.state || ""} {order.address?.zip || ""}
                 </p>
             </div>
 

@@ -6,6 +6,11 @@ import {
     Globe, Facebook, Instagram, Twitter, CheckCircle2,
     Loader2, ArrowRight, Sparkles, Headphones, Users
 } from "lucide-react";
+import {
+  getContactInfo,
+  sendContactMessage,
+  type ContactInfo as ApiContactInfo,
+} from "@/lib/api/contact";
 
 interface ContactInfo {
     email: string; emailSub: string;
@@ -31,33 +36,60 @@ export default function ContactPage() {
     const [error, setError] = useState("");
 
     useEffect(() => {
-        fetch("/api/contact-info")
-            .then(r => r.json())
-            .then(d => { if (d.email) setInfo(d); })
-            .catch(() => { });
+    getContactInfo()
+        .then((data) => {
+            if (data?.email) {
+                setInfo({
+                    ...DEFAULT_INFO,
+                    ...data,
+                });
+            }
+        })
+        .catch(() => {});
     }, []);
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         setError("");
-        setSending(true);
-        try {
-            const res = await fetch("/api/contact", {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify(form),
-            });
-            if (res.ok) {
-                setSent(true);
-                setForm({ name: "", email: "", subject: "", body: "" });
-            } else {
-                const d = await res.json();
-                setError(d.error || "Có lỗi xảy ra, vui lòng thử lại.");
-            }
-        } catch {
-            setError("Không thể kết nối, vui lòng thử lại.");
+
+        const name = form.name.trim();
+        const email = form.email.trim();
+        const subject = form.subject.trim();
+        const body = form.body.trim();
+
+        if (!name || !email || !subject || !body) {
+            setError("Vui lòng nhập đầy đủ thông tin liên hệ.");
+            return;
         }
-        setSending(false);
+
+        setSending(true);
+
+        try {
+            await sendContactMessage({
+                name,
+                email,
+                subject,
+                body,
+            });
+
+            setSent(true);
+            setForm({
+                name: "",
+                email: "",
+                subject: "",
+                body: "",
+            });
+        } catch (error) {
+            console.error("SEND_CONTACT_MESSAGE_ERROR:", error);
+
+            setError(
+                error instanceof Error
+                    ? error.message
+                    : "Không thể gửi tin nhắn, vui lòng thử lại."
+            );
+        } finally {
+            setSending(false);
+        }
     };
 
     const contactCards = [
@@ -84,8 +116,8 @@ export default function ContactPage() {
         {
             icon: MapPin,
             title: "Văn phòng",
-            sub: info.addressSub,
-            value: info.address,
+            sub: info.addressSub || "Địa chỉ liên hệ",
+            value: info.address || "Đang cập nhật địa chỉ",
             href: null,
             gradient: "from-orange-500/10 to-amber-500/10",
             iconColor: "text-orange-600",
@@ -163,12 +195,56 @@ export default function ContactPage() {
                                 <h3 className="font-bold text-foreground mb-0.5">{item.title}</h3>
                                 <p className="text-muted-foreground text-xs mb-2">{item.sub}</p>
                                 {item.href ? (
-                                    <a href={item.href} className="text-primary font-semibold text-sm hover:underline inline-flex items-center gap-1 group/link">
+                                    <a
+                                        href={item.href}
+                                        className="text-primary font-semibold text-sm hover:underline inline-flex items-center gap-1 group/link break-words"
+                                    >
                                         {item.value}
-                                        <ArrowRight className="h-3.5 w-3.5 opacity-0 -translate-x-1 group-hover/link:opacity-100 group-hover/link:translate-x-0 transition-all" />
+                                        <ArrowRight className="h-3.5 w-3.5 opacity-0 -translate-x-1 group-hover/link:opacity-100 group-hover/link:translate-x-0 transition-all shrink-0" />
                                     </a>
-                                ) : (
-                                    <p className="text-foreground font-semibold text-sm">{item.value}</p>
+                                ) : item.title === "Văn phòng" ? (
+                                        <p className="text-foreground font-semibold text-sm leading-relaxed break-words whitespace-normal">
+                                            {(() => {
+                                                const value = item.value || "Đang cập nhật";
+
+                                                const company = value.match(/^(.+?)(?:,\s*Trụ sở:|Trụ sở:)/i)?.[1]?.trim();
+                                                const office = value.match(/Trụ sở:\s*(.+?)(?:,\s*Email:|Email:|$)/i)?.[1]?.trim();
+                                                const email = value.match(/Email:\s*(.+?)(?:,\s*Web:|Web:|$)/i)?.[1]?.trim();
+                                                const web = value.match(/Web:\s*(.+)$/i)?.[1]?.trim();
+
+                                                if (!company && !office && !email && !web) {
+                                                    return value;
+                                                }
+
+                                                return (
+                                                    <>
+                                                        {company && <span className="block">{company}</span>}
+
+                                                        {office && (
+                                                            <span className="block">
+                                                                Trụ sở: {office}
+                                                            </span>
+                                                        )}
+
+                                                        {email && (
+                                                            <span className="block">
+                                                                Email: {email}
+                                                            </span>
+                                                        )}
+
+                                                        {web && (
+                                                            <span className="block">
+                                                                Web: {web}
+                                                            </span>
+                                                        )}
+                                                    </>
+                                                );
+                                            })()}
+                                        </p>
+                                    ) : (
+                                    <p className="text-foreground font-semibold text-sm leading-relaxed break-words whitespace-normal">
+                                        {item.value || "Đang cập nhật"}
+                                    </p>
                                 )}
                             </div>
                         </div>
