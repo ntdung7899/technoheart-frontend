@@ -75,4 +75,4 @@ deploy:production:
     - echo "deploy:production finished - status=$CI_JOB_STATUS"
   environment:
     name: production
-    url: https://gateway.dev.meu-solutions.com/bekind/
+    url: https://technoheart.meu-solutions.com
