@@ -1,0 +1,78 @@
+# ==========================================
+# Author:         Duong Nhat Khoa
+# Email:          nhatkhoa.working@gmail.com
+# Phone:          +84 828 505 090
+# -----------------------------------
+# Created:        2026-05-13
+# LastEditTime:   2026-05-13
+# Version:        1.0
+# Status:         Updated
+# ==========================================
+
+stages:
+  - source
+  - build
+  - deploy
+
+variables:
+  DOCKER_BUILDKIT: "1"
+  COMPOSE_DOCKER_CLI_BUILD: "1"
+
+.job_base: &job_base
+  retry:
+    max: 1
+    when:
+      - runner_system_failure
+      - stuck_or_timeout_failure
+  only:
+    refs:
+      - release/prod
+    variables:
+      - $CI_COMMIT_MESSAGE =~ /^\[tag\]0.1-prod(\s|$)/
+
+source:
+  stage: source
+  <<: *job_base
+  tags:
+    - runner-builder
+  before_script:
+    - echo "source=$CI_PIPELINE_SOURCE ref=$CI_COMMIT_REF_NAME sha=$CI_COMMIT_SHORT_SHA"
+  script:
+    - bash cicd/source.sh
+  artifacts:
+    paths:
+      - cicd-release.env
+    expire_in: 1 day
+
+build:image:
+  stage: build
+  <<: *job_base
+  tags:
+    - runner-builder
+  dependencies:
+    - source
+  before_script:
+    - echo "source=$CI_PIPELINE_SOURCE ref=$CI_COMMIT_REF_NAME sha=$CI_COMMIT_SHORT_SHA"
+    - if [ -f cicd-release.env ]; then set -a; source <(grep -v '^\s*#' cicd-release.env); set +a; fi
+    - . cicd/env-param.sh
+    - cp "$env_file" .env
+  script:
+    - bash cicd/build.sh
+
+deploy:production:
+  stage: deploy
+  <<: *job_base
+  tags:
+    - runner-242
+  dependencies:
+    - source
+  before_script:
+    - echo "source=$CI_PIPELINE_SOURCE ref=$CI_COMMIT_REF_NAME sha=$CI_COMMIT_SHORT_SHA"
+    - if [ -f cicd-release.env ]; then set -a; source <(grep -v '^\s*#' cicd-release.env); set +a; fi
+  script:
+    - bash cicd/deploy-pro.sh
+  after_script:
+    - echo "deploy:production finished - status=$CI_JOB_STATUS"
+  environment:
+    name: production
+    url: https://gateway.dev.meu-solutions.com/bekind/

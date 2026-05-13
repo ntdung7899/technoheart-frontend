@@ -1,0 +1,27 @@
+# ==========================================
+# Author:         Duong Nhat Khoa
+# Email:          nhatkhoa.working@gmail.com
+# Phone:          +84 828 505 090
+# -----------------------------------
+# Created:        2026-05-13
+# LastEditTime:   2026-05-13
+# Version:        1.0
+# Status:         Updated
+# ==========================================
+
+services:
+   app:
+    container_name: ${ENVIRONMENT_NAME}-${PROJECT_NAME}
+    image: ${APP_IMAGE}
+    restart: unless-stopped
+    environment:
+      - NODE_ENV=production
+    ports:
+      - "${PORT_APP}:3000"
+    networks:
+      - meu-solutions-staging
+
+networks:
+  meu-solutions-staging:
+    external: true
+    name: meu-solutions-staging
