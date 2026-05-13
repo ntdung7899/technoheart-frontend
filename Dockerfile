@@ -36,8 +36,6 @@ FROM node:${NODE_VERSION} AS builder
 WORKDIR /app
 
 COPY --from=dependencies /app/node_modules ./node_modules
-COPY deploy/.env.build.staging .env
-COPY deploy/.env.build.staging .env.production
 COPY . .
 
 ENV NODE_ENV=production
@@ -78,7 +76,6 @@ FROM node:${NODE_VERSION} AS runner
 WORKDIR /app
 
 ENV NODE_ENV=production
-ENV APP_ENV=staging
 ENV PORT=3000
 ENV HOSTNAME=0.0.0.0
 

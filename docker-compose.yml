@@ -19,9 +19,9 @@ services:
     ports:
       - "${PORT_APP}:3000"
     networks:
-      - meu-solutions-staging
+      - meu-solutions-product-alpha-net
 
 networks:
-  meu-solutions-staging:
+  meu-solutions-product-alpha-net:
     external: true
-    name: meu-solutions-staging
+    name: meu-solutions-product-alpha-net
