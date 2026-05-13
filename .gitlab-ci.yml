@@ -63,7 +63,7 @@ deploy:production:
   stage: deploy
   <<: *job_base
   tags:
-    - runner-242
+    - runner-inet-79
   dependencies:
     - source
   before_script:
