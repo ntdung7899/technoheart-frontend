@@ -15,7 +15,7 @@ export project_name="technoheart-frontend"
 export image_name="registry.gitlab.com/meu-solutions/technoheart-frontend"
 export environment_name="production"
 
-export port_mapping_app="7035"
+export port_mapping_app="8151"
 
 export mount_data_folder="/mnt/data"
 export env_file="/home/gitlab-runner/technoheart-fe/.env"
