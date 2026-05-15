@@ -21,53 +21,6 @@ function SignupContent() {
         confirmPassword: ''
     });
 
-    // const handleSubmit = async (e: React.FormEvent) => {
-    //     e.preventDefault();
-    //     setError('');
-    //     setSuccess('');
-
-    //     if (formData.password.length < 6) {
-    //         setError('Mật khẩu phải có ít nhất 6 ký tự');
-    //         return;
-    //     }
-
-    //     if (formData.password !== formData.confirmPassword) {
-    //         setError('Mật khẩu xác nhận không khớp');
-    //         return;
-    //     }
-
-    //     setLoading(true);
-
-    //     try {
-    //         const res = await fetch('/api/auth/signup', {
-    //             method: 'POST',
-    //             headers: { 'Content-Type': 'application/json' },
-    //             body: JSON.stringify({
-    //                 name: formData.name,
-    //                 email: formData.email,
-    //                 password: formData.password,
-    //                 referralCode: referralCode || undefined,
-    //             }),
-    //         });
-
-    //         const data = await res.json();
-
-    //         if (!res.ok) {
-    //             setError(data.error || 'Đã có lỗi xảy ra');
-    //             return;
-    //         }
-
-    //         setSuccess('Đăng ký thành công! Đang chuyển hướng...');
-    //         setTimeout(() => {
-    //             router.push('/login');
-    //         }, 1500);
-    //     } catch {
-    //         setError('Không thể kết nối đến server. Vui lòng thử lại.');
-    //     } finally {
-    //         setLoading(false);
-    //     }
-    // };
-
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         setError('');
