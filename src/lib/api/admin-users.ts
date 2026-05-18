@@ -5,8 +5,10 @@ export type AdminUser = {
     id: string;
     name: string | null;
     email: string;
+    phone?: string | null;
     role: string;
     createdAt?: string;
+    updatedAt?: string;
     ordersCount: number;
     _count?: {
         orders: number;
@@ -16,6 +18,9 @@ export type AdminUser = {
 export type AdminUsersResponse = {
     items: AdminUser[];
     total: number;
+    totalPages: number;
+    currentPage: number;
+    pageSize: number;
 };
 
 export type UpdateAdminUserPayload = {
@@ -47,15 +52,84 @@ export async function getAdminUsers(
         }
     });
 
+    if (!query.has("currentPage")) {
+        query.set("currentPage", "1");
+    }
+
+    if (!query.has("pageSize")) {
+        query.set("pageSize", "10");
+    }
+
     const suffix = query.toString() ? `?${query.toString()}` : "";
 
-    const response = await apiFetch<
-        ApiResponse<AdminUsersResponse> | AdminUsersResponse
-    >(`/admin/users${suffix}`, {
+    const response = await apiFetch<any>(`/admin/users${suffix}`, {
         token,
     });
 
-    return unwrapData<AdminUsersResponse>(response);
+    const payload = unwrapData<any>(response);
+
+    const items =
+        payload?.items ||
+        payload?.rows ||
+        payload?.users ||
+        payload?.data?.items ||
+        payload?.data?.rows ||
+        payload?.data?.users ||
+        payload?.responseData?.items ||
+        payload?.responseData?.rows ||
+        payload?.responseData?.users ||
+        response?.responseData?.items ||
+        response?.responseData?.rows ||
+        response?.responseData?.users ||
+        [];
+
+    const total =
+        payload?.total ||
+        payload?.count ||
+        payload?.data?.total ||
+        payload?.data?.count ||
+        payload?.responseData?.total ||
+        payload?.responseData?.count ||
+        response?.responseData?.total ||
+        response?.responseData?.count ||
+        items.length;
+
+    const currentPage =
+        Number(
+            payload?.currentPage ||
+                payload?.data?.currentPage ||
+                payload?.responseData?.currentPage ||
+                response?.responseData?.currentPage ||
+                query.get("currentPage") ||
+                1
+        ) || 1;
+
+    const pageSize =
+        Number(
+            payload?.pageSize ||
+                payload?.data?.pageSize ||
+                payload?.responseData?.pageSize ||
+                response?.responseData?.pageSize ||
+                query.get("pageSize") ||
+                10
+        ) || 10;
+
+    const totalPages =
+        Number(
+            payload?.totalPages ||
+                payload?.data?.totalPages ||
+                payload?.responseData?.totalPages ||
+                response?.responseData?.totalPages ||
+                Math.max(1, Math.ceil(Number(total || 0) / pageSize))
+        ) || 1;
+
+    return {
+        items: Array.isArray(items) ? items : [],
+        total: Number(total || 0),
+        totalPages,
+        currentPage,
+        pageSize,
+    };
 }
 
 export async function updateAdminUser(

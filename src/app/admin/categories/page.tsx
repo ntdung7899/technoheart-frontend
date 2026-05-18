@@ -10,7 +10,11 @@ import {
   Edit,
   Package,
   LayoutGrid,
+  UploadCloud,
+  X,
 } from "lucide-react";
+
+import { uploadFile } from "@/lib/api/files";
 import Image from "next/image";
 import {
   getAdminCategories,
@@ -28,6 +32,8 @@ export default function AdminCategoriesPage() {
   const [formData, setFormData] = useState({ name: "", image: "" });
   const [editingId, setEditingId] = useState<string | null>(null);
   const [searchTerm, setSearchTerm] = useState("");
+  const [uploadingImage, setUploadingImage] = useState(false);
+  const [imagePreview, setImagePreview] = useState("");
 
   useEffect(() => {
     fetchCategories();
@@ -52,6 +58,7 @@ export default function AdminCategoriesPage() {
       name: category.name,
       image: category.image || "",
     });
+    setImagePreview(category.image || "");
     setIsModalOpen(true);
   };
 
@@ -80,7 +87,47 @@ export default function AdminCategoriesPage() {
   const openCreateModal = () => {
     setEditingId(null);
     setFormData({ name: "", image: "" });
+    setImagePreview("");
     setIsModalOpen(true);
+  };
+
+  const handleImageChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+
+    if (!file) return;
+
+    if (!file.type.startsWith("image/")) {
+      alert("Vui lòng chọn file hình ảnh");
+      return;
+    }
+
+    try {
+      setUploadingImage(true);
+
+      const previewUrl = URL.createObjectURL(file);
+      setImagePreview(previewUrl);
+
+      const uploadedUrl = await uploadFile(file);
+
+      setFormData((prev) => ({
+        ...prev,
+        image: uploadedUrl,
+      }));
+    } catch (error) {
+      console.error("UPLOAD_CATEGORY_IMAGE_ERROR:", error);
+      alert(error instanceof Error ? error.message : "Upload ảnh thất bại");
+    } finally {
+      setUploadingImage(false);
+      e.target.value = "";
+    }
+  };
+
+  const handleRemoveImage = () => {
+    setImagePreview("");
+    setFormData((prev) => ({
+      ...prev,
+      image: "",
+    }));
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -113,6 +160,7 @@ export default function AdminCategoriesPage() {
       }
 
       setFormData({ name: "", image: "" });
+      setImagePreview("");
       setEditingId(null);
       setIsModalOpen(false);
     } catch (error) {
@@ -296,39 +344,62 @@ export default function AdminCategoriesPage() {
                 />
               </div>
 
-              <div>
-                <label className="text-xs font-medium text-slate-600 mb-1 block">
-                  URL Hình ảnh
+              <div className="space-y-2">
+                <label className="text-xs font-medium text-slate-500">
+                  Hình ảnh danh mục
                 </label>
 
-                <div className="flex gap-2">
-                  <input
-                    type="text"
-                    className="h-9 flex-1 rounded-lg border border-slate-200 px-3 text-sm focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary/30 transition-all"
-                    value={formData.image}
-                    onChange={(e) =>
-                      setFormData({ ...formData, image: e.target.value })
-                    }
-                    placeholder="https://..."
-                  />
+                <div className="rounded-2xl border border-dashed border-slate-300 bg-slate-50 p-4">
+                  <div className="relative mb-4 aspect-video overflow-hidden rounded-xl border border-slate-200 bg-white">
+                    {imagePreview || formData.image ? (
+                      <>
+                        <img
+                          src={imagePreview || formData.image}
+                          alt="Ảnh danh mục"
+                          className="h-full w-full object-contain p-2"
+                        />
 
-                  <div className="h-9 w-9 rounded-lg border border-slate-200 flex items-center justify-center text-slate-400">
-                    <ImageIcon className="h-4 w-4" />
+                        <button
+                          type="button"
+                          onClick={handleRemoveImage}
+                          className="absolute right-2 top-2 flex h-7 w-7 items-center justify-center rounded-full bg-white/90 text-slate-500 shadow-sm hover:bg-red-50 hover:text-red-600 transition-colors"
+                        >
+                          <X className="h-4 w-4" />
+                        </button>
+                      </>
+                    ) : (
+                      <div className="flex h-full flex-col items-center justify-center text-center">
+                        <div className="mb-3 flex h-12 w-12 items-center justify-center rounded-xl bg-blue-50 text-blue-600">
+                          <UploadCloud className="h-6 w-6" />
+                        </div>
+                        <p className="text-sm font-semibold text-slate-700">
+                          Chọn ảnh từ máy
+                        </p>
+                        <p className="mt-1 text-xs text-slate-400">
+                          PNG, JPG, JPEG, WEBP
+                        </p>
+                      </div>
+                    )}
                   </div>
+
+                  <label className="flex h-10 cursor-pointer items-center justify-center rounded-xl bg-blue-600 px-4 text-sm font-semibold text-white hover:bg-blue-700 transition-colors">
+                    {uploadingImage ? "Đang upload..." : "Tải ảnh lên"}
+                    <input
+                      type="file"
+                      accept="image/*"
+                      onChange={handleImageChange}
+                      disabled={uploadingImage}
+                      className="hidden"
+                    />
+                  </label>
+
+                  {formData.image && (
+                    <p className="mt-3 line-clamp-2 break-all text-xs text-slate-400">
+                      {formData.image}
+                    </p>
+                  )}
                 </div>
               </div>
-
-              {formData.image && (
-                <div className="relative h-32 w-full rounded-lg border border-slate-200 overflow-hidden bg-slate-50">
-                  <Image
-                    src={formData.image}
-                    alt="Preview"
-                    fill
-                    className="object-contain p-2"
-                    unoptimized
-                  />
-                </div>
-              )}
 
               <div className="flex items-center gap-3 pt-2">
                 <button
