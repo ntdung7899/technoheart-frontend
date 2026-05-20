@@ -75,7 +75,16 @@ export async function getAddresses(): Promise<AccountAddress[]> {
     token,
   });
 
-  return unwrapData<AccountAddress[]>(response);
+  const payload = unwrapData<any>(response);
+
+  if (Array.isArray(payload)) return payload;
+  if (Array.isArray(payload?.data)) return payload.data;
+  if (Array.isArray(payload?.responseData)) return payload.responseData;
+  if (Array.isArray(payload?.responseData?.data)) {
+    return payload.responseData.data;
+  }
+
+  return [];
 }
 
 export async function createAddress(
@@ -163,9 +172,23 @@ export type AccountOrder = {
   paymentStatus?: string;
   paymentMethod?: string;
   transactionId?: string;
+  referralCode?: string | null;
   createdAt: string;
   updatedAt?: string;
   items: AccountOrderItem[];
+
+  itemCount?: number;
+  itemsCount?: number;
+  orderItemCount?: number;
+  productCount?: number;
+  totalItems?: number;
+  totalQuantity?: number;
+  _count?: {
+    items?: number;
+    orderItems?: number;
+    products?: number;
+  };
+
   address?: {
     street: string;
     city: string;
@@ -178,21 +201,170 @@ export type AccountOrder = {
   };
 };
 
-export async function getAccountOrders(): Promise<AccountOrder[]> {
+export type AccountOrdersPage = {
+  count: number;
+  rows: AccountOrder[];
+  totalPages: number;
+  currentPage: number;
+  pageSize: number;
+};
+
+const DEFAULT_PAGE_SIZE = 10;
+
+function getOrderItems(order: any): any[] {
+  const items =
+    order?.items ||
+    order?.orderItems ||
+    order?.OrderItems ||
+    order?.orderitems ||
+    order?.order_items ||
+    order?.details ||
+    order?.orderDetails ||
+    order?.OrderDetails ||
+    order?.products ||
+    order?.Products ||
+    order?.cartItems ||
+    order?.CartItems ||
+    [];
+
+  return Array.isArray(items) ? items : [];
+}
+
+function normalizeProduct(item: any) {
+  const product =
+    item?.product ||
+    item?.Product ||
+    item?.products ||
+    item?.Products ||
+    item;
+
+  return {
+    id: product?.id || item?.productId || item?.product_id || "",
+    name:
+      product?.name ||
+      product?.title ||
+      item?.productName ||
+      item?.product_name ||
+      "Sản phẩm",
+    images: Array.isArray(product?.images) ? product.images : [],
+    price: product?.price || item?.price || 0,
+  };
+}
+
+function normalizeOrderItem(item: any, index: number): AccountOrderItem {
+  return {
+    id: item?.id || item?.productId || item?.product_id || `item-${index}`,
+    quantity: Number(item?.quantity || item?.qty || 1),
+    price: item?.price || item?.unitPrice || item?.unit_price || 0,
+    product: normalizeProduct(item),
+  };
+}
+
+function normalizeOrder(order: any): AccountOrder {
+  const items = getOrderItems(order).map(normalizeOrderItem);
+
+  return {
+    ...order,
+    id: order.id,
+    total: Number(order.total || 0),
+    shippingFee: Number(order.shippingFee || order.shipping_fee || 0),
+    status: order.status || "PENDING",
+    paymentStatus: order.paymentStatus || order.payment_status || "UNPAID",
+    paymentMethod: order.paymentMethod || order.payment_method || "",
+    transactionId: order.transactionId || order.transaction_id || "",
+    referralCode: order.referralCode || order.referral_code || null,
+    createdAt: order.createdAt || order.created_at,
+    updatedAt: order.updatedAt || order.updated_at,
+    items,
+    address: order.address || order.Address || order.orderAddress || undefined,
+  };
+}
+
+function normalizeAccountOrdersPage(
+  value: AccountOrdersPage | AccountOrder[] | any,
+  fallbackPage = 1,
+  fallbackPageSize = DEFAULT_PAGE_SIZE
+): AccountOrdersPage {
+  if (Array.isArray(value)) {
+    return {
+      count: value.length,
+      rows: value.map(normalizeOrder),
+      totalPages: 1,
+      currentPage: fallbackPage,
+      pageSize: fallbackPageSize,
+    };
+  }
+
+  const pageData =
+    Array.isArray(value?.rows)
+      ? value
+      : Array.isArray(value?.data?.rows)
+        ? value.data
+        : Array.isArray(value?.responseData?.rows)
+          ? value.responseData
+          : Array.isArray(value?.responseData?.data?.rows)
+            ? value.responseData.data
+            : null;
+
+  const rows = Array.isArray(pageData?.rows)
+    ? pageData.rows.map(normalizeOrder)
+    : [];
+
+  return {
+    count: Number(pageData?.count || rows.length || 0),
+    rows,
+    totalPages: Number(pageData?.totalPages || 1),
+    currentPage: Number(pageData?.currentPage || fallbackPage),
+    pageSize: Number(pageData?.pageSize || fallbackPageSize),
+  };
+}
+
+function normalizeAccountOrderDetail(value: any): AccountOrder | null {
+  const candidates = [
+    value,
+    value?.data,
+    value?.responseData,
+    value?.order,
+    value?.data?.order,
+    value?.responseData?.order,
+    value?.data?.data,
+    value?.responseData?.data,
+    value?.responseData?.data?.data,
+  ];
+
+  const order = candidates.find(
+    (item) => item && typeof item === "object" && item.id
+  );
+
+  if (!order) return null;
+
+  return normalizeOrder(order);
+}
+
+export async function getAccountOrders(params?: {
+  currentPage?: number;
+  pageSize?: number;
+}): Promise<AccountOrdersPage> {
   const token = getAuthToken();
 
   if (!token) {
     throw new Error("Bạn chưa đăng nhập");
   }
 
-  const response = await apiFetch<ApiResponse<AccountOrder[]> | AccountOrder[]>(
-    "/account/orders",
-    {
-      token,
-    }
-  );
+  const currentPage = params?.currentPage ?? 1;
+  const pageSize = params?.pageSize ?? DEFAULT_PAGE_SIZE;
 
-  return unwrapData<AccountOrder[]>(response);
+  const response = await apiFetch<
+    ApiResponse<AccountOrdersPage | AccountOrder[]> |
+    AccountOrdersPage |
+    AccountOrder[]
+  >(`/account/orders?currentPage=${currentPage}&pageSize=${pageSize}`, {
+    token,
+  });
+
+  const payload = unwrapData<any>(response);
+
+  return normalizeAccountOrdersPage(payload, currentPage, pageSize);
 }
 
 export async function getAccountOrderById(id: string): Promise<AccountOrder> {
@@ -209,7 +381,22 @@ export async function getAccountOrderById(id: string): Promise<AccountOrder> {
     }
   );
 
-  return unwrapData<AccountOrder>(response);
+  const payload = unwrapData<any>(response);
+
+  const order =
+    normalizeAccountOrderDetail(payload) ||
+    normalizeAccountOrderDetail(response);
+
+  if (!order?.id) {
+    console.error("INVALID_ACCOUNT_ORDER_DETAIL_RESPONSE:", {
+      response,
+      payload,
+    });
+
+    throw new Error("Dữ liệu chi tiết đơn hàng không hợp lệ");
+  }
+
+  return order;
 }
 
 export type WishlistProduct = {
@@ -243,7 +430,16 @@ export async function getWishlist(): Promise<AccountWishlistItem[]> {
     token,
   });
 
-  return unwrapData<AccountWishlistItem[]>(response);
+  const payload = unwrapData<any>(response);
+
+  if (Array.isArray(payload)) return payload;
+  if (Array.isArray(payload?.data)) return payload.data;
+  if (Array.isArray(payload?.responseData)) return payload.responseData;
+  if (Array.isArray(payload?.responseData?.data)) {
+    return payload.responseData.data;
+  }
+
+  return [];
 }
 
 export async function addToWishlist(productId: string): Promise<unknown> {
@@ -364,5 +560,14 @@ export async function getAccountSecurityHistory(): Promise<LoginHistoryItem[]> {
     token,
   });
 
-  return unwrapData<LoginHistoryItem[]>(response);
+  const payload = unwrapData<any>(response);
+
+  if (Array.isArray(payload)) return payload;
+  if (Array.isArray(payload?.data)) return payload.data;
+  if (Array.isArray(payload?.responseData)) return payload.responseData;
+  if (Array.isArray(payload?.responseData?.data)) {
+    return payload.responseData.data;
+  }
+
+  return [];
 }

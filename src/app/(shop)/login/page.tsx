@@ -22,38 +22,7 @@ export default function LoginPage() {
     const [error, setError] = useState('');
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
-
-    // const handleSubmit = async (e: React.FormEvent) => {
-    //     e.preventDefault();
-    //     setLoading(true);
-    //     setError('');
-
-    //     try {
-    //         const res = await fetch('/api/auth/login', {
-    //             method: 'POST',
-    //             headers: { 'Content-Type': 'application/json' },
-    //             body: JSON.stringify({ email, password }),
-    //         });
-
-    //         const data = await res.json();
-
-    //         if (!res.ok) {
-    //             setError(data.error || 'Đăng nhập thất bại');
-    //             return;
-    //         }
-
-    //         if (data.user?.role === 'ADMIN') {
-    //             router.push('/admin');
-    //         } else {
-    //             router.push('/account');
-    //         }
-    //         router.refresh();
-    //     } catch (error) {
-    //         setError('Không thể kết nối đến máy chủ. Vui lòng thử lại.');
-    //     } finally {
-    //         setLoading(false);
-    //     }
-    // };
+    
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         setLoading(true);
