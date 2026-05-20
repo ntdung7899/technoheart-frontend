@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
-import { Heart, ShoppingBag, Loader2, Trash2 } from "lucide-react";
+import { Heart, Loader2, Trash2, ShoppingCart } from "lucide-react";
 import { EmptyState } from "@/components/account/EmptyState";
 import { formatPrice } from "@/lib/utils";
 import {
@@ -81,7 +81,7 @@ export default function WishlistPage() {
         action={
           <Link
             href="/products"
-            className="px-4 py-2 rounded-xl bg-blue-600 text-white text-sm font-semibold hover:bg-blue-700 transition-colors"
+            className="px-4 py-2 rounded-xl bg-primary text-primary-foreground text-sm font-bold hover:opacity-90 transition-opacity"
           >
             Khám phá sản phẩm
           </Link>
@@ -92,22 +92,24 @@ export default function WishlistPage() {
 
   return (
     <div className="space-y-6">
-      <h1 className="text-2xl font-bold tracking-tight text-slate-800">
-        Sản phẩm yêu thích
-      </h1>
+      <h1 className="text-2xl font-bold tracking-tight">Yêu thích</h1>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
         {items.map((item) => {
           const product = item.product;
           const imageUrl = resolveImageUrl(product.images?.[0]);
+          const isRemoving = removingId === product.id;
 
           return (
             <div
               key={item.id}
-              className="rounded-2xl border border-slate-200 bg-white overflow-hidden hover:shadow-md transition-all"
+              className="rounded-2xl border border-border/60 bg-card p-4 flex items-center justify-between gap-4"
             >
-              <Link href={`/products/${product.id}`} className="block">
-                <div className="relative h-44 bg-slate-50">
+              <Link
+                href={`/products/${product.id}`}
+                className="flex items-center gap-4 min-w-0 flex-1"
+              >
+                <div className="relative h-22 w-22 shrink-0 overflow-hidden rounded-xl bg-secondary">
                   <Image
                     src={imageUrl}
                     alt={product.name}
@@ -117,38 +119,43 @@ export default function WishlistPage() {
                   />
                 </div>
 
-                <div className="p-4">
-                  <h3 className="text-sm font-bold text-slate-900 line-clamp-2">
+                <div className="min-w-0">
+                  <h3 className="text-base font-semibold text-foreground line-clamp-1">
                     {product.name}
                   </h3>
 
-                  <p className="mt-2 text-lg font-bold text-blue-600">
+                  <p className="mt-1 text-xl font-bold text-foreground">
                     {formatPrice(product.price)}
+                  </p>
+
+                  <p className="mt-1 text-sm text-muted-foreground">
+                    Còn hàng
                   </p>
                 </div>
               </Link>
 
-              <div className="px-4 pb-4 flex items-center justify-between gap-2">
-                <Link
-                  href={`/products/${product.id}`}
-                  className="flex-1 inline-flex items-center justify-center gap-2 rounded-xl bg-blue-600 px-3 py-2 text-xs font-bold text-white hover:bg-blue-700 transition-colors"
-                >
-                  <ShoppingBag className="h-4 w-4" />
-                  Xem chi tiết
-                </Link>
-
+              <div className="flex flex-col items-center gap-4 shrink-0">
                 <button
                   type="button"
-                  onClick={() => handleRemove(product.id)}
-                  disabled={removingId === product.id}
-                  className="inline-flex h-9 w-9 items-center justify-center rounded-xl border border-red-100 text-red-500 hover:bg-red-50 disabled:opacity-50 transition-colors"
+                  onClick={() => handleRemove(product.id || item.productId)}
+                  disabled={isRemoving}
+                  className="text-muted-foreground hover:text-destructive disabled:opacity-50 transition-colors"
+                  title="Xoá khỏi yêu thích"
                 >
-                  {removingId === product.id ? (
+                  {isRemoving ? (
                     <Loader2 className="h-4 w-4 animate-spin" />
                   ) : (
                     <Trash2 className="h-4 w-4" />
                   )}
                 </button>
+
+                <Link
+                  href={`/products/${product.id}`}
+                  className="text-muted-foreground hover:text-primary transition-colors"
+                  title="Xem sản phẩm"
+                >
+                  <ShoppingCart className="h-4 w-4" />
+                </Link>
               </div>
             </div>
           );
