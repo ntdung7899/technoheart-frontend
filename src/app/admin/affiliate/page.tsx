@@ -27,7 +27,12 @@ function toQueryParams(params: URLSearchParams) {
 }
 
 function normalizeAffiliateResponse(data: any) {
-    const profiles = data?.profiles || data?.items || [];
+    const profiles =
+        data?.rows ||
+        data?.affiliates ||
+        data?.profiles ||
+        data?.items ||
+        [];
 
     const overview =
         data?.overview ||
@@ -38,7 +43,10 @@ function normalizeAffiliateResponse(data: any) {
     const totalPages =
         data?.pagination?.totalPages ||
         data?.totalPages ||
-        Math.max(1, Math.ceil(Number(data?.total || profiles.length || 0) / 20));
+        Math.max(
+            1,
+            Math.ceil(Number(data?.count || data?.total || profiles.length || 0) / 20)
+        );
 
     return {
         profiles,
@@ -48,7 +56,11 @@ function normalizeAffiliateResponse(data: any) {
 }
 
 function normalizeCommissionResponse(data: any) {
-    const rawItems = data?.commissions || data?.items || [];
+    const rawItems =
+        data?.rows ||
+        data?.commissions ||
+        data?.items ||
+        [];
 
     const commissions = rawItems.map((item: any) => {
         const affiliate = item.affiliate || {};
@@ -158,18 +170,10 @@ export default function AdminAffiliatePage() {
                 Object.fromEntries(params.entries())
             );
 
-            const rawCommissions =
-                (data as any).commissions ||
-                (data as any).items ||
-                [];
+            const normalized = normalizeCommissionResponse(data);
 
-            const totalPagesValue =
-                (data as any).pagination?.totalPages ||
-                (data as any).totalPages ||
-                Math.max(1, Math.ceil(rawCommissions.length / 20));
-
-            setCommissions(rawCommissions);
-            setTotalPages(totalPagesValue);
+            setCommissions(normalized.commissions);
+            setTotalPages(normalized.totalPages);
         } catch (error) {
             console.error("LOAD_ADMIN_AFFILIATE_COMMISSIONS_ERROR:", error);
             setCommissions([]);
