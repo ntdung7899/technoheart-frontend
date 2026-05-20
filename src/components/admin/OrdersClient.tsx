@@ -44,9 +44,26 @@ interface Order {
     user: { name: string | null; email: string };
     _count: { items: number };
 }
+type OrdersPageData = {
+    count: number;
+    rows: Order[];
+    totalPages: number;
+    currentPage: number;
+    pageSize: number;
+};
 
-export default function AdminOrdersClient({ initialOrders }: { initialOrders: Order[] }) {
-    const [orders, setOrders] = useState<Order[]>(initialOrders);
+type AdminOrdersClientProps = {
+    initialOrders: Order[] | OrdersPageData | null | undefined;
+};
+
+export default function AdminOrdersClient({ initialOrders }: AdminOrdersClientProps) {
+    const normalizedOrders = Array.isArray(initialOrders)
+        ? initialOrders
+        : Array.isArray(initialOrders?.rows)
+            ? initialOrders.rows
+            : [];
+
+    const [orders, setOrders] = useState<Order[]>(normalizedOrders);
     const [menuOpen, setMenuOpen] = useState<string | null>(null);
     const [statusMenuMode, setStatusMenuMode] = useState<'delivery' | 'payment' | null>(null);
     
@@ -111,13 +128,17 @@ export default function AdminOrdersClient({ initialOrders }: { initialOrders: Or
     };
     
 
-    const filtered = orders.filter(o => {
+    const safeOrders = Array.isArray(orders) ? orders : [];
+
+    const filtered = safeOrders.filter((o) => {
         const query = searchQuery.toLowerCase();
-        const matchSearch = !query ||
-            o.id.toLowerCase().includes(query) ||
-            o.user.name?.toLowerCase().includes(query) ||
-            o.user.email.toLowerCase().includes(query);
-            
+
+        const matchSearch =
+            !query ||
+            o.id?.toLowerCase().includes(query) ||
+            o.user?.name?.toLowerCase().includes(query) ||
+            o.user?.email?.toLowerCase().includes(query);
+
         const matchDelivery = !deliveryFilter || o.status === deliveryFilter;
         const matchPayment = !paymentFilter || o.paymentStatus === paymentFilter;
 

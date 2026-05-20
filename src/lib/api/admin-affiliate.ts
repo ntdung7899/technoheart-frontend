@@ -224,40 +224,47 @@ export async function updateAdminWithdrawalStatus(
   return unwrapData<AdminWithdrawalRequest>(response);
 }
 
-export async function getAdminWithdrawals(
-  params?: Record<string, string | number | boolean | undefined>
-): Promise<AdminWithdrawalRequest[]> {
-  const token = getRequiredToken();
+export async function getAdminWithdrawals(): Promise<AdminWithdrawalRequest[]> {
+  const token = getAuthToken();
 
-  const query = new URLSearchParams();
+  if (!token) {
+    throw new Error("Bạn chưa đăng nhập");
+  }
 
-  Object.entries(params || {}).forEach(([key, value]) => {
-    if (value !== undefined && value !== "") {
-      query.set(key, String(value));
-    }
-  });
-
-  const suffix = query.toString() ? `?${query.toString()}` : "";
-
-  const response = await apiFetch<
-    ApiResponse<AdminWithdrawalRequest[]> | AdminWithdrawalRequest[]
-  >(`/admin/affiliate/withdrawals${suffix}`, {
+  const response = await apiFetch<any>("/admin/affiliate/withdrawals", {
     token,
   });
 
-  return unwrapData<AdminWithdrawalRequest[]>(response);
+  const payload = unwrapData<any>(response);
+
+  const rows =
+    payload?.rows ||
+    payload?.withdrawals ||
+    payload?.data?.rows ||
+    payload?.data?.withdrawals ||
+    payload?.responseData?.rows ||
+    payload?.responseData?.withdrawals ||
+    [];
+
+  if (!Array.isArray(rows)) {
+    console.error("INVALID_ADMIN_WITHDRAWALS_RESPONSE:", response);
+    return [];
+  }
+
+  return rows;
 }
 
 export async function deleteAdminAffiliate(id: string): Promise<unknown> {
-  const token = getRequiredToken();
+  const token = getAuthToken();
 
-  const response = await apiFetch<ApiResponse<unknown> | unknown>(
-    `/admin/affiliate/${id}`,
-    {
-      method: "DELETE",
-      token,
-    }
-  );
+  if (!token) {
+    throw new Error("Bạn chưa đăng nhập");
+  }
+
+  const response = await apiFetch(`/admin/affiliate/${id}`, {
+    method: "DELETE",
+    token,
+  });
 
   return unwrapData(response);
 }

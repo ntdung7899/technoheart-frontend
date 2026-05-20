@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import {
     Search,
     Filter,
@@ -11,6 +11,8 @@ import {
     Trash2,
     Edit,
     Loader2,
+    ChevronLeft,
+    ChevronRight,
 } from "lucide-react";
 import {
     getAdminUsers,
@@ -19,11 +21,13 @@ import {
     type AdminUser,
 } from "@/lib/api/admin-users";
 
+const PAGE_SIZE = 10;
+
 function normalizeUser(user: AdminUser): AdminUser {
     return {
         ...user,
         name: user.name || null,
-        role: user.role || "USER",
+        role: String(user.role || "USER").toUpperCase(),
         ordersCount: Number(user.ordersCount ?? user._count?.orders ?? 0),
     };
 }
@@ -31,26 +35,38 @@ function normalizeUser(user: AdminUser): AdminUser {
 export default function AdminUsersPage() {
     const [users, setUsers] = useState<AdminUser[]>([]);
     const [loading, setLoading] = useState(true);
+
     const [search, setSearch] = useState("");
     const [roleFilter, setRoleFilter] = useState("");
 
-    async function loadUsers() {
+    const [currentPage, setCurrentPage] = useState(1);
+    const [totalPages, setTotalPages] = useState(1);
+    const [totalUsers, setTotalUsers] = useState(0);
+
+    const loadUsers = useCallback(async () => {
         try {
             setLoading(true);
 
             const data = await getAdminUsers({
                 search,
                 role: roleFilter,
+                currentPage,
+                pageSize: PAGE_SIZE,
             });
 
             setUsers((data.items || []).map(normalizeUser));
+            setTotalUsers(Number(data.total || 0));
+            setTotalPages(Number(data.totalPages || 1));
         } catch (error) {
             console.error("LOAD_ADMIN_USERS_ERROR:", error);
+
             setUsers([]);
+            setTotalUsers(0);
+            setTotalPages(1);
         } finally {
             setLoading(false);
         }
-    }
+    }, [search, roleFilter, currentPage]);
 
     useEffect(() => {
         const timer = setTimeout(() => {
@@ -58,25 +74,27 @@ export default function AdminUsersPage() {
         }, 250);
 
         return () => clearTimeout(timer);
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [search, roleFilter]);
+    }, [loadUsers]);
 
-    const filteredUsers = useMemo(() => {
-        const keyword = search.toLowerCase().trim();
-
+    const displayUsers = useMemo(() => {
         return users.filter((user) => {
-            const matchSearch =
-                !keyword ||
-                String(user.name || "").toLowerCase().includes(keyword) ||
-                String(user.email || "").toLowerCase().includes(keyword);
-
             const matchRole =
                 !roleFilter ||
                 String(user.role || "").toUpperCase() === roleFilter;
 
-            return matchSearch && matchRole;
+            return matchRole;
         });
-    }, [users, search, roleFilter]);
+    }, [users, roleFilter]);
+
+    const handleSearchChange = (value: string) => {
+        setSearch(value);
+        setCurrentPage(1);
+    };
+
+    const handleRoleChange = (value: string) => {
+        setRoleFilter(value);
+        setCurrentPage(1);
+    };
 
     const handleEdit = async (user: AdminUser) => {
         const nextName = window.prompt("Nhập tên người dùng:", user.name || "");
@@ -129,7 +147,18 @@ export default function AdminUsersPage() {
         try {
             await deleteAdminUser(user.id);
 
-            setUsers((prev) => prev.filter((item) => item.id !== user.id));
+            const nextTotal = Math.max(totalUsers - 1, 0);
+            const nextTotalPages = Math.max(1, Math.ceil(nextTotal / PAGE_SIZE));
+
+            setTotalUsers(nextTotal);
+            setTotalPages(nextTotalPages);
+
+            if (currentPage > nextTotalPages) {
+                setCurrentPage(nextTotalPages);
+                return;
+            }
+
+            await loadUsers();
         } catch (error) {
             console.error("DELETE_ADMIN_USER_ERROR:", error);
 
@@ -139,6 +168,14 @@ export default function AdminUsersPage() {
                     : "Không thể xóa người dùng"
             );
         }
+    };
+
+    const goToPreviousPage = () => {
+        setCurrentPage((prev) => Math.max(prev - 1, 1));
+    };
+
+    const goToNextPage = () => {
+        setCurrentPage((prev) => Math.min(prev + 1, totalPages));
     };
 
     return (
@@ -154,30 +191,41 @@ export default function AdminUsersPage() {
             </div>
 
             {/* Search */}
-            <div className="flex items-center gap-3">
-                <div className="relative flex-1 max-w-md group">
-                    <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400 group-focus-within:text-primary transition-colors" />
-                    <input
-                        type="text"
-                        placeholder="Tìm kiếm theo tên hoặc email..."
-                        value={search}
-                        onChange={(event) => setSearch(event.target.value)}
-                        className="h-9 w-full rounded-lg border border-slate-200 bg-white pl-9 pr-3 text-sm focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary/30 transition-all"
-                    />
+            <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
+                <div className="flex items-center gap-3">
+                    <div className="relative flex-1 max-w-md group">
+                        <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400 group-focus-within:text-primary transition-colors" />
+                        <input
+                            type="text"
+                            placeholder="Tìm kiếm theo tên hoặc email..."
+                            value={search}
+                            onChange={(event) =>
+                                handleSearchChange(event.target.value)
+                            }
+                            className="h-9 w-full rounded-lg border border-slate-200 bg-white pl-9 pr-3 text-sm focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary/30 transition-all"
+                        />
+                    </div>
+
+                    <div className="relative">
+                        <Filter className="absolute left-3 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-slate-400" />
+                        <select
+                            value={roleFilter}
+                            onChange={(event) =>
+                                handleRoleChange(event.target.value)
+                            }
+                            className="h-9 pl-8 pr-8 rounded-lg border border-slate-200 bg-white text-sm text-slate-600 focus:outline-none focus:ring-2 focus:ring-primary/20 appearance-none cursor-pointer"
+                        >
+                            <option value="">Vai trò</option>
+                            <option value="USER">USER</option>
+                            <option value="ADMIN">ADMIN</option>
+                        </select>
+                    </div>
                 </div>
 
-                <div className="relative">
-                    <Filter className="absolute left-3 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-slate-400" />
-                    <select
-                        value={roleFilter}
-                        onChange={(event) => setRoleFilter(event.target.value)}
-                        className="h-9 pl-8 pr-8 rounded-lg border border-slate-200 bg-white text-sm text-slate-600 focus:outline-none focus:ring-2 focus:ring-primary/20 appearance-none cursor-pointer"
-                    >
-                        <option value="">Vai trò</option>
-                        <option value="USER">USER</option>
-                        <option value="ADMIN">ADMIN</option>
-                    </select>
-                </div>
+                <p className="text-sm text-slate-500">
+                    Tổng <span className="font-semibold">{totalUsers}</span>{" "}
+                    người dùng
+                </p>
             </div>
 
             {/* Users Table */}
@@ -217,7 +265,7 @@ export default function AdminUsersPage() {
                                         </div>
                                     </td>
                                 </tr>
-                            ) : filteredUsers.length === 0 ? (
+                            ) : displayUsers.length === 0 ? (
                                 <tr>
                                     <td
                                         colSpan={5}
@@ -227,7 +275,7 @@ export default function AdminUsersPage() {
                                     </td>
                                 </tr>
                             ) : (
-                                filteredUsers.map((user) => (
+                                displayUsers.map((user) => (
                                     <tr
                                         key={user.id}
                                         className="group hover:bg-slate-50/50 transition-colors"
@@ -235,7 +283,11 @@ export default function AdminUsersPage() {
                                         <td className="px-4 py-3">
                                             <div className="flex items-center gap-2.5">
                                                 <div className="h-8 w-8 rounded-full bg-slate-100 flex items-center justify-center text-xs font-medium text-slate-600">
-                                                    {(user.name || user.email || "U")
+                                                    {(
+                                                        user.name ||
+                                                        user.email ||
+                                                        "U"
+                                                    )
                                                         .slice(0, 1)
                                                         .toUpperCase()}
                                                 </div>
@@ -319,7 +371,9 @@ export default function AdminUsersPage() {
                                                         <button
                                                             type="button"
                                                             onClick={() =>
-                                                                handleDelete(user)
+                                                                handleDelete(
+                                                                    user
+                                                                )
                                                             }
                                                             className="h-8 w-8 flex items-center justify-center rounded-md hover:bg-red-50 hover:text-red-500 transition-colors"
                                                         >
@@ -334,6 +388,42 @@ export default function AdminUsersPage() {
                             )}
                         </tbody>
                     </table>
+                </div>
+            </div>
+
+            {/* Pagination */}
+            <div className="flex items-center justify-between rounded-xl border border-slate-200 bg-white px-4 py-3 shadow-sm">
+                <p className="text-sm text-slate-500">
+                    Trang{" "}
+                    <span className="font-semibold text-slate-700">
+                        {currentPage}
+                    </span>{" "}
+                    /{" "}
+                    <span className="font-semibold text-slate-700">
+                        {totalPages}
+                    </span>
+                </p>
+
+                <div className="flex items-center gap-2">
+                    <button
+                        type="button"
+                        onClick={goToPreviousPage}
+                        disabled={loading || currentPage <= 1}
+                        className="inline-flex h-9 items-center gap-1 rounded-lg border border-slate-200 px-3 text-sm font-semibold text-slate-600 transition-colors hover:bg-slate-50 disabled:cursor-not-allowed disabled:opacity-50"
+                    >
+                        <ChevronLeft className="h-4 w-4" />
+                        Trước
+                    </button>
+
+                    <button
+                        type="button"
+                        onClick={goToNextPage}
+                        disabled={loading || currentPage >= totalPages}
+                        className="inline-flex h-9 items-center gap-1 rounded-lg border border-slate-200 px-3 text-sm font-semibold text-slate-600 transition-colors hover:bg-slate-50 disabled:cursor-not-allowed disabled:opacity-50"
+                    >
+                        Sau
+                        <ChevronRight className="h-4 w-4" />
+                    </button>
                 </div>
             </div>
         </div>
