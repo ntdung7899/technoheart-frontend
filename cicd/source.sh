@@ -6,7 +6,7 @@
 # Phone:          +84 828 505 090
 # -----------------------------------
 # Created:        2026-05-13
-# LastEditTime:   2026-05-13
+# LastEditTime:   2026-05-21
 # Version:        1.0
 # Status:         Updated
 # ==========================================
@@ -22,7 +22,7 @@ docker version
 echo "=== Gathering traceability information ==="
 GIT_COMMIT_SHA="${CI_COMMIT_SHA:-$(git rev-parse HEAD)}"
 APP_VERSION="${CI_COMMIT_SHORT_SHA:-$(git rev-parse --short HEAD)}"
-IMAGE_TAG="${environment_name}"
+IMAGE_TAG=${CI_COMMIT_MESSAGE#\[tag\]}
 CI_PIPELINE_ID="${CI_PIPELINE_ID:-}"
 CI_JOB_URL="${CI_JOB_URL:-}"
 
