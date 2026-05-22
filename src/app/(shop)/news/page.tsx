@@ -1,8 +1,7 @@
-
 import Link from 'next/link';
 import Image from 'next/image';
 import { Calendar, Clock, ArrowRight, Tag } from 'lucide-react';
-import prisma from '@/lib/prisma';
+import { getNews } from "@/lib/api/news";
 
 export const metadata = {
     title: "Tin tức | Technoheart",
@@ -12,17 +11,24 @@ export const metadata = {
 export const dynamic = 'force-dynamic';
 
 export default async function NewsPage() {
-    const articles = await prisma.news.findMany({
-        where: { published: true },
-        orderBy: { createdAt: 'desc' },
-        include: { author: { select: { name: true } } },
-    });
+    const articles = await getNews();
 
     const featuredPost = articles.find(a => a.featured) || articles[0];
     const regularPosts = articles.filter(a => a.id !== featuredPost?.id);
 
-    const formatDate = (date: Date) =>
-        new Date(date).toLocaleDateString('vi-VN', { day: 'numeric', month: 'long', year: 'numeric' });
+    const formatDate = (date?: string | Date) => {
+        if (!date) return "Đang cập nhật";
+
+        return new Date(date).toLocaleDateString('vi-VN', {
+            day: 'numeric',
+            month: 'long',
+            year: 'numeric',
+        });
+    };
+
+    const hasValidImage = (imageUrl?: string) => {
+        return Boolean(imageUrl && imageUrl !== "/placeholder.png");
+    };
 
     return (
         <div className="min-h-screen bg-background">
@@ -55,11 +61,12 @@ export default async function NewsPage() {
                                 <Link href={`/news/${featuredPost.id}`} className="group relative block overflow-hidden rounded-xl bg-card border border-border/50 shadow-lg hover:shadow-xl transition-shadow duration-500">
                                     <div className="grid lg:grid-cols-2 gap-0">
                                         <div className="relative aspect-[16/9] lg:aspect-auto lg:min-h-[360px] overflow-hidden bg-secondary/20">
-                                            {featuredPost.image ? (
+                                            {hasValidImage(featuredPost.imageUrl) ? (
                                                 <Image
-                                                    src={featuredPost.image}
+                                                    src={featuredPost.imageUrl}
                                                     alt={featuredPost.title}
                                                     fill
+                                                    unoptimized
                                                     className="object-cover transition-transform duration-700 group-hover:scale-105"
                                                 />
                                             ) : (
@@ -72,7 +79,7 @@ export default async function NewsPage() {
                                         <div className="p-8 md:p-10 lg:p-12 flex flex-col justify-center">
                                             <div className="flex items-center gap-3 mb-5">
                                                 <span className="bg-primary px-3 py-1 rounded-lg text-xs font-semibold text-primary-foreground">
-                                                    {featuredPost.category}
+                                                    {featuredPost.category || "Tin tức"}
                                                 </span>
                                                 <span className="text-xs text-muted-foreground font-medium flex items-center gap-1.5">
                                                     <Calendar className="w-3 h-3" /> {formatDate(featuredPost.createdAt)}
@@ -103,11 +110,12 @@ export default async function NewsPage() {
                                         className="group flex flex-col bg-card rounded-xl border border-border/50 overflow-hidden card-hover"
                                     >
                                         <div className="relative aspect-[16/10] overflow-hidden bg-secondary/20">
-                                            {post.image ? (
+                                            {hasValidImage(post.imageUrl) ? (
                                                 <Image
-                                                    src={post.image}
+                                                    src={post.imageUrl}
                                                     alt={post.title}
                                                     fill
+                                                    unoptimized
                                                     className="object-cover transition-transform duration-500 group-hover:scale-105"
                                                 />
                                             ) : (
@@ -117,14 +125,18 @@ export default async function NewsPage() {
                                             )}
                                             <div className="absolute top-3 left-3">
                                                 <span className="bg-background/90 backdrop-blur-sm px-2.5 py-1 rounded-lg text-xs font-semibold uppercase tracking-wider border border-border/50">
-                                                    {post.category}
+                                                    {post.category || "Tin tức"}
                                                 </span>
                                             </div>
                                         </div>
                                         <div className="p-5 flex flex-col flex-1">
                                             <div className="flex items-center gap-4 text-xs text-muted-foreground font-semibold mb-3 uppercase tracking-wider">
-                                                <span className="flex items-center gap-1.5"><Calendar className="w-3 h-3" /> {formatDate(post.createdAt)}</span>
-                                                <span className="flex items-center gap-1.5"><Clock className="w-3 h-3" /> {post.readTime}</span>
+                                                <span className="flex items-center gap-1.5">
+                                                    <Calendar className="w-3 h-3" /> {formatDate(post.createdAt)}
+                                                </span>
+                                                <span className="flex items-center gap-1.5">
+                                                    <Clock className="w-3 h-3" /> {post.readTime || "5 phút đọc"}
+                                                </span>
                                             </div>
                                             <h3 className="text-lg font-bold mb-2 group-hover:text-primary transition-colors line-clamp-2 leading-snug">
                                                 {post.title}

@@ -6,52 +6,86 @@ interface WithdrawalCardProps {
     balance: number;
     loading: boolean;
     onWithdraw: (amount: number, bankName: string, accountNumber: string, accountName: string) => Promise<void>;
-    lastBankInfo?: {
+    savedBankInfo ?: {
         bankName: string;
         accountNumber: string;
         accountName: string;
     };
 }
 
-export function WithdrawalCard({ balance, loading, onWithdraw, lastBankInfo }: WithdrawalCardProps) {
+export function WithdrawalCard({ balance, loading, onWithdraw, savedBankInfo  }: WithdrawalCardProps) {
     const [isOpen, setIsOpen] = useState(false);
     const [amount, setAmount] = useState<string>("");
     
-    const [useSavedBank, setUseSavedBank] = useState<boolean>(!!lastBankInfo);
+    const [lastBankInfo, setSavedBankInfo] = useState(savedBankInfo  || null);
+    const [useSavedBank, setUseSavedBank] = useState<boolean>(!!savedBankInfo );
 
     const [bankName, setBankName] = useState("");
     const [accountNumber, setAccountNumber] = useState("");
     const [accountName, setAccountName] = useState("");
 
     useEffect(() => {
+        if (savedBankInfo ) {
+            setSavedBankInfo(savedBankInfo );
+        }
+    }, [savedBankInfo ]);
+
+    useEffect(() => {
         if (isOpen) {
-            setUseSavedBank(!!lastBankInfo);
+            setUseSavedBank(!!savedBankInfo);
             setAmount("");
         }
-    }, [isOpen, lastBankInfo]);
+    }, [isOpen, savedBankInfo]);
 
     const handleAction = async () => {
         const numAmount = Number(amount);
-        
-        if (useSavedBank && lastBankInfo) {
-            await onWithdraw(numAmount, lastBankInfo.bankName, lastBankInfo.accountNumber, lastBankInfo.accountName);
-            setIsOpen(false);
+
+        if (!numAmount || numAmount <= 0 || numAmount > balance) {
             return;
         }
 
-        if (numAmount > 0 && bankName && accountNumber && accountName) {
-            await onWithdraw(numAmount, bankName, accountNumber, accountName.toUpperCase());
-            setIsOpen(false);
-            setBankName("");
-            setAccountNumber("");
-            setAccountName("");
+        let nextBankInfo = savedBankInfo;
+
+        if (useSavedBank && savedBankInfo) {
+            nextBankInfo = {
+                bankName: savedBankInfo.bankName,
+                accountNumber: savedBankInfo.accountNumber,
+                accountName: savedBankInfo.accountName,
+            };
+        } else {
+            if (!bankName || !accountNumber || !accountName) {
+                return;
+            }
+
+            nextBankInfo = {
+                bankName: bankName.trim(),
+                accountNumber: accountNumber.trim(),
+                accountName: accountName.trim().toUpperCase(),
+            };
         }
+
+        await onWithdraw(
+            numAmount,
+            nextBankInfo.bankName,
+            nextBankInfo.accountNumber,
+            nextBankInfo.accountName
+        );
+
+        // Lưu lại STK vừa rút để mở modal lần sau không phải nhập lại
+        setSavedBankInfo(nextBankInfo);
+        setUseSavedBank(true);
+
+        setIsOpen(false);
+        setAmount("");
+        setBankName("");
+        setAccountNumber("");
+        setAccountName("");
     };
 
     const isOverBalance = Number(amount) > balance;
     
-    const isFormValid = useSavedBank 
-        ? amount && !isOverBalance && lastBankInfo 
+    const isFormValid = useSavedBank
+        ? amount && !isOverBalance && savedBankInfo
         : amount && !isOverBalance && bankName && accountNumber && accountName;
 
     return (
@@ -133,7 +167,7 @@ export function WithdrawalCard({ balance, loading, onWithdraw, lastBankInfo }: W
                             <div className="space-y-3">
                                 <label className="text-sm font-medium">Tài khoản nhận tiền</label>
                                 
-                                {lastBankInfo && (
+                                {savedBankInfo  && (
                                     <div 
                                         onClick={() => setUseSavedBank(true)}
                                         className={`p-3 border rounded-lg cursor-pointer transition-all flex items-start gap-3 ${
@@ -142,9 +176,9 @@ export function WithdrawalCard({ balance, loading, onWithdraw, lastBankInfo }: W
                                     >
                                         <CreditCard className={`h-5 w-5 mt-0.5 ${useSavedBank ? "text-primary" : "text-muted-foreground"}`} />
                                         <div className="flex-1">
-                                            <p className="font-semibold text-sm">{lastBankInfo.bankName}</p>
-                                            <p className="text-sm font-mono mt-0.5">{lastBankInfo.accountNumber}</p>
-                                            <p className="text-xs text-muted-foreground mt-0.5 uppercase">{lastBankInfo.accountName}</p>
+                                            <p className="font-semibold text-sm">{savedBankInfo .bankName}</p>
+                                            <p className="text-sm font-mono mt-0.5">{savedBankInfo .accountNumber}</p>
+                                            <p className="text-xs text-muted-foreground mt-0.5 uppercase">{savedBankInfo .accountName}</p>
                                         </div>
                                         {useSavedBank && <CheckCircle2 className="h-5 w-5 text-primary" />}
                                     </div>

@@ -4,19 +4,15 @@ import { useEffect, useState } from "react";
 import { AddressCard } from "@/components/account/AddressCard";
 import { EmptyState } from "@/components/account/EmptyState";
 import { MapPin, Plus, Loader2, X } from "lucide-react";
+import {
+    getAddresses,
+    createAddress,
+    updateAddress,
+    deleteAddress,
+    type AccountAddress,
+} from "@/lib/api/account";
 
-interface Address {
-    id: string;
-    label: string | null;
-    street: string;
-    city: string;
-    state: string;
-    zip: string;
-    country: string;
-    latitude: number | null;
-    longitude: number | null;
-    isDefault: boolean;
-}
+type Address = AccountAddress;
 
 const emptyForm = {
     label: "",
@@ -39,12 +35,15 @@ export default function AddressesPage() {
     const [saving, setSaving] = useState(false);
     const [error, setError] = useState("");
 
-    const fetchAddresses = () => {
-        fetch("/api/account/addresses")
-            .then((r) => r.json())
-            .then((data) => setAddresses(data.addresses || []))
-            .catch(console.error)
-            .finally(() => setLoading(false));
+    const fetchAddresses = async () => {
+        try {
+            const data = await getAddresses();
+            setAddresses(data);
+        } catch (error) {
+            console.error("FETCH_ADDRESSES_ERROR:", error);
+        } finally {
+            setLoading(false);
+        }
     };
 
     useEffect(() => {
@@ -87,25 +86,35 @@ export default function AddressesPage() {
         setError("");
 
         try {
-            const method = editId ? "PUT" : "POST";
-            const body = editId ? { ...form, id: editId } : form;
+            const payload = {
+                label: form.label || null,
+                street: form.street,
+                city: form.city,
+                state: form.state,
+                zip: form.zip,
+                country: form.country,
+                latitude: form.latitude || null,
+                longitude: form.longitude || null,
+                isDefault: form.isDefault,
+            };
 
-            const res = await fetch("/api/account/addresses", {
-                method,
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify(body),
-            });
-
-            if (!res.ok) {
-                const data = await res.json();
-                setError(data.error || "Có lỗi xảy ra");
-                return;
+            if (editId) {
+                await updateAddress({
+                    ...payload,
+                    id: editId,
+                });
+            } else {
+                await createAddress(payload);
             }
 
             setShowForm(false);
-            fetchAddresses();
-        } catch {
-            setError("Có lỗi xảy ra");
+            await fetchAddresses();
+        } catch (error) {
+            setError(
+                error instanceof Error
+                    ? error.message
+                    : "Có lỗi xảy ra"
+            );
         } finally {
             setSaving(false);
         }
@@ -115,23 +124,38 @@ export default function AddressesPage() {
         if (!confirm("Bạn có chắc muốn xoá địa chỉ này?")) return;
 
         try {
-            await fetch(`/api/account/addresses?id=${id}`, { method: "DELETE" });
+            await deleteAddress(id);
             setAddresses((prev) => prev.filter((a) => a.id !== id));
-        } catch {
-            console.error("Delete failed");
+        } catch (error) {
+            console.error("DELETE_ADDRESS_ERROR:", error);
         }
     };
 
     const handleSetDefault = async (id: string) => {
+        const addr = addresses.find((a) => a.id === id);
+
+        if (!addr) return;
+
         try {
-            await fetch("/api/account/addresses", {
-                method: "PUT",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ id, isDefault: true }),
+            await updateAddress({
+                id,
+                label: addr.label,
+                street: addr.street,
+                city: addr.city,
+                state: addr.state,
+                zip: addr.zip,
+                country: addr.country,
+                latitude: addr.latitude,
+                longitude: addr.longitude,
+                isDefault: true,
+                name: addr.name,
+                phone: addr.phone,
+                ward: addr.ward,
             });
-            fetchAddresses();
-        } catch {
-            console.error("Set default failed");
+
+            await fetchAddresses();
+        } catch (error) {
+            console.error("SET_DEFAULT_ADDRESS_ERROR:", error);
         }
     };
 

@@ -1,32 +1,89 @@
-import prisma from "@/lib/prisma";
+"use client";
+
+import { useEffect, useState } from "react";
+import { Loader2 } from "lucide-react";
 import WithdrawalsClient from "../_components/WithdrawalsClient";
+import {
+    getAdminWithdrawals,
+    type AdminWithdrawalRequest,
+} from "@/lib/api/admin-affiliate";
 
-export const dynamic = 'force-dynamic';
+type WithdrawalRow = {
+    id: string;
+    amount: number;
+    bankName: string;
+    accountNumber: string;
+    accountName: string;
+    status: string;
+    createdAt: string;
+    user: {
+        name: string | null;
+        email: string;
+        referralCode: string;
+    };
+};
 
-export default async function AdminWithdrawalsPage() {
-    const requests = await prisma.withdrawalRequest.findMany({
-        include: {
-            affiliate: {
-                include: { user: true }
-            }
-        },
-        orderBy: { createdAt: 'desc' }
-    });
-
-    const serialized = requests.map(r => ({
-        id: r.id,
-        amount: Number(r.amount),
-        bankName: r.bankName,
-        accountNumber: r.accountNumber,
-        accountName: r.accountName,
-        status: r.status,
-        createdAt: r.createdAt.toISOString(),
+function mapWithdrawal(item: AdminWithdrawalRequest): WithdrawalRow {
+    return {
+        id: item.id,
+        amount: Number(item.amount || 0),
+        bankName: item.bankName || "",
+        accountNumber: item.accountNumber || "",
+        accountName: item.accountName || "",
+        status: item.status || "PENDING",
+        createdAt: item.createdAt || new Date().toISOString(),
         user: {
-            name: r.affiliate.user.name,
-            email: r.affiliate.user.email,
-            referralCode: r.affiliate.referralCode
-        }
-    }));
+            name: item.affiliate?.user?.name || null,
+            email: item.affiliate?.user?.email || "",
+            referralCode: item.affiliate?.referralCode || "",
+        },
+    };
+}
 
-    return <WithdrawalsClient initialData={serialized} />;
+export default function AdminWithdrawalsPage() {
+    const [requests, setRequests] = useState<WithdrawalRow[]>([]);
+    const [loading, setLoading] = useState(true);
+
+    useEffect(() => {
+        let mounted = true;
+
+        async function loadWithdrawals() {
+            try {
+                const data = await getAdminWithdrawals();
+
+                if (mounted) {
+                    setRequests(data.map(mapWithdrawal));
+                }
+            } catch (error) {
+                console.error("LOAD_ADMIN_WITHDRAWALS_ERROR:", error);
+
+                if (mounted) {
+                    setRequests([]);
+                }
+            } finally {
+                if (mounted) {
+                    setLoading(false);
+                }
+            }
+        }
+
+        loadWithdrawals();
+
+        return () => {
+            mounted = false;
+        };
+    }, []);
+
+    if (loading) {
+        return (
+            <div className="flex min-h-[360px] items-center justify-center">
+                <div className="flex items-center gap-3 text-sm font-semibold text-slate-500">
+                    <Loader2 className="h-5 w-5 animate-spin" />
+                    Đang tải yêu cầu rút tiền...
+                </div>
+            </div>
+        );
+    }
+
+    return <WithdrawalsClient initialData={requests} />;
 }

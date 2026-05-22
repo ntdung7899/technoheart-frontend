@@ -5,15 +5,16 @@ import { useRouter } from "next/navigation";
 import Link from "next/link";
 import Image from "next/image";
 import {
-    ArrowLeft, Send, Loader2, ImageIcon, Eye, EyeOff, Star
-} from "lucide-react";
+    ArrowLeft, Send, Loader2, ImageIcon, Eye, EyeOff, Star, UploadCloud, X, } from "lucide-react";
+import { uploadFile } from "@/lib/api/files";
 import RichTextEditor from "@/components/admin/RichTextEditor";
+import { createAdminNews } from "@/lib/api/admin-news";
+import {
+    getAdminNewsCategories,
+    type AdminNewsCategory,
+} from "@/lib/api/admin-news-categories";
 
-interface NewsCategory {
-    id: string;
-    name: string;
-    color: string;
-}
+type NewsCategory = AdminNewsCategory;
 
 export default function NewNewsPage() {
     const router = useRouter();
@@ -21,11 +22,33 @@ export default function NewNewsPage() {
     const [error, setError] = useState("");
     const [preview, setPreview] = useState(false);
     const [categories, setCategories] = useState<NewsCategory[]>([]);
+    const [uploadingImage, setUploadingImage] = useState(false);
+    const [imagePreview, setImagePreview] = useState("");
 
     useEffect(() => {
-        fetch("/api/news-categories")
-            .then(r => r.json())
-            .then(data => setCategories(Array.isArray(data) ? data : []));
+        let mounted = true;
+
+        async function loadCategories() {
+            try {
+                const data = await getAdminNewsCategories();
+
+                if (mounted) {
+                    setCategories(Array.isArray(data) ? data : []);
+                }
+            } catch (error) {
+                console.error("LOAD_ADMIN_NEWS_CATEGORIES_ERROR:", error);
+
+                if (mounted) {
+                    setCategories([]);
+                }
+            }
+        }
+
+        loadCategories();
+
+        return () => {
+            mounted = false;
+        };
     }, []);
 
     const [form, setForm] = useState({
@@ -41,24 +64,73 @@ export default function NewNewsPage() {
 
     const set = (field: string, value: any) => setForm(prev => ({ ...prev, [field]: value }));
 
+    const handleImageChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+        const file = e.target.files?.[0];
+
+        if (!file) return;
+
+        if (!file.type.startsWith("image/")) {
+            alert("Vui lòng chọn file hình ảnh");
+            return;
+        }
+
+        try {
+            setUploadingImage(true);
+
+            const previewUrl = URL.createObjectURL(file);
+            setImagePreview(previewUrl);
+
+            const uploadedUrl = await uploadFile(file);
+
+            set("image", uploadedUrl);
+        } catch (error) {
+            console.error("UPLOAD_NEWS_IMAGE_ERROR:", error);
+            alert(error instanceof Error ? error.message : "Upload ảnh thất bại");
+        } finally {
+            setUploadingImage(false);
+            e.target.value = "";
+        }
+        };
+
+        const handleRemoveImage = () => {
+        setImagePreview("");
+        set("image", "");
+        };
+
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         setError("");
+
         if (!form.title.trim() || !form.excerpt.trim() || !form.content.trim()) {
             setError("Vui lòng điền đầy đủ các trường bắt buộc.");
             return;
         }
+
         setLoading(true);
-        const res = await fetch("/api/news", {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify(form),
-        });
-        if (res.ok) {
+
+        try {
+            await createAdminNews({
+                title: form.title,
+                excerpt: form.excerpt,
+                content: form.content,
+                category: form.category || "Tin tức",
+                image: form.image,
+                readTime: form.readTime,
+                featured: form.featured,
+                published: form.published,
+            });
+
             router.push("/admin/news");
-        } else {
-            const data = await res.json();
-            setError(data.error || "Có lỗi xảy ra, vui lòng thử lại.");
+            router.refresh();
+        } catch (error) {
+            console.error("CREATE_ADMIN_NEWS_ERROR:", error);
+
+            setError(
+                error instanceof Error
+                    ? error.message
+                    : "Có lỗi xảy ra, vui lòng thử lại."
+            );
+        } finally {
             setLoading(false);
         }
     };
@@ -209,26 +281,65 @@ export default function NewNewsPage() {
                     </div>
 
                     {/* Thumbnail */}
-                    <div className="rounded-xl border border-slate-200 bg-white shadow-sm p-5 space-y-3">
-                        <label className="text-xs font-medium text-slate-500">
-                            <span className="flex items-center gap-2">
-                                <ImageIcon className="h-3.5 w-3.5" />
-                                URL ảnh bìa
-                            </span>
-                        </label>
-                        <input
-                            type="url"
-                            value={form.image}
-                            onChange={e => set("image", e.target.value)}
-                            placeholder="https://..."
-                            className="w-full h-9 rounded-lg border border-slate-200 bg-white px-3 text-sm focus:outline-none focus:ring-2 focus:ring-primary/20"
-                        />
-                        {form.image && (
-                            <div className="aspect-video rounded-lg overflow-hidden border border-slate-100 bg-slate-50 relative">
-                                <Image src={form.image} alt="preview" fill className="object-cover" unoptimized onError={e => { (e.target as HTMLImageElement).style.display = "none" }} />
+                    <div className="rounded-xl border border-slate-200 bg-white shadow-sm p-5 space-y-4">
+                        <div className="flex items-center gap-2">
+                            <div className="h-8 w-8 rounded-lg bg-orange-50 text-orange-600 flex items-center justify-center">
+                            <ImageIcon className="h-4 w-4" />
                             </div>
-                        )}
-                    </div>
+                            <p className="text-sm font-bold text-slate-800">Ảnh đại diện bài viết</p>
+                        </div>
+
+                        <div className="rounded-2xl border border-dashed border-slate-300 bg-slate-50/70 p-4">
+                            <div className="relative mb-4 aspect-video overflow-hidden rounded-xl border border-slate-200 bg-white">
+                            {imagePreview || form.image ? (
+                                <>
+                                <img
+                                    src={imagePreview || form.image}
+                                    alt="Ảnh bài viết"
+                                    className="h-full w-full object-contain p-2"
+                                />
+
+                                <button
+                                    type="button"
+                                    onClick={handleRemoveImage}
+                                    className="absolute right-2 top-2 flex h-7 w-7 items-center justify-center rounded-full bg-white/90 text-slate-500 shadow-sm hover:bg-red-50 hover:text-red-600 transition-colors"
+                                >
+                                    <X className="h-4 w-4" />
+                                </button>
+                                </>
+                            ) : (
+                                <div className="flex h-full flex-col items-center justify-center text-center">
+                                <div className="mb-3 flex h-12 w-12 items-center justify-center rounded-xl bg-blue-50 text-blue-600">
+                                    <UploadCloud className="h-6 w-6" />
+                                </div>
+                                <p className="text-sm font-semibold text-slate-700">
+                                    Chọn ảnh từ máy
+                                </p>
+                                <p className="mt-1 text-xs text-slate-400">
+                                    PNG, JPG, JPEG, WEBP
+                                </p>
+                                </div>
+                            )}
+                            </div>
+
+                            <label className="flex h-10 cursor-pointer items-center justify-center rounded-xl bg-blue-600 px-4 text-sm font-semibold text-white hover:bg-blue-700 transition-colors">
+                            {uploadingImage ? "Đang upload..." : "Tải ảnh lên"}
+                            <input
+                                type="file"
+                                accept="image/*"
+                                onChange={handleImageChange}
+                                disabled={uploadingImage}
+                                className="hidden"
+                            />
+                            </label>
+
+                            {form.image && (
+                            <p className="mt-3 line-clamp-2 break-all text-xs text-slate-400">
+                                {form.image}
+                            </p>
+                            )}
+                        </div>
+                        </div>
 
                     {/* Submit */}
                     <button

@@ -1,10 +1,10 @@
-
 "use client";
 
 import Link from 'next/link';
 import { useState, Suspense } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { Mail, Lock, User, Eye, EyeOff, ArrowRight, Github, Chrome, Heart, CheckCircle2, Loader2 } from 'lucide-react';
+import { register } from "@/lib/api/auth";
 
 function SignupContent() {
     const router = useRouter();
@@ -39,30 +39,24 @@ function SignupContent() {
         setLoading(true);
 
         try {
-            const res = await fetch('/api/auth/signup', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                    name: formData.name,
-                    email: formData.email,
-                    password: formData.password,
-                    referralCode: referralCode || undefined,
-                }),
+            await register({
+                name: formData.name,
+                email: formData.email,
+                password: formData.password,
+                referralCode: referralCode || undefined,
             });
 
-            const data = await res.json();
-
-            if (!res.ok) {
-                setError(data.error || 'Đã có lỗi xảy ra');
-                return;
-            }
-
             setSuccess('Đăng ký thành công! Đang chuyển hướng...');
+
             setTimeout(() => {
                 router.push('/login');
             }, 1500);
-        } catch {
-            setError('Không thể kết nối đến server. Vui lòng thử lại.');
+        } catch (error) {
+            setError(
+                error instanceof Error
+                    ? error.message
+                    : 'Không thể kết nối đến server. Vui lòng thử lại.'
+            );
         } finally {
             setLoading(false);
         }

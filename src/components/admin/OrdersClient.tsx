@@ -6,6 +6,8 @@ import {
     Eye, Search, ShoppingBag, MoreHorizontal,
     Check, ChevronDown, Loader2, RefreshCw, Truck, Package, Ban, DollarSign
 } from "lucide-react";
+// import { updateOrderStatus } from "@/lib/api/orders";
+import { updateAdminOrder } from "@/lib/api/admin-orders";
 
 const DELIVERY_OPTIONS = [
     { value: 'PENDING', label: 'Chờ xử lý', color: 'orange', icon: Package },
@@ -42,9 +44,26 @@ interface Order {
     user: { name: string | null; email: string };
     _count: { items: number };
 }
+type OrdersPageData = {
+    count: number;
+    rows: Order[];
+    totalPages: number;
+    currentPage: number;
+    pageSize: number;
+};
 
-export default function AdminOrdersClient({ initialOrders }: { initialOrders: Order[] }) {
-    const [orders, setOrders] = useState<Order[]>(initialOrders);
+type AdminOrdersClientProps = {
+    initialOrders: Order[] | OrdersPageData | null | undefined;
+};
+
+export default function AdminOrdersClient({ initialOrders }: AdminOrdersClientProps) {
+    const normalizedOrders = Array.isArray(initialOrders)
+        ? initialOrders
+        : Array.isArray(initialOrders?.rows)
+            ? initialOrders.rows
+            : [];
+
+    const [orders, setOrders] = useState<Order[]>(normalizedOrders);
     const [menuOpen, setMenuOpen] = useState<string | null>(null);
     const [statusMenuMode, setStatusMenuMode] = useState<'delivery' | 'payment' | null>(null);
     
@@ -67,42 +86,59 @@ export default function AdminOrdersClient({ initialOrders }: { initialOrders: Or
         return () => document.removeEventListener("mousedown", handler);
     }, []);
 
-    const handleStatusChange = async (orderId: string, type: 'delivery' | 'payment', newValue: string) => {
+    const handleStatusChange = async (
+        orderId: string,
+        type: "delivery" | "payment",
+        newValue: string
+    ) => {
         setLoading(orderId);
         setMenuOpen(null);
         setStatusMenuMode(null);
-        try {
-            const bodyData = type === 'delivery' 
-                ? { status: newValue } 
-                : { paymentStatus: newValue };
 
-            const res = await fetch(`/api/orders/${orderId}`, {
-                method: "PATCH",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify(bodyData),
-            });
-            if (res.ok) {
-                setOrders(prev => prev.map(o => {
+        try {
+            const bodyData =
+                type === "delivery"
+                    ? { status: newValue }
+                    : { paymentStatus: newValue };
+
+            await updateAdminOrder(orderId, bodyData);
+
+            setOrders((prev) =>
+                prev.map((o) => {
                     if (o.id === orderId) {
-                        return type === 'delivery' ? { ...o, status: newValue } : { ...o, paymentStatus: newValue };
+                        return type === "delivery"
+                            ? { ...o, status: newValue }
+                            : { ...o, paymentStatus: newValue };
                     }
+
                     return o;
-                }));
-            }
-        } catch (e) {
-            console.error(e);
+                })
+            );
+        } catch (error) {
+            console.error("UPDATE_ADMIN_ORDER_ERROR:", error);
+
+            alert(
+                error instanceof Error
+                    ? error.message
+                    : "Không thể cập nhật trạng thái đơn hàng."
+            );
         } finally {
             setLoading(null);
         }
     };
+    
 
-    const filtered = orders.filter(o => {
+    const safeOrders = Array.isArray(orders) ? orders : [];
+
+    const filtered = safeOrders.filter((o) => {
         const query = searchQuery.toLowerCase();
-        const matchSearch = !query ||
-            o.id.toLowerCase().includes(query) ||
-            o.user.name?.toLowerCase().includes(query) ||
-            o.user.email.toLowerCase().includes(query);
-            
+
+        const matchSearch =
+            !query ||
+            o.id?.toLowerCase().includes(query) ||
+            o.user?.name?.toLowerCase().includes(query) ||
+            o.user?.email?.toLowerCase().includes(query);
+
         const matchDelivery = !deliveryFilter || o.status === deliveryFilter;
         const matchPayment = !paymentFilter || o.paymentStatus === paymentFilter;
 

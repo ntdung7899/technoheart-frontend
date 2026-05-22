@@ -5,14 +5,18 @@ import { useRouter } from "next/navigation";
 import Image from "next/image";
 import { Search, X, Loader2, ShoppingBag, ArrowRight, Sparkles } from "lucide-react";
 import { formatPrice } from "@/lib/utils";
+import {
+  searchProducts,
+  type ProductViewModel,
+} from "@/lib/api/products";
 
-interface SearchResult {
-    id: string;
-    name: string;
-    price: number;
-    images: string[];
-    category: { name: string };
-}
+// interface SearchResult {
+//     id: string;
+//     name: string;
+//     price: number;
+//     images: string[];
+//     category: { name: string };
+// }
 
 interface SearchModalProps {
     variant?: "compact" | "icon" | "hero";
@@ -21,7 +25,7 @@ interface SearchModalProps {
 export function SearchModal({ variant = "compact" }: SearchModalProps) {
     const router = useRouter();
     const [query, setQuery] = useState("");
-    const [results, setResults] = useState<SearchResult[]>([]);
+    const [results, setResults] = useState<ProductViewModel[]>([]);
     const [isOpen, setIsOpen] = useState(false);
     const [isLoading, setIsLoading] = useState(false);
     const [showMobileInput, setShowMobileInput] = useState(false);
@@ -29,23 +33,26 @@ export function SearchModal({ variant = "compact" }: SearchModalProps) {
     const inputRef = useRef<HTMLInputElement>(null);
     const debounceRef = useRef<NodeJS.Timeout | null>(null);
 
-    const searchProducts = useCallback(async (q: string) => {
-        if (!q.trim()) {
+    const handleSearchProducts = useCallback(async (q: string) => {
+        const keyword = q.trim();
+
+        if (!keyword) {
             setResults([]);
             setIsOpen(false);
             return;
         }
 
         setIsLoading(true);
+
         try {
-            const res = await fetch(`/api/products/search?q=${encodeURIComponent(q.trim())}`);
-            const data = await res.json();
-            if (Array.isArray(data)) {
-                setResults(data);
-                setIsOpen(true);
-            }
-        } catch {
+            const data = await searchProducts(keyword);
+
+            setResults(data);
+            setIsOpen(true);
+        } catch (error) {
+            console.error("SEARCH_PRODUCTS_ERROR:", error);
             setResults([]);
+            setIsOpen(true);
         } finally {
             setIsLoading(false);
         }
@@ -54,7 +61,7 @@ export function SearchModal({ variant = "compact" }: SearchModalProps) {
     const handleInputChange = (value: string) => {
         setQuery(value);
         if (debounceRef.current) clearTimeout(debounceRef.current);
-        debounceRef.current = setTimeout(() => searchProducts(value), 300);
+        debounceRef.current = setTimeout(() => handleSearchProducts(value), 300);
     };
 
     const handleSubmit = (e: React.FormEvent) => {
@@ -150,16 +157,25 @@ export function SearchModal({ variant = "compact" }: SearchModalProps) {
                                                 className="flex items-center gap-4 w-full p-3 rounded-2xl hover:bg-secondary/60 transition-all text-left"
                                             >
                                                 <div className="relative h-14 w-14 rounded-xl bg-secondary/40 overflow-hidden flex-shrink-0">
-                                                    {product.images.length > 0 ? (
-                                                        <Image src={product.images[0]} alt={product.name} fill className="object-contain p-1.5" />
+                                                   {product.imageUrl && product.imageUrl !== "/placeholder.png" ? (
+                                                        <Image
+                                                            src={product.imageUrl}
+                                                            alt={product.name}
+                                                            fill
+                                                            unoptimized
+                                                            className="object-contain p-1.5"
+                                                            sizes="48px"
+                                                        />
                                                     ) : (
-                                                        <div className="flex items-center justify-center h-full"><ShoppingBag className="h-5 w-5 text-muted-foreground/30" /></div>
+                                                        <div className="flex items-center justify-center h-full">
+                                                            <ShoppingBag className="h-5 w-5 text-muted-foreground/30" />
+                                                        </div>
                                                     )}
                                                 </div>
                                                 <div className="flex-1 min-w-0">
                                                     <p className="font-semibold text-sm truncate">{product.name}</p>
                                                     <div className="flex items-center gap-2 mt-0.5">
-                                                        <span className="text-xs text-muted-foreground">{product.category.name}</span>
+                                                        <span className="text-xs text-muted-foreground">{product.categoryName || product.category?.name || "Sản phẩm"}</span>
                                                         <span className="text-xs text-muted-foreground/30">·</span>
                                                         <span className="text-sm font-bold text-primary">{formatPrice(Number(product.price))}</span>
                                                     </div>
@@ -235,16 +251,25 @@ export function SearchModal({ variant = "compact" }: SearchModalProps) {
                                             className="flex items-center gap-4 w-full px-4 py-3 hover:bg-primary/5 transition-all text-left group"
                                         >
                                             <div className="relative h-12 w-12 rounded-xl bg-secondary/40 overflow-hidden flex-shrink-0 border border-border/30">
-                                                {product.images.length > 0 ? (
-                                                    <Image src={product.images[0]} alt={product.name} fill className="object-contain p-1.5" sizes="48px" />
+                                                {product.imageUrl && product.imageUrl !== "/placeholder.png" ? (
+                                                    <Image
+                                                        src={product.imageUrl}
+                                                        alt={product.name}
+                                                        fill
+                                                        unoptimized
+                                                        className="object-contain p-1.5"
+                                                        sizes="48px"
+                                                    />
                                                 ) : (
-                                                    <div className="flex items-center justify-center h-full"><ShoppingBag className="h-4 w-4 text-muted-foreground/30" /></div>
+                                                    <div className="flex items-center justify-center h-full">
+                                                        <ShoppingBag className="h-5 w-5 text-muted-foreground/30" />
+                                                    </div>
                                                 )}
                                             </div>
                                             <div className="flex-1 min-w-0">
                                                 <p className="font-semibold text-sm truncate group-hover:text-primary transition-colors">{product.name}</p>
                                                 <div className="flex items-center gap-2 mt-0.5">
-                                                    <span className="text-xs font-semibold uppercase tracking-wider text-muted-foreground/50">{product.category.name}</span>
+                                                    <span className="text-xs font-semibold uppercase tracking-wider text-muted-foreground/50">{product.categoryName || product.category?.name || "Sản phẩm"}</span>
                                                     <span className="text-xs text-muted-foreground/30">·</span>
                                                     <span className="text-sm font-bold text-primary">{formatPrice(Number(product.price))}</span>
                                                 </div>
@@ -312,16 +337,25 @@ export function SearchModal({ variant = "compact" }: SearchModalProps) {
                                         className="flex items-center gap-3 w-full px-4 py-2.5 hover:bg-primary/5 transition-all text-left group"
                                     >
                                         <div className="relative h-10 w-10 rounded-lg bg-secondary/40 overflow-hidden flex-shrink-0 border border-border/30">
-                                            {product.images.length > 0 ? (
-                                                <Image src={product.images[0]} alt={product.name} fill className="object-contain p-1" sizes="40px" />
+                                            {product.imageUrl && product.imageUrl !== "/placeholder.png" ? (
+                                                <Image
+                                                    src={product.imageUrl}
+                                                    alt={product.name}
+                                                    fill
+                                                    unoptimized
+                                                    className="object-contain p-1.5"
+                                                    sizes="48px"
+                                                />
                                             ) : (
-                                                <div className="flex items-center justify-center h-full"><ShoppingBag className="h-3.5 w-3.5 text-muted-foreground/30" /></div>
+                                                <div className="flex items-center justify-center h-full">
+                                                    <ShoppingBag className="h-5 w-5 text-muted-foreground/30" />
+                                                </div>
                                             )}
                                         </div>
                                         <div className="flex-1 min-w-0">
                                             <p className="font-medium text-sm truncate group-hover:text-primary transition-colors">{product.name}</p>
                                             <div className="flex items-center gap-2 mt-0.5">
-                                                <span className="text-xs text-muted-foreground/50">{product.category.name}</span>
+                                                <span className="text-xs text-muted-foreground/50">{product.categoryName || product.category?.name || "Sản phẩm"}</span>
                                                 <span className="text-xs text-muted-foreground/20">·</span>
                                                 <span className="text-xs font-bold text-primary">{formatPrice(Number(product.price))}</span>
                                             </div>

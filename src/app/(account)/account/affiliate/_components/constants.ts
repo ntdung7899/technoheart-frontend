@@ -13,7 +13,7 @@ export interface AffiliateData {
         teamPV: number;
         totalEarnings: number;
         paidEarnings: number;
-        
+
         lastWithdrawal?: {
             bankName: string;
             accountNumber: string;
@@ -26,20 +26,114 @@ export interface AffiliateData {
         pendingEarnings: number;
         rates: { f1Rate: number; f2Rate: number };
         achievement: { rate: number; label: string } | null;
-        progression: { nextRank: string | null; pvNeeded: number; progress: number; pvType: "personal" | "team" };
-        rankInfo: { label: string; minPersonalPV: number; minTeamPV: number; description: string; color: string };
+        progression: {
+            nextRank: string | null;
+            pvNeeded: number;
+            progress: number;
+            pvType: "personal" | "team";
+        };
+        rankInfo: {
+            label: string;
+            minPersonalPV: number;
+            minTeamPV: number;
+            description: string;
+            color: string;
+        };
     };
 }
 
-export const RANK_DISPLAY: Record<string, { label: string; icon: LucideIcon; gradient: string; badge: string }> = {
-    BA: { label: "Brand Ambassador", icon: Star, gradient: "from-slate-500 to-slate-700", badge: "bg-slate-100 text-slate-700" },
-    VIP: { label: "VIP Partner", icon: Zap, gradient: "from-blue-500 to-blue-700", badge: "bg-blue-100 text-blue-700" },
-    VVIP: { label: "VVIP Partner", icon: Crown, gradient: "from-purple-500 to-purple-700", badge: "bg-purple-100 text-purple-700" },
-    L1: { label: "Đại diện kinh doanh", icon: Shield, gradient: "from-emerald-500 to-emerald-700", badge: "bg-emerald-100 text-emerald-700" },
-    L2: { label: "Giám đốc khu vực", icon: Award, gradient: "from-amber-500 to-amber-700", badge: "bg-amber-100 text-amber-700" },
-    L3: { label: "Giám đốc vùng", icon: Award, gradient: "from-red-500 to-red-700", badge: "bg-red-100 text-red-700" },
-    L4: { label: "Đại sứ TH quốc gia", icon: Crown, gradient: "from-pink-500 to-pink-700", badge: "bg-pink-100 text-pink-700" },
-    L5: { label: "Đại sứ TH toàn cầu", icon: Crown, gradient: "from-indigo-500 to-indigo-700", badge: "bg-indigo-100 text-indigo-700" },
+export type RankDisplayItem = {
+    label: string;
+    icon: LucideIcon;
+    gradient: string;
+    badge: string;
+    minPersonalPV: number;
+    minTeamPV: number;
+    description: string;
+    color: string;
+};
+
+export const RANK_DISPLAY: Record<string, RankDisplayItem> = {
+    BA: {
+        label: "Brand Ambassador",
+        icon: Star,
+        gradient: "from-slate-500 to-slate-700",
+        badge: "bg-slate-100 text-slate-700",
+        minPersonalPV: 100,
+        minTeamPV: 0,
+        description: "Cấp bậc khởi đầu dành cho cộng tác viên giới thiệu sản phẩm.",
+        color: "slate",
+    },
+    VIP: {
+        label: "VIP Partner",
+        icon: Zap,
+        gradient: "from-blue-500 to-blue-700",
+        badge: "bg-blue-100 text-blue-700",
+        minPersonalPV: 500,
+        minTeamPV: 0,
+        description: "Đối tác VIP có hiệu suất cá nhân tốt và được hưởng hoa hồng cao hơn.",
+        color: "blue",
+    },
+    VVIP: {
+        label: "VVIP Partner",
+        icon: Crown,
+        gradient: "from-purple-500 to-purple-700",
+        badge: "bg-purple-100 text-purple-700",
+        minPersonalPV: 1000,
+        minTeamPV: 0,
+        description: "Đối tác VVIP có hiệu suất cao, đủ điều kiện nhận thêm quyền lợi nâng cao.",
+        color: "purple",
+    },
+    L1: {
+        label: "Đại diện kinh doanh",
+        icon: Shield,
+        gradient: "from-emerald-500 to-emerald-700",
+        badge: "bg-emerald-100 text-emerald-700",
+        minPersonalPV: 500,
+        minTeamPV: 20000,
+        description: "Cấp thành tựu dành cho đối tác có nhóm đạt tối thiểu 20.000 PV.",
+        color: "emerald",
+    },
+    L2: {
+        label: "Giám đốc khu vực",
+        icon: Award,
+        gradient: "from-amber-500 to-amber-700",
+        badge: "bg-amber-100 text-amber-700",
+        minPersonalPV: 500,
+        minTeamPV: 60000,
+        description: "Cấp thành tựu dành cho đối tác có nhóm đạt tối thiểu 60.000 PV.",
+        color: "amber",
+    },
+    L3: {
+        label: "Giám đốc vùng",
+        icon: Award,
+        gradient: "from-red-500 to-red-700",
+        badge: "bg-red-100 text-red-700",
+        minPersonalPV: 1000,
+        minTeamPV: 170000,
+        description: "Cấp thành tựu dành cho đối tác VVIP có nhóm đạt tối thiểu 170.000 PV.",
+        color: "red",
+    },
+    L4: {
+        label: "Đại sứ TH quốc gia",
+        icon: Crown,
+        gradient: "from-pink-500 to-pink-700",
+        badge: "bg-pink-100 text-pink-700",
+        minPersonalPV: 1000,
+        minTeamPV: 600000,
+        description: "Cấp thành tựu cấp quốc gia cho đối tác VVIP có nhóm đạt tối thiểu 600.000 PV.",
+        color: "pink",
+    },
+    L5: {
+        label: "Đại sứ TH toàn cầu",
+        icon: Crown,
+        gradient: "from-indigo-500 to-indigo-700",
+        badge: "bg-indigo-100 text-indigo-700",
+        minPersonalPV: 1000,
+        minTeamPV: 2000000,
+        description: "Cấp thành tựu cao nhất cho đối tác VVIP có nhóm đạt tối thiểu 2.000.000 PV.",
+        color: "indigo",
+    },
 };
 
 export const COMMISSION_TABLE = [

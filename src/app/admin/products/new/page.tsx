@@ -2,37 +2,53 @@
 
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
-import { Loader2, ArrowLeft, Image as ImageIcon, Sparkles, Package, DollarSign, Tag, ChevronDown, ShieldCheck } from "lucide-react";
+import { Loader2, ArrowLeft, Image as ImageIcon, Sparkles, Package, DollarSign, Tag, ChevronDown, ShieldCheck, X, UploadCloud } from "lucide-react";
 import Link from "next/link";
 import RichTextEditor from "@/components/admin/RichTextEditor";
+import { createAdminProduct } from "@/lib/api/admin-products";
+import { getCategories, type Category } from "@/lib/api/categories";
+import { uploadFile } from "@/lib/api/files";
+
 
 export default function NewProductPage() {
     const router = useRouter();
     const [loading, setLoading] = useState(false);
-    const [categories, setCategories] = useState([]);
+    const [categories, setCategories] = useState<Category[]>([]);
+    const [uploadingImage, setUploadingImage] = useState(false);
+    const [imagePreview, setImagePreview] = useState("");
+
     const [formData, setFormData] = useState({
-        name: "",
-        description: "",
-        price: "",
-        stock: "",
-        categoryId: "",
-        imageUrl: "https://ik.imagekit.io/demo/img/default-product.jpg",
-        warranty: "Bảo hành 12 tháng chính hãng",
-        shippingInfo: "Giao hàng nhanh 1-2 ngày",
-        returnPolicy: "Hỗ trợ đổi trong 7 ngày",
-        origin: "",
+    name: "",
+    description: "",
+    price: "",
+    stock: "",
+    categoryId: "",
+    images: [] as string[],
+    warranty: "Bảo hành 12 tháng chính hãng",
+    shippingInfo: "Giao hàng nhanh 1-2 ngày",
+    returnPolicy: "Hỗ trợ đổi trong 7 ngày",
+    origin: "",
     });
 
     useEffect(() => {
-        fetch("/api/categories")
-            .then(res => res.json())
-            .then(data => {
-                setCategories(data);
-                if (data.length > 0) {
-                    setFormData(prev => ({ ...prev, categoryId: data[0].id }));
-                }
-            })
-            .catch(err => console.error("Error fetching categories:", err));
+        async function loadCategories() {
+            try {
+            const data = await getCategories({ take: 100 });
+
+            setCategories(data);
+
+            if (data.length > 0) {
+                setFormData((prev) => ({
+                ...prev,
+                categoryId: data[0].id,
+                }));
+            }
+            } catch (error) {
+            console.error("LOAD_CATEGORIES_ERROR:", error);
+            }
+        }
+
+        loadCategories();
     }, []);
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
@@ -44,25 +60,61 @@ export default function NewProductPage() {
         setLoading(true);
 
         try {
-            const res = await fetch("/api/products", {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify(formData)
-            });
+            await createAdminProduct(formData);
 
-            if (res.ok) {
-                router.push("/admin/products");
-                router.refresh();
-            } else {
-                const error = await res.json();
-                alert(error.error || "Failed to create product");
-            }
+            router.push("/admin/products");
+            router.refresh();
         } catch (error) {
-            console.error(error);
-            alert("Error creating product");
+            console.error("CREATE_ADMIN_PRODUCT_ERROR:", error);
+
+            alert(
+            error instanceof Error
+                ? error.message
+                : "Không thể tạo sản phẩm"
+            );
         } finally {
             setLoading(false);
         }
+    };
+
+    const handleImageChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+        const file = e.target.files?.[0];
+
+        if (!file) return;
+
+        if (!file.type.startsWith("image/")) {
+            alert("Vui lòng chọn file hình ảnh");
+            return;
+        }
+
+        try {
+            setUploadingImage(true);
+
+            const previewUrl = URL.createObjectURL(file);
+            setImagePreview(previewUrl);
+
+            const uploadedUrl = await uploadFile(file);
+
+            setFormData((prev) => ({
+            ...prev,
+            images: [uploadedUrl],
+            }));
+        } catch (error) {
+            console.error("UPLOAD_PRODUCT_IMAGE_ERROR:", error);
+            alert(error instanceof Error ? error.message : "Upload ảnh thất bại");
+        } finally {
+            setUploadingImage(false);
+            e.target.value = "";
+        }
+    };
+
+    const handleRemoveImage = () => {
+        setImagePreview("");
+
+        setFormData((prev) => ({
+            ...prev,
+            images: [],
+        }));
     };
 
     return (
@@ -258,31 +310,63 @@ export default function NewProductPage() {
                     <div className="p-5 rounded-xl bg-white border border-slate-200 shadow-sm space-y-5">
                         <div className="flex items-center gap-2">
                             <div className="h-8 w-8 rounded-lg bg-orange-50 text-orange-600 flex items-center justify-center">
-                                <ImageIcon className="h-4 w-4" />
+                            <ImageIcon className="h-4 w-4" />
                             </div>
-                            <h3 className="font-bold text-sm">Hình ảnh</h3>
+                            <h3 className="font-bold text-sm">Hình ảnh sản phẩm</h3>
                         </div>
 
-                        <div className="space-y-4">
-                            <div className="aspect-square rounded-xl border-2 border-dashed border-slate-200 bg-slate-50 flex flex-col items-center justify-center p-6 text-center group hover:border-primary/40 transition-colors">
-                                <div className="h-10 w-10 rounded-lg bg-white shadow-sm flex items-center justify-center mb-3 group-hover:scale-110 transition-transform">
-                                    <ImageIcon className="h-5 w-5 text-slate-400" />
+                            <div className="rounded-2xl border border-dashed border-slate-300 bg-slate-50/70 p-4">
+                                <div className="relative mb-4 aspect-square overflow-hidden rounded-xl border border-slate-200 bg-white">
+                                {imagePreview || formData.images[0] ? (
+                                    <>
+                                    <img
+                                        src={imagePreview || formData.images[0]}
+                                        alt="Ảnh sản phẩm"
+                                        className="h-full w-full object-contain p-2"
+                                    />
+
+                                    <button
+                                        type="button"
+                                        onClick={handleRemoveImage}
+                                        className="absolute right-2 top-2 flex h-7 w-7 items-center justify-center rounded-full bg-white/90 text-slate-500 shadow-sm hover:bg-red-50 hover:text-red-600 transition-colors"
+                                    >
+                                        <X className="h-4 w-4" />
+                                    </button>
+                                    </>
+                                ) : (
+                                    <div className="flex h-full flex-col items-center justify-center text-center">
+                                    <div className="mb-3 flex h-12 w-12 items-center justify-center rounded-xl bg-blue-50 text-blue-600">
+                                        <UploadCloud className="h-6 w-6" />
+                                    </div>
+                                    <p className="text-sm font-semibold text-slate-700">
+                                        Chọn ảnh từ máy
+                                    </p>
+                                    <p className="mt-1 text-xs text-slate-400">
+                                        PNG, JPG, JPEG, WEBP
+                                    </p>
+                                    </div>
+                                )}
                                 </div>
-                                <p className="text-[11px] text-slate-400">Demo Preview</p>
-                            </div>
 
-                            <div className="space-y-1.5">
-                                <label className="text-xs font-medium text-slate-500 ml-1">URL Hình ảnh</label>
+                                <label className="flex h-10 cursor-pointer items-center justify-center rounded-xl bg-blue-600 px-4 text-sm font-semibold text-white hover:bg-blue-700 transition-colors">
+                                {uploadingImage ? "Đang upload..." : "Tải ảnh lên"}
                                 <input
-                                    type="text"
-                                    name="imageUrl"
-                                    className="h-9 w-full rounded-lg border border-slate-200 bg-white px-3 text-sm focus:outline-none focus:ring-2 focus:ring-primary/20 transition-all focus:border-primary/30"
-                                    value={formData.imageUrl}
-                                    onChange={handleChange}
+                                    type="file"
+                                    accept="image/*"
+                                    onChange={handleImageChange}
+                                    disabled={uploadingImage}
+                                    className="hidden"
                                 />
+                                </label>
+
+                                {formData.images[0] && (
+                                <p className="mt-3 line-clamp-2 break-all text-xs text-slate-400">
+                                    {formData.images[0]}
+                                </p>
+                                )}
                             </div>
                         </div>
-                    </div>
+                    
 
                     {/* Submit Button */}
                     <button

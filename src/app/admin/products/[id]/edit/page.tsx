@@ -2,24 +2,34 @@
 
 import { useState, useEffect } from "react";
 import { useRouter, useParams } from "next/navigation";
-import { Loader2, ArrowLeft, Image as ImageIcon, Sparkles, Package, DollarSign, Tag, ChevronDown, Save, ShieldCheck } from "lucide-react";
+import { Loader2, ArrowLeft, Image as ImageIcon, Sparkles, Package, DollarSign, Tag, ChevronDown, Save, ShieldCheck, UploadCloud,
+X, } from "lucide-react";
+import { uploadFile } from "@/lib/api/files";
 import Link from "next/link";
 import Image from "next/image";
 import RichTextEditor from "@/components/admin/RichTextEditor";
+import {
+  getAdminProductById,
+  updateAdminProduct,
+} from "@/lib/api/admin-products";
+import { getCategories, type Category } from "@/lib/api/categories";
 
 export default function EditProductPage() {
     const router = useRouter();
     const { id } = useParams();
     const [fetching, setFetching] = useState(true);
     const [loading, setLoading] = useState(false);
-    const [categories, setCategories] = useState([]);
+    const [categories, setCategories] = useState<Category[]>([]);
+    const [uploadingImage, setUploadingImage] = useState(false);
+    const [imagePreview, setImagePreview] = useState("");
+
     const [formData, setFormData] = useState({
         name: "",
         description: "",
         price: "",
         stock: "",
         categoryId: "",
-        imageUrl: "",
+        images: [] as string[],
         warranty: "",
         shippingInfo: "",
         returnPolicy: "",
@@ -27,39 +37,86 @@ export default function EditProductPage() {
     });
 
     useEffect(() => {
-        const fetchData = async () => {
-            try {
-                const [catsRes, prodRes] = await Promise.all([
-                    fetch("/api/categories"),
-                    fetch(`/api/products/${id}`)
-                ]);
+    const fetchData = async () => {
+        try {
+        const productId = String(id || "");
 
-                const catsData = await catsRes.json();
-                const prodData = await prodRes.json();
+        const [catsData, prodData] = await Promise.all([
+            getCategories({ take: 100 }),
+            getAdminProductById(productId),
+        ]);
 
-                setCategories(catsData);
-                setFormData({
-                    name: prodData.name,
-                    description: prodData.description,
-                    price: prodData.price.toString(),
-                    stock: prodData.stock.toString(),
-                    categoryId: prodData.categoryId,
-                    imageUrl: prodData.images[0] || "",
-                    warranty: prodData.warranty || "",
-                    shippingInfo: prodData.shippingInfo || "",
-                    returnPolicy: prodData.returnPolicy || "",
-                    origin: prodData.origin || "",
-                });
-            } catch (error) {
-                console.error("Error fetching data:", error);
-                alert("Failed to load product data");
-            } finally {
-                setFetching(false);
-            }
+        setCategories(catsData);
+
+        const productImages = Array.isArray(prodData.images)
+            ? prodData.images
+            : [];
+
+            setFormData({
+            name: prodData.name || "",
+            description: prodData.description || "",
+            price: String(prodData.price || ""),
+            stock: String(prodData.stock || ""),
+            categoryId: prodData.categoryId || "",
+            images: productImages,
+            warranty: prodData.warranty || "",
+            shippingInfo: prodData.shippingInfo || "",
+            returnPolicy: prodData.returnPolicy || "",
+            origin: prodData.origin || "",
+            });
+
+            setImagePreview(productImages[0] || "");
+        } catch (error) {
+        console.error("LOAD_ADMIN_PRODUCT_DETAIL_ERROR:", error);
+        alert("Không tải được dữ liệu sản phẩm");
+        } finally {
+        setFetching(false);
+        }
+    };
+
+    if (id) {
+        fetchData();
+    }
+    }, [id]);
+    const handleImageChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+        const file = e.target.files?.[0];
+
+        if (!file) return;
+
+        if (!file.type.startsWith("image/")) {
+            alert("Vui lòng chọn file hình ảnh");
+            return;
+        }
+
+        try {
+            setUploadingImage(true);
+
+            const previewUrl = URL.createObjectURL(file);
+            setImagePreview(previewUrl);
+
+            const uploadedUrl = await uploadFile(file);
+
+            setFormData((prev) => ({
+            ...prev,
+            images: [uploadedUrl],
+            }));
+        } catch (error) {
+            console.error("UPLOAD_PRODUCT_IMAGE_ERROR:", error);
+            alert(error instanceof Error ? error.message : "Upload ảnh thất bại");
+        } finally {
+            setUploadingImage(false);
+            e.target.value = "";
+        }
         };
 
-        fetchData();
-    }, [id]);
+        const handleRemoveImage = () => {
+        setImagePreview("");
+
+        setFormData((prev) => ({
+            ...prev,
+            images: [],
+        }));
+        };
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
         setFormData({ ...formData, [e.target.name]: e.target.value });
@@ -70,22 +127,18 @@ export default function EditProductPage() {
         setLoading(true);
 
         try {
-            const res = await fetch(`/api/products/${id}`, {
-                method: "PATCH",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify(formData)
-            });
+            await updateAdminProduct(String(id), formData);
 
-            if (res.ok) {
-                router.push("/admin/products");
-                router.refresh();
-            } else {
-                const error = await res.json();
-                alert(error.error || "Failed to update product");
-            }
+            router.push("/admin/products");
+            router.refresh();
         } catch (error) {
-            console.error(error);
-            alert("Error updating product");
+            console.error("UPDATE_ADMIN_PRODUCT_ERROR:", error);
+
+            alert(
+            error instanceof Error
+                ? error.message
+                : "Không thể cập nhật sản phẩm"
+            );
         } finally {
             setLoading(false);
         }
@@ -284,40 +337,64 @@ export default function EditProductPage() {
 
                     {/* Media */}
                     <div className="p-5 rounded-xl bg-white border border-slate-200 shadow-sm space-y-5">
-                        <div className="flex items-center gap-2">
-                            <div className="h-8 w-8 rounded-lg bg-orange-50 text-orange-600 flex items-center justify-center">
-                                <ImageIcon className="h-4 w-4" />
-                            </div>
-                            <h3 className="font-bold text-sm">Hình ảnh</h3>
+                    <div className="flex items-center gap-2">
+                        <div className="h-8 w-8 rounded-lg bg-orange-50 text-orange-600 flex items-center justify-center">
+                        <ImageIcon className="h-4 w-4" />
                         </div>
-
-                        <div className="space-y-4">
-                            <div className="aspect-square rounded-xl border-2 border-dashed border-slate-200 bg-slate-50 flex flex-col items-center justify-center p-6 text-center group overflow-hidden relative">
-                                {formData.imageUrl ? (
-                                    <Image src={formData.imageUrl} alt="Preview" fill className="object-contain" unoptimized />
-                                ) : (
-                                    <>
-                                        <div className="h-10 w-10 rounded-lg bg-white shadow-sm flex items-center justify-center mb-3 group-hover:scale-110 transition-transform">
-                                            <ImageIcon className="h-5 w-5 text-slate-400" />
-                                        </div>
-                                        <p className="text-[11px] text-slate-400">Xem trước</p>
-                                    </>
-                                )}
-                            </div>
-
-                            <div className="space-y-1.5">
-                                <label className="text-xs font-medium text-slate-500 ml-1">URL Hình ảnh</label>
-                                <input
-                                    type="text"
-                                    name="imageUrl"
-                                    className="h-9 w-full rounded-lg border border-slate-200 bg-white px-3 text-sm focus:outline-none focus:ring-2 focus:ring-primary/20 transition-all focus:border-primary/30"
-                                    value={formData.imageUrl}
-                                    onChange={handleChange}
-                                />
-                            </div>
-                        </div>
+                        <h3 className="font-bold text-sm">Hình ảnh sản phẩm</h3>
                     </div>
 
+                    <div className="rounded-2xl border border-dashed border-slate-300 bg-slate-50/70 p-4">
+                        <div className="relative mb-4 aspect-square overflow-hidden rounded-xl border border-slate-200 bg-white">
+                        {imagePreview || formData.images[0] ? (
+                            <>
+                            <img
+                                src={imagePreview || formData.images[0]}
+                                alt="Ảnh sản phẩm"
+                                className="h-full w-full object-contain p-2"
+                            />
+
+                            <button
+                                type="button"
+                                onClick={handleRemoveImage}
+                                className="absolute right-2 top-2 flex h-7 w-7 items-center justify-center rounded-full bg-white/90 text-slate-500 shadow-sm hover:bg-red-50 hover:text-red-600 transition-colors"
+                            >
+                                <X className="h-4 w-4" />
+                            </button>
+                            </>
+                        ) : (
+                            <div className="flex h-full flex-col items-center justify-center text-center">
+                            <div className="mb-3 flex h-12 w-12 items-center justify-center rounded-xl bg-blue-50 text-blue-600">
+                                <UploadCloud className="h-6 w-6" />
+                            </div>
+                            <p className="text-sm font-semibold text-slate-700">
+                                Chọn ảnh từ máy
+                            </p>
+                            <p className="mt-1 text-xs text-slate-400">
+                                PNG, JPG, JPEG, WEBP
+                            </p>
+                            </div>
+                        )}
+                        </div>
+
+                        <label className="flex h-10 cursor-pointer items-center justify-center rounded-xl bg-blue-600 px-4 text-sm font-semibold text-white hover:bg-blue-700 transition-colors">
+                        {uploadingImage ? "Đang upload..." : "Tải ảnh lên"}
+                        <input
+                            type="file"
+                            accept="image/*"
+                            onChange={handleImageChange}
+                            disabled={uploadingImage}
+                            className="hidden"
+                        />
+                        </label>
+
+                        {formData.images[0] && (
+                        <p className="mt-3 line-clamp-2 break-all text-xs text-slate-400">
+                            {formData.images[0]}
+                        </p>
+                        )}
+                    </div>
+                    </div>
                     {/* Submit Button */}
                     <button
                         type="submit"

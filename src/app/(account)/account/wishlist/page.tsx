@@ -3,138 +3,164 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
+import { Heart, Loader2, Trash2, ShoppingCart } from "lucide-react";
 import { EmptyState } from "@/components/account/EmptyState";
-import { Heart, Loader2, Trash2, ShoppingCart, Package } from "lucide-react";
-import { useRouter } from "next/navigation";
+import { formatPrice } from "@/lib/utils";
+import {
+  getWishlist,
+  removeFromWishlist,
+  type AccountWishlistItem,
+} from "@/lib/api/account";
 
-interface WishlistItem {
-    id: string;
-    productId: string;
-    product: {
-        id: string;
-        name: string;
-        price: string;
-        images: string[];
-        stock: number;
-    };
+function resolveImageUrl(image?: string | null) {
+  if (!image) return "/placeholder.png";
+
+  if (image.startsWith("http://") || image.startsWith("https://")) {
+    return image;
+  }
+
+  const cleanImage = image.replace(/^\/+/, "");
+
+  return `${process.env.NEXT_PUBLIC_STORAGE_URL || "http://localhost:3000"}/${cleanImage}`;
 }
 
 export default function WishlistPage() {
-    const [items, setItems] = useState<WishlistItem[]>([]);
-    const [loading, setLoading] = useState(true);
-    const [removing, setRemoving] = useState<string | null>(null);
-    const router = useRouter(); 
+  const [items, setItems] = useState<AccountWishlistItem[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [removingId, setRemovingId] = useState<string | null>(null);
 
-    useEffect(() => {
-        fetch("/api/account/wishlist")
-            .then((r) => r.json())
-            .then((data) => setItems(data.wishlist || []))
-            .catch(console.error)
-            .finally(() => setLoading(false));
-    }, []);
-
-    const handleRemove = async (productId: string) => {
-        setRemoving(productId);
-        try {
-            await fetch(`/api/account/wishlist?productId=${productId}`, {
-                method: "DELETE",
-            });
-            setItems((prev) => prev.filter((i) => i.product.id !== productId));
-        } catch (error) {
-            console.error(error);
-        } finally {
-            setRemoving(null);
-        }
-    };
-
-    if (loading) {
-        return (
-            <div className="flex items-center justify-center py-20">
-                <Loader2 className="h-6 w-6 animate-spin text-muted-foreground" />
-            </div>
-        );
+  async function loadWishlist() {
+    try {
+      const data = await getWishlist();
+      console.log("ACCOUNT_WISHLIST_DATA:", data);
+      setItems(data);
+    } catch (error) {
+      console.error("LOAD_WISHLIST_ERROR:", error);
+    } finally {
+      setLoading(false);
     }
+  }
 
+  useEffect(() => {
+    loadWishlist();
+  }, []);
+
+  const handleRemove = async (productId: string) => {
+    try {
+      setRemovingId(productId);
+
+      await removeFromWishlist(productId);
+
+      setItems((prev) => prev.filter((item) => item.productId !== productId));
+    } catch (error) {
+      console.error("REMOVE_WISHLIST_ERROR:", error);
+      alert(
+        error instanceof Error
+          ? error.message
+          : "Không thể xoá sản phẩm khỏi yêu thích"
+      );
+    } finally {
+      setRemovingId(null);
+    }
+  };
+
+  if (loading) {
     return (
-        <div className="space-y-6">
-            <h1 className="text-2xl font-bold tracking-tight">Yêu thích</h1>
-
-            {items.length === 0 ? (
-                <EmptyState
-                    icon={<Heart className="h-8 w-8" />}
-                    title="Chưa có sản phẩm yêu thích"
-                    description="Hãy thêm sản phẩm vào danh sách yêu thích để theo dõi"
-                    action={
-                        <Link
-                            href="/products"
-                            className="px-4 py-2 rounded-xl bg-primary text-primary-foreground text-sm font-bold hover:opacity-90 transition-opacity"
-                        >
-                            Khám phá sản phẩm
-                        </Link>
-                    }
-                />
-            ) : (
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                    {items.map((item) => (
-                        <div
-                            key={item.id}
-                            className="rounded-2xl border border-border/40 bg-card/50 p-4 flex gap-4 hover:shadow-sm transition-shadow"
-                        >
-                            <Link
-                                href={`/products/${item.product.id}`}
-                                className="h-20 w-20 rounded-xl bg-secondary/50 flex items-center justify-center shrink-0 overflow-hidden"
-                            >
-                                {item.product.images?.[0] ? (
-                                    <Image
-                                        src={item.product.images[0]}
-                                        alt={item.product.name}
-                                        width={80}
-                                        height={80}
-                                        className="h-full w-full object-cover"
-                                        unoptimized
-                                    />
-                                ) : (
-                                    <Package className="h-6 w-6 text-muted-foreground" />
-                                )}
-                            </Link>
-                            <div className="flex-1 min-w-0">
-                                <Link href={`/products/${item.product.id}`}>
-                                    <p className="text-sm font-medium truncate hover:text-primary transition-colors">
-                                        {item.product.name}
-                                    </p>
-                                </Link>
-                                <p className="text-lg font-bold mt-1">
-                                    {Number(item.product.price).toLocaleString("vi-VN")}₫
-                                </p>
-                                <p className="text-xs text-muted-foreground">
-                                    {item.product.stock > 0 ? "Còn hàng" : "Hết hàng"}
-                                </p>
-                            </div>
-                            <div className="flex flex-col gap-1.5 shrink-0">
-                                <button
-                                    onClick={() => handleRemove(item.product.id)}
-                                    disabled={removing === item.product.id}
-                                    className="p-2 rounded-xl text-muted-foreground hover:text-destructive hover:bg-destructive/5 transition-colors disabled:opacity-50"
-                                    title="Xoá"
-                                >
-                                    {removing === item.product.id ? (
-                                        <Loader2 className="h-4 w-4 animate-spin" />
-                                    ) : (
-                                        <Trash2 className="h-4 w-4" />
-                                    )}
-                                </button>
-                               <button
-                                    onClick={() => router.push('/cart')} 
-                                    className="p-2 rounded-xl text-muted-foreground hover:text-primary hover:bg-primary/5 transition-colors"
-                                    title="Đến giỏ hàng"
-                                >
-                                    <ShoppingCart className="h-4 w-4" />
-                                </button>
-                            </div>
-                        </div>
-                    ))}
-                </div>
-            )}
-        </div>
+      <div className="flex items-center justify-center py-20">
+        <Loader2 className="h-6 w-6 animate-spin text-muted-foreground" />
+      </div>
     );
+  }
+
+  if (items.length === 0) {
+    return (
+      <EmptyState
+        icon={<Heart className="h-8 w-8" />}
+        title="Chưa có sản phẩm yêu thích"
+        description="Bạn chưa lưu sản phẩm nào vào danh sách yêu thích."
+        action={
+          <Link
+            href="/products"
+            className="px-4 py-2 rounded-xl bg-primary text-primary-foreground text-sm font-bold hover:opacity-90 transition-opacity"
+          >
+            Khám phá sản phẩm
+          </Link>
+        }
+      />
+    );
+  }
+
+  return (
+    <div className="space-y-6">
+      <h1 className="text-2xl font-bold tracking-tight">Yêu thích</h1>
+
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+        {items.map((item) => {
+          const product = item.product;
+          const imageUrl = resolveImageUrl(product.images?.[0]);
+          const isRemoving = removingId === product.id;
+
+          return (
+            <div
+              key={item.id}
+              className="rounded-2xl border border-border/60 bg-card p-4 flex items-center justify-between gap-4"
+            >
+              <Link
+                href={`/products/${product.id}`}
+                className="flex items-center gap-4 min-w-0 flex-1"
+              >
+                <div className="relative h-22 w-22 shrink-0 overflow-hidden rounded-xl bg-secondary">
+                  <Image
+                    src={imageUrl}
+                    alt={product.name}
+                    fill
+                    className="object-cover"
+                    unoptimized
+                  />
+                </div>
+
+                <div className="min-w-0">
+                  <h3 className="text-base font-semibold text-foreground line-clamp-1">
+                    {product.name}
+                  </h3>
+
+                  <p className="mt-1 text-xl font-bold text-foreground">
+                    {formatPrice(product.price)}
+                  </p>
+
+                  <p className="mt-1 text-sm text-muted-foreground">
+                    Còn hàng
+                  </p>
+                </div>
+              </Link>
+
+              <div className="flex flex-col items-center gap-4 shrink-0">
+                <button
+                  type="button"
+                  onClick={() => handleRemove(product.id || item.productId)}
+                  disabled={isRemoving}
+                  className="text-muted-foreground hover:text-destructive disabled:opacity-50 transition-colors"
+                  title="Xoá khỏi yêu thích"
+                >
+                  {isRemoving ? (
+                    <Loader2 className="h-4 w-4 animate-spin" />
+                  ) : (
+                    <Trash2 className="h-4 w-4" />
+                  )}
+                </button>
+
+                <Link
+                  href={`/products/${product.id}`}
+                  className="text-muted-foreground hover:text-primary transition-colors"
+                  title="Xem sản phẩm"
+                >
+                  <ShoppingCart className="h-4 w-4" />
+                </Link>
+              </div>
+            </div>
+          );
+        })}
+      </div>
+    </div>
+  );
 }

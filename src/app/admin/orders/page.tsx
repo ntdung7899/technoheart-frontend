@@ -1,26 +1,53 @@
-import prisma from "@/lib/prisma";
+"use client";
+
+import { useEffect, useState } from "react";
+import { Loader2 } from "lucide-react";
 import AdminOrdersClient from "@/components/admin/OrdersClient";
+import {
+  getAdminOrders,
+  type AdminOrderListItem,
+} from "@/lib/api/admin-orders";
 
-export const dynamic = 'force-dynamic';
+export default function AdminOrdersPage() {
+  const [orders, setOrders] = useState<AdminOrderListItem[]>([]);
+  const [loading, setLoading] = useState(true);
 
-export default async function AdminOrdersPage() {
-    const orders = await prisma.order.findMany({
-        include: {
-            user: true,
-            _count: { select: { items: true } }
-        },
-        orderBy: { createdAt: 'desc' }
-    });
+  useEffect(() => {
+    let mounted = true;
 
-    const serialized = orders.map(o => ({
-        id: o.id,
-        total: Number(o.total).toString(),
-        status: o.status,
-        paymentStatus: o.paymentStatus,
-        createdAt: o.createdAt.toISOString(),
-        user: { name: o.user.name, email: o.user.email },
-        _count: o._count,
-    }));
+    async function loadOrders() {
+      try {
+        const data = await getAdminOrders();
 
-    return <AdminOrdersClient initialOrders={serialized} />;
+        if (mounted) {
+          setOrders(data);
+        }
+      } catch (error) {
+        console.error("LOAD_ADMIN_ORDERS_ERROR:", error);
+      } finally {
+        if (mounted) {
+          setLoading(false);
+        }
+      }
+    }
+
+    loadOrders();
+
+    return () => {
+      mounted = false;
+    };
+  }, []);
+
+  if (loading) {
+    return (
+      <div className="flex min-h-[360px] items-center justify-center">
+        <div className="flex items-center gap-3 text-sm font-semibold text-slate-500">
+          <Loader2 className="h-5 w-5 animate-spin" />
+          Đang tải đơn hàng...
+        </div>
+      </div>
+    );
+  }
+
+  return <AdminOrdersClient initialOrders={orders} />;
 }
