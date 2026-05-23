@@ -233,3 +233,17 @@ export async function getAffiliateTeam(): Promise<AffiliateTeamResponse> {
 
   return unwrapData<AffiliateTeamResponse>(response);
 }
+
+export async function cancelWithdrawal(id: string): Promise<unknown> {
+  const token = getRequiredToken();
+
+  const response = await apiFetch<ApiResponse<unknown> | unknown>(
+    `/affiliate/withdrawals/${id}`,
+    {
+      method: "DELETE",
+      token,
+    }
+  );
+
+  return unwrapData(response);
+}

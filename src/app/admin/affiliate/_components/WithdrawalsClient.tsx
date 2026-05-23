@@ -3,6 +3,7 @@
 import { useState, useRef, useEffect } from "react";
 import { Search, Wallet, MoreHorizontal, Check, ChevronDown, Loader2, RefreshCw, Ban, CreditCard } from "lucide-react";
 import { updateAdminWithdrawalStatus } from "@/lib/api/admin-affiliate";
+import { getApiErrorMessage } from "@/lib/format-meu";
 
 const STATUS_OPTIONS = [
     { value: 'PENDING', label: 'Chờ xử lý', color: 'orange', icon: RefreshCw },
@@ -86,11 +87,7 @@ export default function WithdrawalsClient({ initialData }: { initialData: Withdr
         } catch (error) {
             console.error("UPDATE_ADMIN_WITHDRAWAL_STATUS_ERROR:", error);
 
-            alert(
-                error instanceof Error
-                    ? error.message
-                    : "Có lỗi xảy ra khi cập nhật!"
-            );
+            alert(getApiErrorMessage(error, "Có lỗi xảy ra khi cập nhật!"));
         } finally {
             setLoading(null);
         }

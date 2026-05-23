@@ -19,7 +19,9 @@ import {
     ChevronsRight,
     Store,
     ChevronDown,
-    Wallet       
+    Wallet,
+    Award,
+    Warehouse
 } from "lucide-react";
 
 const navItems = [
@@ -35,6 +37,9 @@ const navItems = [
             { label: "Lịch sử rút tiền", href: "/account/affiliate/withdrawals", icon: Wallet },
         ]
     },
+    { label: "Ví", href: "/account/wallet", icon: Wallet },
+    { label: "Quản trị & Thưởng", href: "/account/rank", icon: Award },
+    { label: "Hub", href: "/account/hub", icon: Warehouse },
     { label: "Hồ sơ", href: "/account/profile", icon: UserCircle },
     { label: "Địa chỉ", href: "/account/addresses", icon: MapPin },
     // { label: "Ưu đãi", href: "/account/rewards", icon: Gift },

@@ -1,4 +1,18 @@
 {
+    "model": "dev-hard",
+  "env": {
+    "ANTHROPIC_BASE_URL": "http://localhost:20128",
+    "ANTHROPIC_AUTH_TOKEN": "sk-88caf31648361b45-gq7i3g-39d07b94",
+    "ANTHROPIC_API_KEY": "sk-88caf31648361b45-gq7i3g-39d07b94",
+    "ANTHROPIC_CUSTOM_MODEL_OPTION": "dev-hard",
+    "ANTHROPIC_CUSTOM_MODEL_OPTION_NAME": "9Router dev-hard",
+    "ANTHROPIC_CUSTOM_MODEL_OPTION_DESCRIPTION": "Route through local 9Router combo dev-hard",
+    "ANTHROPIC_CUSTOM_MODEL_OPTION_SUPPORTED_CAPABILITIES": "effort,thinking,adaptive_thinking,interleaved_thinking",
+    "ANTHROPIC_DEFAULT_OPUS_MODEL": "dev-hard",
+    "ANTHROPIC_DEFAULT_SONNET_MODEL": "dev-hard",
+    "ANTHROPIC_DEFAULT_HAIKU_MODEL": "dev-hard",
+    "CLAUDE_CODE_SUBAGENT_MODEL": "dev-hard"
+  },
   "permissions": {
     "allow": [
       "Bash(npx tsc *)"

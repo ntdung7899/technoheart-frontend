@@ -26,7 +26,8 @@ import {
     ChevronsRight,
     LogOut,
     ChevronDown,
-    Wallet
+    Wallet,
+    CalendarClock
 } from 'lucide-react';
 
 export default function AdminLayout({
@@ -169,6 +170,7 @@ export default function AdminLayout({
                 { label: 'Yêu cầu rút tiền', href: '/admin/affiliate/withdrawals', icon: Wallet },
             ]
         },
+        { label: 'Chu kỳ chi trả', href: '/admin/payout-cycles', icon: CalendarClock },
         { label: 'Khách hàng', href: '/admin/users', icon: Users },
         { label: 'Báo cáo', href: '/admin/analytics', icon: BarChart3 },
         { label: 'Liên hệ', href: '/admin/contact', icon: MessageSquare },
